@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ExpenseTracker</title>
+    <script>
+        (function () {
+            var savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+            }
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ExpenseTracker.styles.css" asp-append-version="true" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Toastr / SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --sidebar-bg: #0b0f19;
+            --sidebar-hover: rgba(255, 255, 255, 0.03);
+            --sidebar-active: #818cf8;
+            --sidebar-active-bg: rgba(129, 140, 248, 0.08);
+            --sidebar-text: #64748b;
+            --sidebar-text-bright: #f1f5f9;
+            --sidebar-accent: #6366f1;
+            --body-bg: #f8fafc;
+            --topbar-bg: rgba(255, 255, 255, 0.85);
+            --topbar-border: #f1f5f9;
+            --text-main: #1e293b;
+            --sidebar-w: 260px;
+            --sidebar-collapsed-w: 76px;
+            --topbar-h: 95px;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+
+        [data-theme="dark"] {
+            --body-bg: #0f172a;
+            --topbar-bg: rgba(30, 41, 59, 0.85);
+            --topbar-border: #334155;
+            --text-main: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        #sidebar {
+            width: var(--sidebar-collapsed-w);
+            min-width: var(--sidebar-collapsed-w);
+            background: var(--sidebar-bg);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            position: relative;
+            z-index: 1000;
+            border-right: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 20px 0 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        #sidebar:hover {
+            width: var(--sidebar-w);
+            min-width: var(--sidebar-w);
+        }
+
+        /* Logo Area */
+        .sidebar-logo-area {
+            height: 90px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            transition: var(--transition);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .brand-logo-container {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+            transition: var(--transition);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .brand-logo-container::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            border-radius: 18px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        #sidebar:hover .brand-logo-container::after {
+            opacity: 1;
+        }
+
+        .brand-name-text {
+            margin-left: 14px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.03em;
+            opacity: 0;
+            transform: translateX(-10px);
+            white-space: nowrap;
+            transition: var(--transition);
+            pointer-events: none;
+        }
+
+        #sidebar:hover .brand-name-text {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Sidebar Scrollable Content */
+        .sidebar-main-content {
+            flex: 1;
+            padding: 10px 14px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar-main-content::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .sidebar-main-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .nav-section {
+            margin-bottom: 28px;
+        }
+
+        .section-heading {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+            margin-bottom: 14px;
+            padding-left: 12px;
+            transition: var(--transition);
+            white-space: nowrap;
+            opacity: 0;
+        }
+
+        #sidebar:hover .section-heading {
+            opacity: 1;
+        }
+
+        /* Nav Items */
+        .nav-item-new {
+            display: flex;
+            align-items: center;
+            height: 48px;
+            border-radius: 12px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            transition: var(--transition);
+            margin-bottom: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item-new:hover {
+            color: var(--sidebar-text-bright);
+            background: var(--sidebar-hover);
+            transform: translateX(4px);
+        }
+
+        .nav-item-new.active {
+            color: var(--sidebar-active);
+            background: var(--sidebar-active-bg);
+        }
+
+        .nav-item-new.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 15%;
+            height: 70%;
+            width: 3px;
+            background: var(--sidebar-active);
+            border-radius: 0 4px 4px 0;
+            box-shadow: 4px 0 15px var(--sidebar-active);
+        }
+
+        .nav-icon-box {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .nav-icon-box i {
+            width: 20px;
+            height: 20px;
+        }
+
+        .nav-label-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        #sidebar:hover .nav-label-text {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Pulse effect for active icon */
+        .nav-item-new.active .nav-icon-box {
+            color: var(--sidebar-active);
+        }
+
+        /* Sidebar Footer (Profile) */
+        .sidebar-user-profile {
+            padding: 20px 17px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-container {
+            display: flex;
+            align-items: center;
+            height: 50px;
+            border-radius: 12px;
+            transition: var(--transition);
+            text-decoration: none;
+            overflow: hidden;
+        }
+
+        .avatar-glow {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            flex-shrink: 0;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .profile-container:hover .avatar-glow {
+            border-color: var(--sidebar-active);
+            box-shadow: 0 0 15px rgba(129, 140, 248, 0.2);
+        }
+
+        .user-details-box {
+            margin-left: 12px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        #sidebar:hover .user-details-box {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .profile-name {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .profile-role {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--sidebar-text);
+            white-space: nowrap;
+        }
+
+        /* --- MAIN CONTENT & TOPBAR --- */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            background: var(--body-bg);
+            position: relative;
+        }
+
+        .modern-topbar {
+            height: var(--topbar-h);
+            min-height: var(--topbar-h);
+            background: var(--topbar-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+            border-bottom: 1px solid var(--topbar-border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+
+        .topbar-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .topbar-profile-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            text-decoration: none;
+            height: 52px; /* Fixed height for sleek look */
+        }
+
+        .topbar-profile-card:hover {
+            background: var(--card);
+            border-color: var(--sidebar-accent);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .profile-avatar-small {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, var(--sidebar-accent) 0%, #818cf8 100%);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        .profile-info-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .profile-name-text {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .profile-role-text {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .dropdown-menu-profile {
+            border: none;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            border-radius: 16px;
+            padding: 8px;
+            margin-top: 12px !important;
+            min-width: 180px;
+            background: var(--card);
+            border: 1px solid var(--border);
+        }
+
+        .dropdown-item-custom {
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--muted);
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dropdown-item-custom:hover {
+            background: var(--bg);
+            color: var(--sidebar-accent);
+        }
+
+        .dropdown-item-custom.text-danger:hover {
+            background: #fff1f2;
+            color: #e11d48;
+        }
+
+        /* Modal Styles */
+        .modal-custom-content {
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-custom-header {
+            border: none;
+            padding: 40px 40px 10px;
+            text-align: center;
+            display: block;
+        }
+
+        .modal-custom-body {
+            padding: 10px 40px 20px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .modal-custom-footer {
+            border: none;
+            padding: 10px 40px 40px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .modal-custom-footer form {
+            flex: 1;
+            display: flex;
+        }
+
+        .btn-modal-confirm {
+            background: #e11d48;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 16px;
+            font-weight: 700;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-confirm:hover {
+            background: #be123c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(225, 29, 72, 0.3);
+        }
+
+        .btn-modal-cancel {
+            background: var(--bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 16px;
+            font-weight: 700;
+            flex: 1;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-cancel:hover {
+            background: var(--border);
+        }
+
+        .content-container {
+            padding: 40px;
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Mobile Adjustments */
+        @@media (max-width: 991.98px) {
+            #sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                bottom: 0;
+                width: 280px;
+            }
+
+            body.sidebar-open #sidebar {
+                left: 0;
+            }
+
+            .sidebar-overlay {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.5);
+                backdrop-filter: blur(4px);
+                z-index: 999;
+                opacity: 0;
+                pointer-events: none;
+                transition: var(--transition);
+            }
+
+            body.sidebar-open .sidebar-overlay {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .mobile-only-toggle {
+                display: flex !important;
+            }
+        }
+
+        .mobile-only-toggle {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <aside id="sidebar">
+            <!-- Brand Logo Section -->
+            <div class="sidebar-logo-area">
+                <div class="brand-logo-container">
+                    <i data-lucide="wallet-2"></i>
+                </div>
+                <span class="brand-name-text">ExpensePro</span>
+            </div>
+
+            <!-- Navigation Items -->
+            <div class="sidebar-main-content">
+                <div class="nav-section">
+                    <div class="section-heading">Overview</div>
+                    <a asp-controller="Expense" asp-action="Dashboard" class="nav-item-new">
+                        <div class="nav-icon-box"><i data-lucide="grid"></i></div>
+                        <span class="nav-label-text">Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="section-heading">Manage</div>
+                    <a asp-controller="Category" asp-action="Index" class="nav-item-new">
+                        <div class="nav-icon-box"><i data-lucide="tag"></i></div>
+                        <span class="nav-label-text">Expense Categories</span>
+                    </a>
+                    <a asp-controller="Expense" asp-action="Index" class="nav-item-new">
+                        <div class="nav-icon-box"><i data-lucide="receipt"></i></div>
+                        <span class="nav-label-text">Expenses</span>
+                    </a>
+                    <a asp-controller="Wallet" asp-action="Index" class="nav-item-new">
+                        <div class="nav-icon-box"><i data-lucide="wallet"></i></div>
+                        <span class="nav-label-text">Accounts</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="section-heading">Income</div>
+                    <a asp-controller="IncomeCategory" asp-action="Index" class="nav-item-new">
+                        <div class="nav-icon-box"><i data-lucide="briefcase"></i></div>
+                        <span class="nav-label-text">Income Sources</span>
+                    </a>
+                    <a asp-controller="Income" asp-action="Index" class="nav-item-new">
+                        <div class="nav-icon-box"><i data-lucide="trending-up"></i></div>
+                        <span class="nav-label-text">Income Log</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="section-heading">Analysis</div>
+                    <a asp-controller="Expense" asp-action="MonthlySummary" class="nav-item-new">
+                        <div class="nav-icon-box"><i data-lucide="calendar"></i></div>
+                        <span class="nav-label-text">Monthly Summary</span>
+                    </a>
+                    <a asp-controller="Budget" asp-action="Index" class="nav-item-new">
+                        <div class="nav-icon-box"><i data-lucide="target"></i></div>
+                        <span class="nav-label-text">Budget Planning</span>
+                    </a>
+                    <a asp-controller="Expense" asp-action="Charts" class="nav-item-new">
+                        <div class="nav-icon-box"><i data-lucide="line-chart"></i></div>
+                        <span class="nav-label-text">Insights</span>
+                    </a>
+                    <a asp-controller="Report" asp-action="Index" class="nav-item-new">
+                        <div class="nav-icon-box"><i data-lucide="file-bar-chart"></i></div>
+                        <span class="nav-label-text">Detailed Reports</span>
+                    </a>
+                    <a asp-controller="RecurringTransaction" asp-action="Index" class="nav-item-new">
+                        <div class="nav-icon-box"><i data-lucide="refresh-cw"></i></div>
+                        <span class="nav-label-text">Automations</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <div class="main-wrapper">
+            <header class="modern-topbar">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="icon-btn-top mobile-only-toggle" id="mobileToggle">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 class="topbar-title">@ViewData["Title"]</h2>
+                </div>
+
+                <div class="topbar-actions">
+                    <button class="btn btn-link text-muted p-2 me-2 rounded-circle" id="themeToggle" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--border);">
+                        <i data-lucide="moon" id="themeIcon" size="20"></i>
+                    </button>
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <div class="dropdown">
+                            <div class="topbar-profile-card" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="profile-avatar-small">
+                                    <i data-lucide="user" size="18"></i>
+                                </div>
+                                <div class="profile-info-text">
+                                    <span class="profile-name-text">@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</span>
+                                </div>
+                                <i data-lucide="chevron-down" size="14" class="text-muted ms-1"></i>
+                            </div>
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-profile">
+                                <li>
+                                    <button type="button" class="dropdown-item-custom text-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                        <i data-lucide="log-out" size="18"></i>
+                                        Sign Out
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary rounded-pill px-4 fw-700">Login</a>
+                    }
+                </div>
+            </header>
+
+            <!-- Logout Confirmation Modal -->
+            <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content modal-custom-content">
+                        <div class="modal-header modal-custom-header">
+                            <div class="mb-3">
+                                <div class="icon-box bg-danger-subtle text-danger p-3 rounded-circle d-inline-flex">
+                                    <i data-lucide="log-out" size="32"></i>
+                                </div>
+                            </div>
+                            <h4 class="fw-800 text-main-adaptive mb-0">Confirm Logout</h4>
+                        </div>
+                        <div class="modal-body modal-custom-body">
+                            Are you sure you want to sign out of your account? Any unsaved changes may be lost.
+                        </div>
+                        <div class="modal-footer modal-custom-footer">
+                            <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Cancel</button>
+                            <form asp-controller="Account" asp-action="Logout" method="post" id="logoutFormMain">
+                                <button type="submit" class="btn-modal-confirm">Sign Out</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <main class="content-container">
+                @RenderBody()
+            </main>
+            
+            <!-- Mobile Bottom Navigation -->
+            <div class="mobile-bottom-nav d-lg-none">
+                <a asp-controller="Expense" asp-action="Dashboard" class="mobile-nav-item">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Home</span>
+                </a>
+                <a asp-controller="Expense" asp-action="Index" class="mobile-nav-item">
+                    <i data-lucide="receipt"></i>
+                    <span>Log</span>
+                </a>
+                <div class="mobile-nav-item fab-container">
+                    <a asp-controller="Expense" asp-action="Create" class="mobile-fab shadow-lg">
+                        <i data-lucide="plus"></i>
+                    </a>
+                </div>
+                <a asp-controller="Budget" asp-action="Index" class="mobile-nav-item">
+                    <i data-lucide="target"></i>
+                    <span>Budget</span>
+                </a>
+                <a asp-controller="Profile" asp-action="Index" class="mobile-nav-item">
+                    <i data-lucide="user"></i>
+                    <span>Profile</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/site.js"></script>
+    
+    <!-- Global Toast System -->
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            background: 'var(--card)',
+            color: 'var(--text-main)',
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        // Auto-show TempData messages if they exist
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+            Toast.fire({
+                icon: 'success',
+                title: '@TempData["SuccessMessage"]'
+            });
+            </text>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+            Toast.fire({
+                icon: 'error',
+                title: '@TempData["ErrorMessage"]'
+            });
+            </text>
+        }
+    </script>
+    
+    @RenderSection("Scripts", required: false)
+
+    <script>
+        $(function () {
+            // Initialize Lucide icons
+            lucide.createIcons();
+
+            const body = $('body');
+            const sidebar = $('#sidebar');
+            const isMobile = () => window.matchMedia('(max-width: 991.98px)').matches;
+
+            // Active link highlighting
+            const currentPath = window.location.pathname.toLowerCase();
+            $('.nav-item-new').each(function () {
+                const linkPath = $(this).attr('href')?.toLowerCase();
+                if (currentPath === linkPath) {
+                    $(this).addClass('active');
+                }
+            });
+
+            const toggleMobileSidebar = () => {
+                body.toggleClass('sidebar-open');
+            };
+
+            $('#mobileToggle, #sidebarOverlay').on('click', toggleMobileSidebar);
+
+            // Handle window resize
+            $(window).on('resize', function () {
+                if (!isMobile()) {
+                    body.removeClass('sidebar-open');
+                }
+            });
+
+            // Theme Toggle Logic
+            const themeToggleBtn = $('#themeToggle');
+            const setTheme = (theme) => {
+                const html = $('html');
+                if (theme === 'dark') {
+                    html.attr('data-theme', 'dark');
+                    html.attr('data-bs-theme', 'dark');
+                    $('#themeIcon').replaceWith('<i data-lucide="sun" id="themeIcon" size="20"></i>');
+                } else {
+                    html.removeAttr('data-theme');
+                    html.attr('data-bs-theme', 'light');
+                    $('#themeIcon').replaceWith('<i data-lucide="moon" id="themeIcon" size="20"></i>');
+                }
+                localStorage.setItem('theme', theme);
+                lucide.createIcons();
+            };
+
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+
+            themeToggleBtn.on('click', function () {
+                const html = $('html');
+                const isDark = html.attr('data-theme') === 'dark';
+                setTheme(isDark ? 'light' : 'dark');
+            });
+        });
+
+        
+        function downloadPageAsPDF(elementId, fileName) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            // Optional: Temporarily add a class for PDF-specific styling
+            element.classList.add('pdf-export-mode');
+
+            const options = {
+                margin: [10, 10, 10, 10],
+                filename: fileName + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    letterRendering: true,
+                    scrollY: 0
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Generate PDF
+            html2pdf().set(options).from(element).save().then(() => {
+                element.classList.remove('pdf-export-mode');
+            });
+        }
+
+        async function exportWithFallback(serverUrl, fallbackElementId, fallbackFileName) {
+            try {
+                const response = await fetch(serverUrl, { method: 'GET', credentials: 'same-origin' });
+                if (!response.ok) throw new Error('Server export failed');
+
+                const blob = await response.blob();
+                const disposition = response.headers.get('content-disposition') || '';
+                const fileNameMatch = disposition.match(/filename="?([^"]+)"?/i);
+                const downloadName = fileNameMatch ? fileNameMatch[1] : fallbackFileName;
+
+                const objectUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = objectUrl;
+                link.download = downloadName;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(objectUrl);
+            } catch (error) {
+                downloadPageAsPDF(fallbackElementId, fallbackFileName.replace('.pdf', ''));
+            }
+        }
+    </script>
+</body>
+</html>
+

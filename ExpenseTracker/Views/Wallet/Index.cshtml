@@ -1,0 +1,208 @@
+@model IEnumerable<ExpenseTracker.Models.Entities.Account>
+
+@{
+    ViewData["Title"] = "My Accounts";
+}
+
+<style>
+    :root {
+        --accent: #f59e0b; /* Amber/Gold */
+        --accent-soft: rgba(245, 158, 11, 0.1);
+        --card-radius: 24px;
+    }
+
+    .account-page-wrapper {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .account-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+    }
+
+    .account-card {
+        background: var(--card);
+        border-radius: 28px;
+        padding: 30px;
+        border: 1px solid rgba(0,0,0,0.03);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .account-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .account-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(circle at top right, var(--accent-soft), transparent);
+        border-radius: 0 0 0 100%;
+    }
+
+    .account-type-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .account-balance-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+        margin-bottom: 4px;
+    }
+
+    .account-balance-value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 15px;
+    }
+
+    .account-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 15px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .btn-account-edit {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.2s;
+    }
+
+    .btn-account-edit:hover {
+        color: var(--accent);
+    }
+
+    .total-wealth-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 32px;
+        margin-bottom: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    .wealth-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+</style>
+
+<div class="account-page-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <div>
+            <h1 class="h3 fw-800 text-main-adaptive m-0">Wallets & Accounts</h1>
+            <p class="text-muted small m-0">Manage your cash, bank accounts, and investments in one place.</p>
+        </div>
+        <a asp-action="Create" class="btn btn-warning rounded-pill px-4 py-2 fw-bold shadow-sm" style="background: var(--accent); border: none; color: white">
+            <i data-lucide="plus" class="me-2" style="width: 18px"></i> New Account
+        </a>
+    </div>
+
+    @{
+        var totalWealth = Model.Sum(a => a.CurrentBalance);
+    }
+
+    <div class="total-wealth-card">
+        <div>
+            <div class="text-white-50 small fw-bold text-uppercase mb-1" style="letter-spacing: 0.1em">Total Net Worth</div>
+            <div class="wealth-value">₹ @totalWealth.ToString("N0")</div>
+        </div>
+        <div style="opacity: 0.2">
+            <i data-lucide="gem" style="width: 80px; height: 80px"></i>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i data-lucide="wallet" style="width: 60px; height: 60px; color: #cbd5e1" class="mb-3"></i>
+            <h5 class="fw-bold">No Accounts Linked</h5>
+            <p class="text-muted">Start by adding your first bank account or cash wallet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="account-grid">
+            @foreach (var item in Model)
+            {
+                <div class="account-card">
+                    @{
+                        string icon = "banknote";
+                        switch(item.Type) {
+                            case ExpenseTracker.Models.Entities.AccountType.Bank: icon = "landmark"; break;
+                            case ExpenseTracker.Models.Entities.AccountType.CreditCard: icon = "credit-card"; break;
+                            case ExpenseTracker.Models.Entities.AccountType.Savings: icon = "piggy-bank"; break;
+                            case ExpenseTracker.Models.Entities.AccountType.Investment: icon = "trending-up"; break;
+                        }
+                    }
+                    <div class="account-type-icon">
+                        <i data-lucide="@icon"></i>
+                    </div>
+                    
+                    <h5 class="fw-800 text-main-adaptive mb-1">@item.Name</h5>
+                    <div class="text-muted small mb-4">@item.Type Account</div>
+
+                    <div class="account-balance-label">Available Balance</div>
+                    <div class="account-balance-value">₹ @item.CurrentBalance.ToString("N2")</div>
+
+                    <div class="account-footer">
+                        <div class="small fw-600 @(item.CurrentBalance < 0 ? "text-danger" : "text-success")">
+                            <i data-lucide="@(item.CurrentBalance < 0 ? "alert-circle" : "shield-check")" style="width: 14px"></i>
+                            @(item.CurrentBalance < 0 ? "Overdrawn" : "Healthy")
+                        </div>
+                        <div class="d-flex gap-3">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn-account-edit">
+                                <i data-lucide="settings" style="width: 14px"></i> Settings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            lucide.createIcons();
+        });
+    </script>
+}
+

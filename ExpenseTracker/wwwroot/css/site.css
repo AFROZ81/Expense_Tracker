@@ -1,0 +1,455 @@
+/* =====================================================
+   1. IMPORTS & FONTS
+===================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* =====================================================
+   2. DESIGN TOKENS (THEME SYSTEM)
+===================================================== */
+:root {
+    /* Brand Colors */
+    --primary: #4f46e5; /* Indigo-600 */
+    --primary-hover: #4338ca; /* Indigo-700 */
+    --secondary: #10b981; /* Emerald-500 */
+    --danger: #ef4444; /* Red-500 */
+    --warning: #f59e0b; /* Amber-500 */
+    --info: #3b82f6; /* Blue-500 */
+    /* Neutrals */
+    --dark: #0f172a; /* Slate-900 */
+    --muted: #64748b; /* Slate-500 */
+    --border: #e2e8f0; /* Slate-200 */
+    --bg: #f8fafc; /* Slate-50 */
+    --card: #ffffff;
+    --text-main: #0f172a;
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    /* Layout */
+    --sidebar-width: 280px;
+    --radius-card: 16px;
+    --radius-btn: 8px;
+    --radius-input: 10px;
+}
+
+[data-theme="dark"] {
+    /* Brand Colors remain similar, adjust if needed */
+    --primary: #6366f1; /* Indigo-500 */
+    --primary-hover: #818cf8; /* Indigo-400 */
+    /* Neutrals */
+    --dark: #f8fafc; /* Invert dark for text */
+    --muted: #94a3b8; /* Slate-400 */
+    --border: #334155; /* Slate-700 */
+    --bg: #0f172a; /* Slate-900 */
+    --card: #1e293b; /* Slate-800 */
+    --text-main: #f8fafc;
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+}
+
+/* Smooth theme transitions across all pages/components */
+html, body, .card, .table, .table-responsive, .form-control, .form-select, .input-group-text,
+.modal-content, .dropdown-menu, .btn, .badge, .list-group-item, .navbar, .nav-link, .topbar-profile-card {
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* =====================================================
+   3. GLOBAL RESET & TYPOGRAPHY
+===================================================== */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%; /* Important for fixed layout */
+    background-color: var(--bg);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--dark);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    overflow: hidden; /* Prevents double scrollbars */
+}
+
+a {
+    text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    color: var(--dark);
+    letter-spacing: -0.025em;
+}
+
+/* =====================================================
+   4. APP LAYOUT (FIXED SIDEBAR LOGIC)
+===================================================== */
+.app-container {
+    display: flex;
+    height: 100vh; /* Locks container to viewport height */
+    width: 100vw;
+    overflow: hidden; /* Prevents outer scrolling */
+}
+
+/* Sidebar styles moved to _Layout.cshtml for dynamic hover expansion */
+
+/* =====================================================
+   6. MAIN CONTENT AREA (SCROLLABLE)
+===================================================== */
+.main-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg);
+    height: 100%; /* Takes full height of parent */
+    overflow-y: auto; /* ENABLE SCROLLING HERE */
+    position: relative;
+}
+
+.content-area {
+    padding: 2rem 2.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* =====================================================
+   7. CARDS & CONTAINERS
+===================================================== */
+.card {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+    .card:hover {
+        box-shadow: var(--shadow-md); /* Subtle lift on hover */
+    }
+
+.card-header {
+    background-color: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* =====================================================
+   8. TABLES
+===================================================== */
+.table-responsive {
+    border-radius: var(--radius-card);
+    background: var(--card);
+}
+
+.table {
+    margin-bottom: 0;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+    .table thead th {
+        background-color: var(--bg);
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .table tbody td {
+        padding: 18px 24px;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.925rem;
+        color: var(--dark);
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table tbody tr:hover {
+        background-color: var(--bg);
+    }
+
+/* =====================================================
+   9. BUTTONS
+===================================================== */
+.btn {
+    padding: 10px 20px;
+    border-radius: var(--radius-btn);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border: 1px solid transparent;
+    box-shadow: 0 2px 5px rgba(79, 70, 229, 0.3);
+    color: white;
+}
+
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
+    }
+
+.btn-secondary {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    color: var(--dark);
+}
+
+    .btn-secondary:hover {
+        background-color: var(--bg);
+        border-color: var(--muted);
+    }
+
+/* =====================================================
+   10. FORMS & INPUTS
+===================================================== */
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--dark);
+    margin-bottom: 8px;
+}
+
+.form-control, .form-select {
+    padding: 12px 16px;
+    border-radius: var(--radius-input);
+    border: 1px solid var(--border);
+    background-color: var(--bg);
+    color: var(--dark);
+    font-size: 0.95rem;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        outline: 0;
+    }
+
+    /* Validation Styles */
+    .input-validation-error {
+        border-color: var(--danger) !important;
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+    }
+    .field-validation-error {
+        color: var(--danger) !important;
+        font-weight: 500;
+        font-size: 0.8rem;
+    }
+    
+    /* Global Select styling */
+    select.form-select, select.modern-select {
+        cursor: pointer;
+    }
+
+/* =====================================================
+   11. UTILITIES
+===================================================== */
+.badge {
+    padding: 6px 12px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    border-radius: 20px;
+}
+
+.bg-success-subtle {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.bg-danger-subtle {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.bg-primary-subtle {
+    background-color: #e0e7ff;
+    color: #3730a3;
+}
+
+.text-muted {
+    color: var(--muted) !important;
+}
+
+.fw-bold {
+    font-weight: 700 !important;
+}
+
+.shadow-sm {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.text-main-adaptive {
+    color: var(--text-main) !important;
+}
+
+.bg-bg-adaptive {
+    background-color: var(--bg) !important;
+}
+
+/* Bootstrap compatibility layer for dark mode */
+[data-theme="dark"] .bg-light,
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .table-light,
+[data-theme="dark"] .list-group-item,
+[data-theme="dark"] .dropdown-menu,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .offcanvas,
+[data-theme="dark"] .popover {
+    background-color: var(--card) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .text-dark {
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .btn-light {
+    background-color: var(--card) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .btn-light:hover,
+[data-theme="dark"] .btn-light:focus {
+    background-color: var(--bg) !important;
+    color: var(--text-main) !important;
+    border-color: var(--muted) !important;
+}
+
+[data-theme="dark"] .input-group-text,
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--bg) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .table thead th {
+    background-color: #111c31 !important;
+}
+
+[data-theme="dark"] .table tbody tr:hover {
+    background-color: #16233a !important;
+}
+
+/* Progress Bar Helper */
+.progress-thin {
+    height: 6px;
+    background-color: #f1f5f9;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    background: var(--primary);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =====================================================
+   12. MOBILE BOTTOM NAVIGATION (D-LG-NONE)
+===================================================== */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    width: 20%;
+}
+
+.mobile-nav-item i {
+    width: 22px;
+    height: 22px;
+    margin-bottom: 4px;
+}
+
+.mobile-nav-item.active,
+.mobile-nav-item:hover {
+    color: var(--primary);
+}
+
+.fab-container {
+    position: relative;
+    top: -20px;
+}
+
+.mobile-fab {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.mobile-fab i {
+    width: 24px;
+    height: 24px;
+    color: white;
+    margin: 0;
+}
+
+.mobile-fab:hover {
+    transform: scale(1.05);
+    color: white;
+}
+
+@media (max-width: 991.98px) {
+    .main-wrapper {
+        padding-bottom: 70px; /* Account for bottom nav */
+    }
+}

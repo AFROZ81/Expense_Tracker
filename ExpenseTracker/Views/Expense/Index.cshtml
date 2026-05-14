@@ -1,0 +1,286 @@
+@model IEnumerable<ExpenseTracker.Models.Entities.Expense>
+
+@{
+    ViewData["Title"] = "Expenses";
+}
+
+<style>
+    :root {
+        --accent: #6366f1;
+        --accent-soft: rgba(99, 102, 241, 0.08);
+        --card-radius: 24px;
+    }
+
+    .expense-page-wrapper {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .premium-card {
+        background: var(--card);
+        border-radius: var(--card-radius);
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    .premium-card-header {
+        padding: 24px 32px;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modern-table {
+        margin-bottom: 0;
+    }
+
+    .modern-table thead th {
+        background: var(--bg);
+        padding: 18px 32px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .modern-table tbody td {
+        padding: 20px 32px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+    }
+
+    .date-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .calendar-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.6rem;
+        font-weight: 800;
+    }
+
+    .calendar-icon span { font-size: 0.9rem; margin-top: -2px; }
+
+    .category-pill {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: var(--bg);
+        color: var(--text-main);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--border);
+    }
+
+    .amount-text {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .action-btn-group {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--muted);
+        text-decoration: none;
+    }
+
+    .btn-edit:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+    .btn-delete:hover { background: var(--card); color: #ef4444; border-color: #fecaca; }
+
+    /* Modal Styling */
+    .premium-modal .modal-content { border-radius: 30px; border: none; box-shadow: 0 25px 70px rgba(0,0,0,0.2); }
+    .modal-confirm-icon { width: 80px; height: 80px; background: var(--card); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+    .btn-modal-confirm { background: #ef4444; color: white; border: none; padding: 12px 30px; border-radius: 14px; font-weight: 700; transition: all 0.2s ease; }
+    .btn-modal-confirm:hover { background: #dc2626; transform: translateY(-2px); color: white; }
+    .btn-modal-cancel { background: var(--border); color: var(--muted); border: none; padding: 12px 30px; border-radius: 14px; font-weight: 700; }
+</style>
+
+<div class="expense-page-wrapper" id="expenseHistoryReport">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <div>
+            <h1 class="h3 fw-800 text-main-adaptive m-0">Transaction History</h1>
+            <p class="text-muted small m-0">Track every penny you spend and manage your finances better.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-light rounded-pill px-4 py-2 fw-bold shadow-sm border" onclick="exportWithFallback('@Url.Action("ExpensesPdf", "Export")', 'expenseHistoryReport', 'Transaction_History.pdf')">
+                <i data-lucide="download" class="me-2" style="width: 18px"></i> Download PDF
+            </button>
+            <a class="btn btn-light rounded-pill px-4 py-2 fw-bold shadow-sm border" href="@Url.Action("ExpensesExcel", "Export")">
+                <i data-lucide="sheet" class="me-2" style="width: 18px"></i> Download Excel
+            </a>
+            <a asp-action="Create" class="btn btn-indigo rounded-pill px-4 py-2 fw-bold shadow-sm" style="background: var(--accent); color: white">
+                <i data-lucide="plus" class="me-2" style="width: 18px"></i> Add Expense
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Table Card -->
+    <div class="premium-card">
+        <div class="premium-card-header">
+            <h5 class="fw-700 m-0 d-flex align-items-center gap-2">
+                <i data-lucide="receipt" style="width: 20px; color: var(--accent)"></i>
+                Recent Transactions
+            </h5>
+            <span class="badge bg-light text-main-adaptive rounded-pill px-3 py-2 border">
+                @Model.Count() Records Found
+            </span>
+        </div>
+
+        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+            <table class="table modern-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th class="text-center">Amount</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5">
+                                <div class="text-center py-5">
+                                    <i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1" class="mb-3"></i>
+                                    <h6 class="fw-bold">No Expenses Recorded</h6>
+                                    <p class="text-muted small">Your transaction list is currently empty.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.OrderByDescending(x => x.ExpenseDate))
+                        {
+                            <tr>
+                                <td>
+                                    <div class="date-box">
+                                        <div class="calendar-icon">
+                                            @item.ExpenseDate.ToString("MMM")
+                                            <span>@item.ExpenseDate.ToString("dd")</span>
+                                        </div>
+                                        <div>
+                                            <span class="fw-700 text-main-adaptive d-block">@item.ExpenseDate.ToString("yyyy")</span>
+                                            <span class="text-muted small">@item.ExpenseDate.DayOfWeek</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="category-pill">
+                                        <i data-lucide="hash" style="width: 12px"></i>
+                                        @(item.Category?.Name ?? "General")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-main-adaptive fw-500 text-truncate d-inline-block" style="max-width: 200px;" title="@item.Description">
+                                        @(string.IsNullOrWhiteSpace(item.Description) ? "No description" : item.Description)
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="amount-text">₹ @item.Amount.ToString("N2")</span>
+                                </td>
+                                <td>
+                                    <div class="action-btn-group">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit" title="Edit Transaction">
+                                            <i data-lucide="pencil" style="width: 16px"></i>
+                                        </a>
+                                        <button type="button" 
+                                                class="btn-action btn-delete delete-trigger" 
+                                                data-id="@item.Id"
+                                                data-amount="@item.Amount.ToString("N2")"
+                                                data-date="@item.ExpenseDate.ToString("dd MMM yyyy")"
+                                                title="Delete Transaction">
+                                            <i data-lucide="trash-2" style="width: 16px"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Premium Delete Confirmation Modal -->
+<div class="modal fade premium-modal" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content" style="background: var(--card); border: 1px solid var(--border);">
+            <div class="modal-body p-5 text-center">
+                <div class="modal-confirm-icon">
+                    <i data-lucide="alert-triangle" style="width: 40px; height: 40px"></i>
+                </div>
+                <h4 class="fw-800 text-main-adaptive mb-2">Delete Expense?</h4>
+                <p class="text-muted mb-4">Are you sure you want to delete the expense of <strong id="deleteTargetAmount" class="text-danger"></strong> from <span id="deleteTargetDate" class="fw-bold text-main-adaptive"></span>?</p>
+                
+                <div class="d-flex gap-3 justify-content-center">
+                    <button type="button" class="btn-modal-cancel flex-grow-1" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmDeleteBtn" href="#" class="btn-modal-confirm flex-grow-1 text-decoration-none">Confirm</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            lucide.createIcons();
+
+            $('.delete-trigger').on('click', function() {
+                const id = $(this).data('id');
+                const amount = $(this).data('amount');
+                const date = $(this).data('date');
+                const deleteUrl = `/Expense/Delete/${id}`;
+
+                $('#deleteTargetAmount').text('₹ ' + amount);
+                $('#deleteTargetDate').text(date);
+                $('#confirmDeleteBtn').attr('href', deleteUrl);
+                
+                new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+            });
+        });
+    </script>
+}

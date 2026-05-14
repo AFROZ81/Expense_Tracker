@@ -1,0 +1,324 @@
+@model IEnumerable<ExpenseTracker.Models.Entities.IncomeCategory>
+
+@{
+    ViewData["Title"] = "Income Categories";
+}
+
+<style>
+    :root {
+        --accent: #10b981; /* Green for Income */
+        --accent-soft: rgba(16, 185, 129, 0.1);
+        --card-radius: 24px;
+    }
+
+    .category-page-wrapper {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .premium-card {
+        background: var(--card);
+        border-radius: var(--card-radius);
+        border: 1px solid rgba(0,0,0,0.03);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .premium-card-header {
+        padding: 24px 32px;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modern-table {
+        margin-bottom: 0;
+    }
+
+    .modern-table thead th {
+        background: var(--bg);
+        padding: 18px 32px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .modern-table tbody td {
+        padding: 20px 32px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+        color: var(--text-main);
+    }
+
+    .modern-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .modern-table tbody tr:hover {
+        background-color: #fcfdfe;
+    }
+
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .status-active {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-inactive {
+        background: var(--border);
+        color: var(--muted);
+    }
+
+    .action-btn-group {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--muted);
+        text-decoration: none;
+    }
+
+    .btn-edit:hover {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-color: var(--accent);
+    }
+
+    .btn-delete:hover {
+        background: var(--card);
+        color: #ef4444;
+        border-color: #fecaca;
+    }
+
+    .category-icon-box {
+        width: 32px;
+        height: 32px;
+        background: var(--accent-soft);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+    }
+
+    /* Modal Styling */
+    .premium-modal .modal-content {
+        border-radius: 30px;
+        border: none;
+        box-shadow: 0 25px 70px rgba(0,0,0,0.2);
+    }
+
+    .modal-confirm-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--card);
+        color: #ef4444;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+    }
+
+    .btn-modal-confirm {
+        background: #ef4444;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 14px;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+
+    .btn-modal-confirm:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
+        color: white;
+    }
+
+    .btn-modal-cancel {
+        background: var(--border);
+        color: var(--muted);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 14px;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+
+    .btn-modal-cancel:hover {
+        background: #e2e8f0;
+        color: var(--text-main);
+    }
+</style>
+
+<div class="category-page-wrapper">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <div>
+            <h1 class="h3 fw-800 text-main-adaptive m-0">Income Categories</h1>
+            <p class="text-muted small m-0">Organize your income sources (Salary, Freelance, etc.).</p>
+        </div>
+        <a asp-action="Create" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow-sm" style="background: var(--accent); border: none; color: white">
+            <i data-lucide="plus" class="me-2" style="width: 18px"></i> New Category
+        </a>
+    </div>
+
+    <!-- Main Table Card -->
+    <div class="premium-card">
+        <div class="premium-card-header">
+            <h5 class="fw-700 m-0 d-flex align-items-center gap-2">
+                <i data-lucide="briefcase" style="width: 20px; color: var(--accent)"></i>
+                All Income Sources
+            </h5>
+            <span class="badge bg-light text-main-adaptive rounded-pill px-3 py-2 border">
+                @Model.Count() Active Lists
+            </span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table modern-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Source Name</th>
+                        <th>Status</th>
+                        <th class="text-end">Management</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="3">
+                                <div class="text-center py-5">
+                                    <i data-lucide="folder-open" style="width: 48px; height: 48px; color: #cbd5e1" class="mb-3"></i>
+                                    <h6 class="fw-bold">No Categories Found</h6>
+                                    <p class="text-muted small">Start by creating your first income category above.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="category-icon-box">
+                                            <i data-lucide="plus" style="width: 16px"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-700 text-main-adaptive d-block">@item.Name</span>
+                                            <span class="text-muted small">Category ID: #@item.Id</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="status-badge status-active">
+                                            <i data-lucide="check-circle-2" style="width: 14px"></i> Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-inactive">
+                                            <i data-lucide="slash" style="width: 14px"></i> Inactive
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="action-btn-group">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit" title="Edit Category">
+                                            <i data-lucide="pencil" style="width: 16px"></i>
+                                        </a>
+                                        <button type="button" 
+                                                class="btn-action btn-delete delete-trigger" 
+                                                data-id="@item.Id"
+                                                data-name="@item.Name"
+                                                title="Delete Category">
+                                            <i data-lucide="trash-2" style="width: 16px"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Premium Delete Confirmation Modal -->
+<div class="modal fade premium-modal" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content">
+            <div class="modal-body p-5 text-center">
+                <div class="modal-confirm-icon">
+                    <i data-lucide="alert-circle" style="width: 40px; height: 40px"></i>
+                </div>
+                <h4 class="fw-800 text-main-adaptive mb-2">Delete Category?</h4>
+                <p class="text-muted mb-4">Are you sure you want to delete <strong id="deleteTargetName" class="text-main-adaptive"></strong>? This action cannot be undone.</p>
+                
+                <div class="d-flex gap-3 justify-content-center">
+                    <button type="button" class="btn-modal-cancel flex-grow-1" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmDeleteBtn" href="#" class="btn-modal-confirm flex-grow-1 text-decoration-none">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            lucide.createIcons();
+
+            // Handle Delete Modal
+            $('.delete-trigger').on('click', function() {
+                const id = $(this).data('id');
+                const name = $(this).data('name');
+                const deleteUrl = `/IncomeCategory/Delete/${id}`;
+
+                $('#deleteTargetName').text(name);
+                $('#confirmDeleteBtn').attr('href', deleteUrl);
+                
+                const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                modal.show();
+            });
+        });
+    </script>
+}
+

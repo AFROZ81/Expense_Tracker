@@ -1,0 +1,149 @@
+@model ExpenseTracker.Models.Entities.Account
+
+@{
+    ViewData["Title"] = "Edit Account";
+}
+
+<style>
+    :root {
+        --accent: #f59e0b;
+        --card-radius: 24px;
+    }
+
+    .form-container {
+        animation: fadeIn 0.5s ease-out;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .premium-card {
+        background: var(--card);
+        border-radius: var(--card-radius);
+        border: 1px solid rgba(0,0,0,0.03);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        padding: 40px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin-bottom: 10px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 14px;
+        padding: 12px 20px;
+        border: 1px solid var(--border);
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+    }
+
+    .btn-submit {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 14px;
+        font-weight: 700;
+        transition: all 0.2s ease;
+        width: 100%;
+    }
+
+    .btn-submit:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(245, 158, 11, 0.2);
+        color: white;
+    }
+
+    .btn-delete-link {
+        color: #ef4444;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+
+    .btn-delete-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="form-container">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a asp-action="Index" class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px">
+            <i data-lucide="arrow-left" style="width: 20px; color: var(--muted);"></i>
+        </a>
+        <h1 class="h3 fw-800 text-main-adaptive m-0">Edit Account</h1>
+    </div>
+
+    <div class="premium-card">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CurrentBalance" />
+            
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            
+            <div class="mb-4">
+                <label asp-for="Name" class="form-label">Account Name</label>
+                <input asp-for="Name" class="form-control" placeholder="e.g. HDFC Savings, Wallet Cash" />
+                <span asp-validation-for="Name" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Type" class="form-label">Account Type</label>
+                <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<ExpenseTracker.Models.Entities.AccountType>()"></select>
+                <span asp-validation-for="Type" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="InitialBalance" class="form-label">Starting Balance</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light">₹</span>
+                    <input asp-for="InitialBalance" class="form-control" type="number" step="0.01" placeholder="0.00" />
+                </div>
+                <span asp-validation-for="InitialBalance" class="text-danger small"></span>
+                <p class="text-muted small mt-1">Note: Adjusting this will shift the current balance by the same difference.</p>
+            </div>
+
+            <div class="mb-4 d-flex align-items-center gap-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" asp-for="IsActive">
+                    <label class="form-check-label fw-600 text-main-adaptive" asp-for="IsActive">Is Active?</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit mt-2">
+                Save Adjustments
+            </button>
+        </form>
+
+        <div class="mt-4 pt-4 border-top text-center">
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn-delete-link" onclick="return confirm('Are you sure you want to delete this account? It must have no transactions.')">
+                <i data-lucide="trash-2" style="width: 14px"></i> Permanently Delete Account
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function() {
+            lucide.createIcons();
+        });
+    </script>
+}
+

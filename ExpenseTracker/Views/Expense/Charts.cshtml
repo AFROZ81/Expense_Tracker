@@ -1,0 +1,264 @@
+@{
+    ViewData["Title"] = "Financial Analytics";
+    var pie = (ExpenseTracker.Models.ViewModels.ChartDataViewModel)ViewBag.PieChart;
+    var bar = (ExpenseTracker.Models.ViewModels.ChartDataViewModel)ViewBag.BarChart;
+
+    var maxCategory = pie.Labels
+        .Zip(pie.Values, (label, value) => new { label, value })
+        .OrderByDescending(x => x.value)
+        .FirstOrDefault();
+}
+
+<style>
+    :root {
+        --accent: #6366f1;
+        --card-radius: 30px;
+    }
+
+    .analytics-page-wrapper {
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .premium-chart-card {
+        background: var(--card);
+        border-radius: var(--card-radius);
+        padding: 35px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border);
+        height: 100%;
+        transition: transform 0.3s ease;
+    }
+
+    .premium-chart-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .chart-header {
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chart-icon-box {
+        width: 44px;
+        height: 44px;
+        background: var(--accent-soft, #f5f3ff);
+        color: var(--accent);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .chart-canvas-container {
+        position: relative;
+        height: 350px;
+        width: 100%;
+    }
+
+    /* Insight Banner */
+    .insight-banner {
+        background: var(--card);
+        border: 1px solid #fee2e2;
+        border-radius: 20px;
+        padding: 20px 30px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 35px;
+    }
+
+    .insight-icon {
+        width: 50px;
+        height: 50px;
+        background: #fff;
+        color: #ef4444;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.1);
+    }
+</style>
+
+<div class="analytics-page-wrapper" id="analyticsReport">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <div>
+            <h1 class="h3 fw-800 text-main-adaptive m-0">Visual Insights</h1>
+            <p class="text-muted small m-0">Understand your financial patterns with interactive data visualization.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-light rounded-pill px-4 py-2 fw-bold shadow-sm border" onclick="downloadPageAsPDF('analyticsReport', 'Financial_Analytics_Report')">
+                <i data-lucide="download" class="me-2" style="width: 18px"></i> Download PDF
+            </button>
+            <button class="btn btn-light rounded-pill px-4 py-2 fw-bold shadow-sm border" type="button">
+                <i data-lucide="calendar" class="me-2" style="width: 18px"></i> Last 6 Months
+            </button>
+        </div>
+    </div>
+
+    @if (maxCategory != null)
+    {
+        <div class="insight-banner">
+            <div class="insight-icon">
+                <i data-lucide="trending-up" style="width: 24px"></i>
+            </div>
+            <div>
+                <h6 class="fw-800 text-main-adaptive m-0">Spending Insight</h6>
+                <p class="text-muted small m-0">Your highest spending is in <strong class="text-danger">@maxCategory.label</strong> which accounts for <strong>₹ @maxCategory.value.ToString("N0")</strong> of your total budget.</p>
+            </div>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Doughnut Chart -->
+        <div class="col-lg-5">
+            <div class="premium-chart-card">
+                <div class="chart-header">
+                    <div>
+                        <h6 class="fw-800 m-0 text-main-adaptive">Category Share</h6>
+                        <p class="text-muted small m-0">Proportional spending distribution</p>
+                    </div>
+                    <div class="chart-icon-box">
+                        <i data-lucide="pie-chart" style="width: 20px"></i>
+                    </div>
+                </div>
+                <div class="chart-canvas-container">
+                    <canvas id="categoryDoughnut"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bar Chart -->
+        <div class="col-lg-7">
+            <div class="premium-chart-card">
+                <div class="chart-header">
+                    <div>
+                        <h6 class="fw-800 m-0 text-main-adaptive">Expenditure Trend</h6>
+                        <p class="text-muted small m-0">Monthly spending comparison</p>
+                    </div>
+                    <div class="chart-icon-box" style="background: #eef2ff; color: #4f46e5;">
+                        <i data-lucide="bar-chart-3" style="width: 20px"></i>
+                    </div>
+                </div>
+                <div class="chart-canvas-container">
+                    <canvas id="trendBarChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+@section Scripts {
+    <script>
+        $(function() {
+            lucide.createIcons();
+
+            // --- Category Doughnut ---
+            const doughnutCtx = document.getElementById('categoryDoughnut').getContext('2d');
+            const pLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(pie.Labels));
+            const pValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(pie.Values));
+            
+            const pColors = ['#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#f97316'];
+
+            new Chart(doughnutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: pLabels,
+                    datasets: [{
+                        data: pValues,
+                        backgroundColor: pColors,
+                        borderWidth: 5,
+                        borderColor: '#ffffff',
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 25,
+                                font: { family: 'Inter', size: 12, weight: '600' }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 15,
+                            usePointStyle: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ₹ ' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // --- Trend Bar Chart ---
+            const barCtx = document.getElementById('trendBarChart').getContext('2d');
+            const bLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(bar.Labels));
+            const bValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(bar.Values));
+
+            const gradient = barCtx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, '#6366f1');
+            gradient.addColorStop(1, 'rgba(99, 102, 241, 0.1)');
+
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: bLabels,
+                    datasets: [{
+                        label: 'Total Spent',
+                        data: bValues,
+                        backgroundColor: gradient,
+                        borderRadius: 12,
+                        borderSkipped: false,
+                        barPercentage: 0.5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 15,
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ₹ ' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9', borderDash: [5, 5] },
+                            ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#475569' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

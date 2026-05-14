@@ -1,0 +1,234 @@
+@model ExpenseTracker.Models.Entities.Expense
+
+@{
+    ViewData["Title"] = "Edit Transaction";
+}
+
+<style>
+    :root {
+        --accent: #6366f1;
+        --accent-hover: #4f46e5;
+    }
+
+    .form-page-wrapper {
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @@keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .premium-form-card {
+        background: var(--card);
+        border-radius: 30px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border);
+        overflow: hidden;
+    }
+
+    .card-gradient-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        padding: 40px;
+        text-align: center;
+        color: white;
+    }
+
+    .card-gradient-header i {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        border-radius: 18px;
+        margin-bottom: 15px;
+        display: inline-block;
+    }
+
+    .form-body {
+        padding: 40px;
+    }
+
+    /* Modern Inputs */
+    .modern-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .modern-input-group {
+        position: relative;
+        margin-bottom: 25px;
+    }
+
+    .modern-input, .modern-select {
+        width: 100%;
+        padding: 14px 20px 14px 50px;
+        border-radius: 16px;
+        border: 1.5px solid var(--border);
+        background: var(--bg);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        outline: none;
+        appearance: none;
+    }
+
+    .modern-input:focus, .modern-select:focus {
+        border-color: var(--accent);
+        background: var(--card);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .input-icon-left {
+        position: absolute;
+        left: 18px;
+        top: 42px; /* Adjusted for label */
+        color: #94a3b8;
+        transition: all 0.2s ease;
+    }
+
+    .modern-input:focus + .input-icon-left, .modern-select:focus + .input-icon-left {
+        color: var(--accent);
+    }
+
+    .amount-input-box {
+        position: relative;
+    }
+
+    .currency-symbol {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: 800;
+        color: var(--muted);
+        font-size: 1.2rem;
+    }
+
+    .amount-field {
+        padding-left: 45px !important;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    /* Buttons */
+    .btn-save {
+        background: var(--accent);
+        color: white;
+        padding: 14px 30px;
+        border-radius: 16px;
+        font-weight: 700;
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-save:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-back {
+        color: var(--muted);
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-back:hover {
+        color: var(--text-main);
+        transform: translateX(-4px);
+    }
+</style>
+
+<div class="form-page-wrapper">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="premium-form-card">
+                <div class="card-gradient-header">
+                    <i data-lucide="edit-3" style="width: 32px; height: 32px"></i>
+                    <h2 class="fw-800 m-0">Modify Transaction</h2>
+                    <p class="text-white-50 m-0 small">Update the record for transaction #@Model.Id</p>
+                </div>
+
+                <div class="form-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="modern-input-group">
+                                    <label asp-for="ExpenseDate" class="modern-label">Transaction Date</label>
+                                    <input asp-for="ExpenseDate" type="date" class="modern-input" value="@Model.ExpenseDate.ToString("yyyy-MM-dd")" />
+                                    <i data-lucide="calendar" class="input-icon-left" style="width: 18px"></i>
+                                    <span asp-validation-for="ExpenseDate" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="modern-input-group">
+                                    <label asp-for="CategoryId" class="modern-label">Category</label>
+                                    <select asp-for="CategoryId" class="modern-select" asp-items="ViewBag.CategoryList"></select>
+                                    <i data-lucide="tag" class="input-icon-left" style="width: 18px"></i>
+                                    <span asp-validation-for="CategoryId" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="modern-input-group">
+                                    <label asp-for="AccountId" class="modern-label">Payment Account / Wallet</label>
+                                    <select asp-for="AccountId" class="modern-select" asp-items="ViewBag.AccountList">
+                                        <option value="">-- Select Account --</option>
+                                    </select>
+                                    <i data-lucide="wallet" class="input-icon-left" style="width: 18px"></i>
+                                    <span asp-validation-for="AccountId" class="text-danger small mt-1 d-block"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modern-input-group mt-3">
+                            <label asp-for="Amount" class="modern-label">Amount Spent</label>
+                            <div class="amount-input-box">
+                                <span class="currency-symbol">₹</span>
+                                <input asp-for="Amount" class="modern-input amount-field" placeholder="0.00" />
+                            </div>
+                            <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="modern-input-group">
+                            <label asp-for="Description" class="modern-label">Notes (Optional)</label>
+                            <textarea asp-for="Description" class="modern-input" style="height: 120px; padding-left: 20px; resize: none;" placeholder="What was this expense for?"></textarea>
+                            <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-5">
+                            <a asp-action="Index" class="btn-back">
+                                <i data-lucide="arrow-left" style="width: 18px"></i>
+                                Back to history
+                            </a>
+                            <button type="submit" class="btn-save shadow-lg">
+                                <i data-lucide="save" style="width: 18px"></i>
+                                Update Record
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            lucide.createIcons();
+        });
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,121 @@
+@model ExpenseTracker.Models.ViewModels.FullReportViewModel
+
+@{
+    ViewData["Title"] = "Financial Report";
+}
+
+<div class="container-fluid py-4" id="reportContent">
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <div>
+            <h2 class="fw-800 text-dark mb-1">Financial Statement</h2>
+            <p class="text-muted">Period: @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn btn-outline-primary rounded-3 px-4">
+                <i data-lucide="printer" class="me-2"></i> Print
+            </button>
+            <button id="downloadPdf" class="btn btn-primary rounded-3 px-4 shadow-sm">
+                <i data-lucide="download-cloud" class="me-2"></i> Export PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="glass-card p-4 border-start border-primary border-4">
+                <div class="text-muted small fw-600 text-uppercase mb-1">Total Income</div>
+                <h3 class="fw-800 text-success">@Model.TotalIncome.ToString("C")</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card p-4 border-start border-danger border-4">
+                <div class="text-muted small fw-600 text-uppercase mb-1">Total Expenses</div>
+                <h3 class="fw-800 text-danger">@Model.TotalExpense.ToString("C")</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="glass-card p-4 border-start border-indigo border-4">
+                <div class="text-muted small fw-600 text-uppercase mb-1">Net Savings</div>
+                <h3 class="fw-800 text-primary">@Model.NetSavings.ToString("C")</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Table -->
+    <div class="glass-card p-4">
+        <h5 class="fw-700 mb-4">Transaction Details</h5>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="border-0">Date</th>
+                        <th class="border-0">Description</th>
+                        <th class="border-0">Category</th>
+                        <th class="border-0">Account</th>
+                        <th class="border-0 text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var income in Model.Incomes)
+                    {
+                        <tr>
+                            <td>@income.IncomeDate.ToShortDateString()</td>
+                            <td>@income.Description</td>
+                            <td><span class="badge bg-success-subtle text-success border border-success-subtle">@income.IncomeCategory?.Name</span></td>
+                            <td>@income.Account?.Name</td>
+                            <td class="text-end text-success fw-600">+ @income.Amount.ToString("N2")</td>
+                        </tr>
+                    }
+                    @foreach (var expense in Model.Expenses)
+                    {
+                        <tr>
+                            <td>@expense.ExpenseDate.ToShortDateString()</td>
+                            <td>@expense.Description</td>
+                            <td><span class="badge bg-danger-subtle text-danger border border-danger-subtle">@expense.Category?.Name</span></td>
+                            <td>@expense.Account?.Name</td>
+                            <td class="text-end text-danger fw-600">- @expense.Amount.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="bg-light">
+                    <tr>
+                        <th colspan="4" class="text-end">Balance for Period</th>
+                        <th class="text-end fw-800 fs-5">@Model.NetSavings.ToString("C")</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('downloadPdf').addEventListener('click', function () {
+            const element = document.getElementById('reportContent');
+            const options = {
+                margin: 10,
+                filename: 'Financial_Report_@(Model.StartDate.ToString("yyyyMMdd")).pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Temporarily hide buttons for PDF
+            const buttons = document.querySelectorAll('.no-print');
+            buttons.forEach(b => b.style.display = 'none');
+
+            html2pdf().set(options).from(element).save().then(() => {
+                buttons.forEach(b => b.style.display = 'flex');
+            });
+        });
+    </script>
+}
+
+<style>
+    @@media print {
+        .no-print { display: none !important; }
+        .glass-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+        body { background: white !important; }
+    }
+</style>

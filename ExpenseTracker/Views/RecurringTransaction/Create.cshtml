@@ -1,0 +1,81 @@
+@model ExpenseTracker.Models.Entities.RecurringTransaction
+
+@{
+    ViewData["Title"] = "New Recurring Rule";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="glass-card p-5">
+                <h3 class="fw-800 text-main-adaptive mb-4 text-center">Setup Automated Transaction</h3>
+                
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="Type" class="form-label fw-700 small text-muted text-uppercase">Type</label>
+                            <select asp-for="Type" class="form-select rounded-3 p-3 fw-600" id="typeSelector" asp-items="Html.GetEnumSelectList<ExpenseTracker.Models.Entities.TransactionType>()"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Frequency" class="form-label fw-700 small text-muted text-uppercase">Frequency</label>
+                            <select asp-for="Frequency" class="form-select rounded-3 p-3 fw-600" asp-items="Html.GetEnumSelectList<ExpenseTracker.Models.Entities.Frequency>()"></select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Description" class="form-label fw-700 small text-muted text-uppercase">Description</label>
+                        <input asp-for="Description" class="form-control rounded-3 p-3 fw-600" placeholder="e.g., Netflix Subscription" />
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Amount" class="form-label fw-700 small text-muted text-uppercase">Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 rounded-start-3">₹</span>
+                            <input asp-for="Amount" class="form-control border-start-0 rounded-end-3 p-3 fw-800" placeholder="0.00" />
+                        </div>
+                        <span asp-validation-for="Amount" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6" id="expenseCategoryGroup">
+                            <label class="form-label fw-700 small text-muted text-uppercase">Expense Category</label>
+                            <select name="ExpenseCategoryId" class="form-select rounded-3 p-3 fw-600" asp-items="ViewBag.ExpenseCategoryList"></select>
+                        </div>
+                        <div class="col-md-6 d-none" id="incomeCategoryGroup">
+                            <label class="form-label fw-700 small text-muted text-uppercase">Income Category</label>
+                            <select name="IncomeCategoryId" class="form-select rounded-3 p-3 fw-600" asp-items="ViewBag.IncomeCategoryList"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="AccountId" class="form-label fw-700 small text-muted text-uppercase">Pay From/To Account</label>
+                            <select asp-for="AccountId" class="form-select rounded-3 p-3 fw-600" asp-items="ViewBag.AccountList"></select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="StartDate" class="form-label fw-700 small text-muted text-uppercase">Start From</label>
+                        <input asp-for="StartDate" type="date" class="form-control rounded-3 p-3 fw-600" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="d-flex gap-3 mt-5">
+                        <a asp-action="Index" class="btn btn-light w-100 py-3 rounded-3 fw-700">Cancel</a>
+                        <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-700 shadow-sm">Save Rule</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('typeSelector').addEventListener('change', function() {
+            const isExpense = this.value == "0"; // Assuming Expense is 0
+            document.getElementById('expenseCategoryGroup').classList.toggle('d-none', !isExpense);
+            document.getElementById('incomeCategoryGroup').classList.toggle('d-none', isExpense);
+        });
+    </script>
+}
+

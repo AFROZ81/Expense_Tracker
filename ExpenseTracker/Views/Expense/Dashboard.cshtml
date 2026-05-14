@@ -1,0 +1,566 @@
+@model ExpenseTracker.Models.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Financial Dashboard";
+}
+
+<style>
+    :root {
+        --accent: #6366f1;
+        --accent-dark: #4f46e5;
+        --success: #0cda3fff;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --glass: rgba(255, 255, 255, 0.7);
+        --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .dashboard-wrapper {
+        padding-bottom: 40px;
+    }
+
+    .animate-item {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @@keyframes fadeUp {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Welcome Banner */
+    .welcome-banner {
+        background: var(--card);
+        border-radius: 24px;
+        padding: 30px;
+        margin-bottom: 32px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .welcome-text h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 8px;
+        letter-spacing: -0.02em;
+    }
+
+    .current-date {
+        color: var(--muted);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Stat Cards */
+    .stat-card {
+        background: var(--card);
+        border-radius: 24px;
+        padding: 24px;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border);
+        box-shadow: var(--card-shadow);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card.hero-stat {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        color: white;
+    }
+
+    .stat-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        font-size: 1.25rem;
+    }
+
+    .hero-stat .stat-icon-wrapper {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+        color: var(--text-main);
+        letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .hero-stat .stat-label {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .trend-indicator {
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-top: 12px;
+    }
+
+    .trend-up { background: #dcfce7; color: #15803d; }
+    .trend-down { background: #fee2e2; color: #b91c1c; }
+
+    /* Category Breakdown List */
+    .breakdown-card {
+        background: var(--card);
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border);
+    }
+
+    .breakdown-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .category-list-item {
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .category-list-item:last-child {
+        border-bottom: none;
+    }
+
+    .category-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .category-name {
+        font-weight: 600;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .category-amount {
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .progress-track {
+        height: 8px;
+        background: var(--bg);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 10px;
+        transition: width 1s ease-in-out;
+    }
+
+    /* Floating Quick Actions */
+    .quick-action-card {
+        background: var(--bg);
+        border: 2px dashed var(--border);
+        border-radius: 24px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .quick-action-card:hover {
+        background: var(--card);
+        border-color: var(--accent);
+        transform: scale(1.02);
+    }
+
+    .action-icon {
+        width: 44px;
+        height: 44px;
+        background: var(--card);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        color: var(--accent);
+    }
+
+    @@media (max-width: 768px) {
+        .welcome-banner {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+    }
+</style>
+
+<div class="dashboard-wrapper" id="dashboardReport">
+    <!-- Welcome Header -->
+    <div class="welcome-banner animate-item" style="animation-delay: 0.05s;">
+        <div class="welcome-text">
+            <h1 id="greetingText">Good Day, @(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</h1>
+            <div class="current-date">
+                <i data-lucide="calendar"></i>
+                <span id="dateDisplay"></span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-light rounded-pill px-4 py-2 fw-bold shadow-sm" onclick="downloadPageAsPDF('dashboardReport', 'Expense_Dashboard_Report')">
+                <i data-lucide="download" class="me-2" style="width: 18px"></i> Download PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Key Metrics Grid -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-4 col-md-12 animate-item" style="animation-delay: 0.1s;">
+            <div class="stat-card hero-stat">
+                <div class="stat-icon-wrapper">
+                    <i data-lucide="wallet"></i>
+                </div>
+                <div class="stat-label">Net Balance</div>
+                <div class="stat-value">₹ @Model.NetBalance.ToString("N0")</div>
+                <div class="trend-indicator @(Model.NetBalance >= 0 ? "trend-up" : "trend-down")">
+                    <i data-lucide="@(Model.NetBalance >= 0 ? "shield-check" : "alert-circle")" style="width: 12px"></i> 
+                    @(Model.NetBalance >= 0 ? "Surplus" : "Deficit") available
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 animate-item" style="animation-delay: 0.2s;">
+            <div class="stat-card">
+                <div class="stat-icon-wrapper" style="background: var(--card); color: #10b981;">
+                    <i data-lucide="trending-up"></i>
+                </div>
+                <div class="stat-label">Income (This Month)</div>
+                <div class="stat-value">₹ @Model.ThisMonthIncome.ToString("N0")</div>
+                <div class="text-muted small mt-2">
+                    Total: ₹ @Model.TotalIncome.ToString("N0")
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 animate-item" style="animation-delay: 0.3s;">
+            <div class="stat-card">
+                <div class="stat-icon-wrapper" style="background: var(--card); color: #ef4444;">
+                    <i data-lucide="trending-down"></i>
+                </div>
+                <div class="stat-label">Expenses (This Month)</div>
+                <div class="stat-value">₹ @Model.ThisMonthExpense.ToString("N0")</div>
+                @{
+                    var diff = Model.ThisMonthExpense - Model.LastMonthExpense;
+                    var trendClass = diff > 0 ? "trend-down" : "trend-up";
+                    var trendIcon = diff > 0 ? "arrow-up" : "arrow-down";
+                    var trendText = diff > 0 ? "Increased" : "Decreased";
+                }
+                <div class="trend-indicator @trendClass">
+                    <i data-lucide="@trendIcon" style="width: 12px"></i> @trendText vs last month
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Category Breakdown -->
+        <div class="col-lg-8 animate-item" style="animation-delay: 0.4s;">
+            <div class="breakdown-card h-100">
+                <div class="breakdown-header">
+                    <h5 class="fw-800 m-0 text-main-adaptive">Spending Breakdown</h5>
+                    <div class="badge rounded-pill px-3 py-2" style="background: rgba(99, 102, 241, 0.1); color: var(--accent)">
+                        @Model.CategorySummary.Count Active Categories
+                    </div>
+                </div>
+
+                <div class="row align-items-center mt-3">
+                    @if (!Model.CategorySummary.Any())
+                    {
+                        <div class="col-12 text-center py-5">
+                            <i data-lucide="layout-list" style="width: 48px; height: 48px; color: #cbd5e1" class="mb-3"></i>
+                            <p class="text-muted">No expenses found for this period.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-5 mb-4 mb-md-0 d-flex justify-content-center">
+                            <div style="position: relative; height: 220px; width: 220px;">
+                                <canvas id="categoryChart"></canvas>
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                    <span style="font-size: 0.8rem; color: var(--muted); text-transform: uppercase; font-weight: 700;">Total</span><br/>
+                                    <span style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">₹ @Model.CategorySummary.Sum(x => x.TotalAmount).ToString("N0")</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="category-list" style="max-height: 250px; overflow-y: auto; padding-right: 10px;">
+                                @{
+                                    var maxVal = Model.CategorySummary.Max(x => x.TotalAmount);
+                                    foreach (var item in Model.CategorySummary.OrderByDescending(x => x.TotalAmount))
+                                    {
+                                        var percentage = maxVal > 0 ? (item.TotalAmount / maxVal * 100) : 0;
+                                        <div class="category-list-item">
+                                            <div class="category-info">
+                                                <span class="category-name">
+                                                    <i data-lucide="hash" style="width: 16px; color: var(--accent)"></i>
+                                                    @item.CategoryName
+                                                </span>
+                                                <span class="category-amount">₹ @item.TotalAmount.ToString("N0")</span>
+                                            </div>
+                                            <div class="progress-track">
+                                                <div class="progress-bar-fill" style="width: 0%" data-width="@percentage%"></div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions (Equally Heighted) -->
+        <div class="col-lg-4 animate-item" style="animation-delay: 0.5s;">
+            <div class="row g-4 h-70">
+                <div class="col-12 h-50">
+                    <a asp-controller="Income" asp-action="Create" class="text-decoration-none h-100 d-block">
+                        <div class="quick-action-card border-success border-opacity-25" style="border-style: solid; border-width: 1px; padding: 24px;">
+                            <div class="action-icon text-success bg-success bg-opacity-10">
+                                <i data-lucide="plus-circle"></i>
+                            </div>
+                            <h6 class="fw-bold text-main-adaptive m-0">Add New Income</h6>
+                            <p class="small text-muted mb-0">Record a new earning quickly</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-12 h-50">
+                    <a asp-controller="Expense" asp-action="Create" class="text-decoration-none h-100 d-block">
+                        <div class="quick-action-card border-danger border-opacity-25" style="border-style: solid; border-width: 1px; padding: 24px;">
+                            <div class="action-icon text-danger bg-danger bg-opacity-10">
+                                <i data-lucide="minus-circle"></i>
+                            </div>
+                            <h6 class="fw-bold text-main-adaptive m-0">Add New Expense</h6>
+                            <p class="small text-muted mb-0">Record a new spending quickly</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Wallets (Full Width Below) -->
+        <div class="col-lg-12 animate-item" style="animation-delay: 0.6s;">
+            <div class="breakdown-card">
+                <div class="breakdown-header mb-4">
+                    <div>
+                        <h5 class="fw-800 m-0">My Wallets</h5>
+                        <p class="text-muted small mb-0">Manage your connected bank accounts and cash balances</p>
+                    </div>
+                    <a asp-controller="Wallet" asp-action="Index" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">Manage All</a>
+                </div>
+                <div class="row g-4">
+                    @if (!Model.Accounts.Any())
+                    {
+                        <div class="col-12 text-center py-4">
+                            <p class="text-muted small">No accounts setup. <a asp-controller="Wallet" asp-action="Create" class="fw-bold">Add one now</a> to track your balances!</p>
+                        </div>
+                    }
+                    else
+                    {
+                        foreach (var acc in Model.Accounts)
+                        {
+                            <div class="col-md-4 col-sm-6">
+                                <div class="d-flex justify-content-between align-items-center p-4 rounded-4 bg-bg-adaptive hover-lift h-100 shadow-sm" style="transition: all 0.2s; border: 1px solid var(--border);">
+                                    <div class="d-flex align-items-center gap-3">
+                                        @{
+                                            var icon = "wallet";
+                                            var iconColor = "#f59e0b";
+                                            if (acc.Type == ExpenseTracker.Models.Entities.AccountType.Bank) { icon = "building-2"; iconColor = "#3b82f6"; }
+                                            else if (acc.Type == ExpenseTracker.Models.Entities.AccountType.CreditCard) { icon = "credit-card"; iconColor = "#ec4899"; }
+                                            else if (acc.Type == ExpenseTracker.Models.Entities.AccountType.Savings) { icon = "piggy-bank"; iconColor = "#10b981"; }
+                                        }
+                                        <div style="width: 48px; height: 48px; background: var(--card); color: @iconColor; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 15px rgba(0,0,0,0.05);">
+                                            <i data-lucide="@icon" style="width: 24px"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-800 text-main-adaptive">@acc.Name</div>
+                                            <div class="text-muted" style="font-size: 0.75rem; font-weight: 600;">@acc.Type | Since @acc.CreatedOn.ToString("MMM yyyy")</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-800 text-main-adaptive" style="font-size: 1.1rem">₹ @acc.CurrentBalance.ToString("N0")</div>
+                                        <div class="text-muted small">Current Balance</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget Health Tracking -->
+        <div class="col-lg-12 mb-2 animate-item" style="animation-delay: 0.7s;">
+            <div class="breakdown-card">
+                <div class="breakdown-header">
+                    <div>
+                        <h5 class="fw-800 m-0">Budget Health</h5>
+                        <p class="text-muted small mb-0">How you're tracking against your monthly goals</p>
+                    </div>
+                    <a asp-controller="Budget" asp-action="Index" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">View All</a>
+                </div>
+
+                <div class="row g-4 mt-1">
+                    @if (!Model.BudgetSummary.Any())
+                    {
+                        <div class="col-12 text-center py-4">
+                            <div class="icon-box bg-light text-muted p-3 rounded-circle d-inline-flex mb-3">
+                                <i data-lucide="target" size="24"></i>
+                            </div>
+                            <p class="text-muted small">No budgets set for this month. <a asp-controller="Budget" asp-action="Create" class="fw-bold">Set one now</a> to track your goals!</p>
+                        </div>
+                    }
+                    else
+                    {
+                        foreach (var budget in Model.BudgetSummary)
+                        {
+                            var barColor = "#10b981";
+                            if (budget.PercentageUsed >= 100) barColor = "#ef4444";
+                            else if (budget.PercentageUsed >= 80) barColor = "#f59e0b";
+
+                            <div class="col-xl-3 col-lg-4 col-md-6">
+                                <div class="p-4 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: var(--bg); border: 1px solid var(--border);">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <span class="fw-800 text-main-adaptive">@budget.CategoryName</span>
+                                            <span class="badge @(budget.IsOverBudget ? "bg-danger" : "bg-secondary bg-opacity-25 text-main-adaptive") rounded-pill">@budget.PercentageUsed.ToString("N0")%</span>
+                                        </div>
+                                        <div class="progress-track mb-3" style="height: 10px;">
+                                            <div class="progress-bar-fill" style="width: 0%; background: @barColor;" data-width="@(Math.Min(budget.PercentageUsed, 100))%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <div class="d-flex flex-column">
+                                            <span class="text-muted" style="font-size: 0.7rem; text-transform: uppercase; font-weight: 700;">Spent</span>
+                                            <span class="fw-800" style="font-size: 0.9rem">₹ @budget.ActualSpent.ToString("N0")</span>
+                                        </div>
+                                        <div class="d-flex flex-column text-end">
+                                            <span class="text-muted" style="font-size: 0.7rem; text-transform: uppercase; font-weight: 700;">Budget</span>
+                                            <span class="fw-800" style="font-size: 0.9rem; color: var(--accent)">₹ @budget.BudgetAmount.ToString("N0")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            // Dynamic Greeting
+            const hour = new Date().getHours();
+            const fullName = "@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)";
+            let greeting = "Good Evening";
+            if (hour < 12) greeting = "Good Morning";
+            else if (hour < 18) greeting = "Good Afternoon";
+            $('#greetingText').text(`${greeting}, ${fullName}`);
+
+            // Set current date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            $('#dateDisplay').text(new Date().toLocaleDateString('en-US', options));
+
+            // Animate progress bars
+            setTimeout(() => {
+                $('.progress-bar-fill').each(function() {
+                    $(this).css('width', $(this).data('width'));
+                });
+            }, 300);
+
+            // Re-initialize Lucide icons for dynamic content
+            lucide.createIcons();
+
+            @if(Model.CategorySummary.Any())
+            {
+                <text>
+                const ctx = document.getElementById('categoryChart').getContext('2d');
+                const categories = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategorySummary.Select(c => c.CategoryName)));
+                const amounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategorySummary.Select(c => c.TotalAmount)));
+                
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: categories,
+                        datasets: [{
+                            data: amounts,
+                            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#0ea5e9'],
+                            borderWidth: 0,
+                            hoverOffset: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                titleFont: { family: 'Inter', size: 13 },
+                                bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: true
+                            }
+                        }
+                    }
+                });
+                </text>
+            }
+        });
+    </script>
+}
+
+    </script>
+

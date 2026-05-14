@@ -1,0 +1,212 @@
+@model ExpenseTracker.Models.Entities.Category
+
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<style>
+    :root {
+        --accent: #6366f1;
+        --accent-hover: #4f46e5;
+    }
+
+    .form-page-wrapper {
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @@keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .premium-form-card {
+        background: var(--card);
+        border-radius: 30px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border);
+        overflow: hidden;
+    }
+
+    .card-gradient-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        padding: 40px;
+        text-align: center;
+        color: white;
+    }
+
+    .card-gradient-header i {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        border-radius: 18px;
+        margin-bottom: 15px;
+        display: inline-block;
+    }
+
+    .form-body {
+        padding: 40px;
+    }
+
+    /* Modern Inputs */
+    .modern-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .modern-input-group {
+        position: relative;
+        margin-bottom: 25px;
+    }
+
+    .modern-input {
+        width: 100%;
+        padding: 14px 20px 14px 50px;
+        border-radius: 16px;
+        border: 1.5px solid var(--border);
+        background: var(--bg);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        outline: none;
+    }
+
+    .modern-input:focus {
+        border-color: var(--accent);
+        background: var(--card);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .input-icon-left {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        transition: all 0.2s ease;
+    }
+
+    .modern-input:focus + .input-icon-left {
+        color: var(--accent);
+    }
+
+    /* Switch Customization */
+    .premium-switch-box {
+        background: var(--bg);
+        padding: 20px;
+        border-radius: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        border: 1px solid var(--border);
+    }
+
+    .switch-label-area h6 {
+        margin: 0;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .switch-label-area p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--muted);
+    }
+
+    /* Buttons */
+    .btn-save {
+        background: var(--accent);
+        color: white;
+        padding: 14px 30px;
+        border-radius: 16px;
+        font-weight: 700;
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-save:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-back {
+        color: var(--muted);
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-back:hover {
+        color: var(--text-main);
+        transform: translateX(-4px);
+    }
+</style>
+
+<div class="form-page-wrapper">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="premium-form-card">
+                <div class="card-gradient-header">
+                    <i data-lucide="edit-3" style="width: 32px; height: 32px"></i>
+                    <h2 class="fw-800 m-0">Edit Category</h2>
+                    <p class="text-white-50 m-0 small">Update the details for Category #@Model.Id</p>
+                </div>
+
+                <div class="form-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="modern-input-group">
+                            <label asp-for="Name" class="modern-label">Category Name</label>
+                            <div class="position-relative">
+                                <input asp-for="Name" class="modern-input" placeholder="e.g. Health, Travel, Subscriptions" />
+                                <i data-lucide="tag" class="input-icon-left" style="width: 18px"></i>
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="premium-switch-box">
+                            <div class="switch-label-area">
+                                <h6>Enable Category</h6>
+                                <p>Set visibility status for this category across the app.</p>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" style="width: 45px; height: 24px; cursor: pointer;">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-5">
+                            <a asp-action="Index" class="btn-back">
+                                <i data-lucide="arrow-left" style="width: 18px"></i>
+                                Back to categories
+                            </a>
+                            <button type="submit" class="btn-save shadow-lg">
+                                <i data-lucide="save" style="width: 18px"></i>
+                                Update Category
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            lucide.createIcons();
+        });
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

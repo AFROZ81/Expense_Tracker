@@ -1,0 +1,378 @@
+@model ExpenseTracker.Models.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account - ExpensePro</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --card-bg: white;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --input-bg: #f8fafc;
+        }
+
+        [data-theme="dark"] {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --input-bg: #0f172a;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-gradient);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        @@keyframes slideIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .logo-icon {
+            background: var(--primary);
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+        }
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .form-label {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            padding: 10px 16px;
+            border: 1.5px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background: var(--card-bg);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            color: var(--text-main);
+        }
+
+        .btn-register {
+            background: var(--primary);
+            color: white;
+            padding: 14px;
+            border-radius: 14px;
+            font-weight: 700;
+            width: 100%;
+            border: none;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .btn-register:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .footer-text a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .password-toggle-group {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+            z-index: 10;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--primary);
+        }
+
+        .form-control.with-toggle {
+            padding-right: 45px;
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        /* Password Strength Meter */
+        .strength-meter {
+            height: 4px;
+            background-color: #f1f5f9;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .strength-meter-fill {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s ease;
+        }
+
+        .strength-text {
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .strength-weak { background-color: #ef4444; width: 33.33%; }
+        .strength-good { background-color: #f59e0b; width: 66.66%; }
+        .strength-strong { background-color: #10b981; width: 100%; }
+
+        .text-weak { color: #ef4444; }
+        .text-good { color: #f59e0b; }
+        .text-strong { color: #10b981; }
+
+        .theme-toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(100, 116, 139, 0.1);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle-btn:hover {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .text-main-adaptive { color: var(--text-main) !important; }
+        .text-muted { color: var(--text-muted) !important; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Dark Mode">
+            <i data-lucide="moon" id="themeIcon" size="20"></i>
+        </button>
+        <div class="brand-logo">
+            <div class="logo-icon">
+                <i data-lucide="shield-check"></i>
+            </div>
+            <div class="brand-name">ExpensePro</div>
+        </div>
+
+        <h4 class="fw-800 text-main-adaptive mb-1 text-center">Start your journey</h4>
+        <p class="text-muted small mb-4 text-center">Create a secure account to start tracking.</p>
+
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label">Full Name</label>
+                <input asp-for="FullName" class="form-control" placeholder="John Doe" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Email Address</label>
+                <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <div class="password-toggle-group">
+                        <input asp-for="Password" class="form-control with-toggle" type="password" placeholder="••••••••" id="passwordInput" onkeyup="checkPasswordStrength(this.value)" />
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('passwordInput', 'passwordIcon')">
+                            <i data-lucide="eye" id="passwordIcon" size="18"></i>
+                        </button>
+                    </div>
+                    <div class="strength-meter">
+                        <div id="strengthMeterFill" class="strength-meter-fill"></div>
+                    </div>
+                    <div id="strengthText" class="strength-text text-muted">Enter password</div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ConfirmPassword" class="form-label">Confirm</label>
+                    <div class="password-toggle-group">
+                        <input asp-for="ConfirmPassword" class="form-control with-toggle" type="password" placeholder="••••••••" id="confirmPasswordInput" />
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('confirmPasswordInput', 'confirmPasswordIcon')">
+                            <i data-lucide="eye" id="confirmPasswordIcon" size="18"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-register">
+                Create Free Account
+            </button>
+        </form>
+
+        <div class="footer-text">
+            Already have an account? <a asp-action="Login">Sign in</a>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const passwordIcon = document.getElementById(iconId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.setAttribute('data-lucide', 'eye');
+            }
+            
+            // Re-initialize lucide for the changed icon
+            lucide.createIcons();
+        }
+
+        function checkPasswordStrength(password) {
+            const strengthMeterFill = document.getElementById('strengthMeterFill');
+            const strengthText = document.getElementById('strengthText');
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/\d/) || password.match(/[^a-zA-Z\d]/)) strength++;
+            
+            strengthMeterFill.className = 'strength-meter-fill';
+            strengthText.className = 'strength-text';
+            
+            if (password.length === 0) {
+                strengthMeterFill.style.width = '0';
+                strengthText.innerText = 'Enter password';
+                strengthText.classList.add('text-muted');
+            } else if (strength === 1 || password.length < 8) {
+                strengthMeterFill.classList.add('strength-weak');
+                strengthText.innerText = 'Weak Password';
+                strengthText.classList.add('text-weak');
+            } else if (strength === 2) {
+                strengthMeterFill.classList.add('strength-good');
+                strengthText.innerText = 'Good Password';
+                strengthText.classList.add('text-good');
+            } else if (strength === 3) {
+                strengthMeterFill.classList.add('strength-strong');
+                strengthText.innerText = 'Strong Password';
+                strengthText.classList.add('text-strong');
+            }
+        }
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        
+        // Check saved theme
+        const savedTheme = localStorage.getItem('appTheme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        themeIcon.setAttribute('data-lucide', savedTheme === 'dark' ? 'sun' : 'moon');
+        lucide.createIcons();
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('appTheme', newTheme);
+            
+            themeIcon.setAttribute('data-lucide', newTheme === 'dark' ? 'sun' : 'moon');
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
+

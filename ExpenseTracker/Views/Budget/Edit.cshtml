@@ -1,0 +1,121 @@
+@model ExpenseTracker.Models.Entities.Budget
+
+@{
+    ViewData["Title"] = "Adjust Budget";
+    var currentYear = DateTime.Now.Year;
+}
+
+<style>
+    :root {
+        --accent: #6366f1;
+        --card-radius: 24px;
+    }
+
+    .form-container {
+        animation: fadeIn 0.5s ease-out;
+        max-width: 650px;
+        margin: 0 auto;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .premium-card {
+        background: var(--card);
+        border-radius: var(--card-radius);
+        border: 1px solid rgba(0,0,0,0.03);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+        padding: 40px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 10px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 14px;
+        padding: 12px 20px;
+        border: 1px solid var(--border);
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .btn-submit {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 16px;
+        border-radius: 16px;
+        font-weight: 800;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .btn-submit:hover {
+        background: #4f46e5;
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.25);
+        color: white;
+    }
+</style>
+
+<div class="form-container">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a asp-action="Index" class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px">
+            <i data-lucide="arrow-left" style="width: 20px; color: var(--muted);"></i>
+        </a>
+        <h1 class="h3 fw-800 text-main-adaptive m-0">Adjust Budget</h1>
+    </div>
+
+    <div class="premium-card">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CategoryId" />
+            <input type="hidden" asp-for="Month" />
+            <input type="hidden" asp-for="Year" />
+
+            <div class="alert alert-indigo border-0 rounded-4 p-3 mb-4 d-flex align-items-center gap-3" style="background: var(--accent-soft); color: var(--accent)">
+                <i data-lucide="info" style="width: 24px"></i>
+                <div class="small fw-600">
+                    Adjusting budget for <strong>@System.Globalization.DateTimeFormatInfo.InvariantInfo.GetMonthName(Model.Month) @Model.Year</strong> 
+                    in <strong>@(Model.Category?.Name ?? "Selected Category")</strong>.
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Amount" class="form-label">New Monthly Limit</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0" style="border-radius: 14px 0 0 14px;">₹</span>
+                    <input asp-for="Amount" class="form-control border-start-0" type="number" step="0.01" placeholder="0.00" style="border-radius: 0 14px 14px 0;" />
+                </div>
+                <span asp-validation-for="Amount" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Save Adjustments
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function() {
+            lucide.createIcons();
+        });
+    </script>
+}
+
