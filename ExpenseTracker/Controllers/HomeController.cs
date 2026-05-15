@@ -10,7 +10,7 @@ namespace ExpenseTracker.Controllers
         {
             if (User.Identity?.IsAuthenticated ?? false)
                 return RedirectToAction("Dashboard", "Expense");
-            return RedirectToAction("Login", "Account");
+            return View();
         }
 
         public IActionResult Privacy()
