@@ -1,10 +1,6 @@
 # <p align="center">✨ ExpenseTracker (ASP.NET Core MVC) ✨</p>
 
 <p align="center">
-  <img src="./assets/expense_tracker_banner.png" alt="Expense Tracker Banner" width="100%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); margin-bottom: 20px;" />
-</p>
-
-<p align="center">
   <strong>A premium, modern, and production-grade personal finance SaaS-like web application.</strong>
 </p>
 
