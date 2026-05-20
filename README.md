@@ -1,11 +1,7 @@
 # <p align="center">✨ ExpenseTracker (ASP.NET Core MVC) ✨</p>
 
 <p align="center">
-  <img src="./assets/expense_tracker_banner.png" alt="Expense Tracker Banner" width="100%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); margin-bottom: 20px;" />
-</p>
-
-<p align="center">
-  <strong>A premium, modern, and production-grade personal finance SaaS-like web application.</strong>
+  <strong>A premium, modern, and production-grade personal finance personal-use & SaaS-ready web application.</strong>
 </p>
 
 <p align="center">
@@ -19,34 +15,35 @@
 
 ---
 
-## 🌟 Executive Summary
+## 🌟 What This App Does (At a Glance)
 
-**ExpenseTracker** is a sleek, multi-module personal finance dashboard that enables users to securely record, audit, and forecast their financial health. 
+**ExpenseTracker** is a secure personal finance application where users can track incomes and expenses across custom categories, maintain wallet running balances in real time, configure automated recurring payments, monitor monthly budget caps, and generate pixel-perfect corporate reports.
 
-Built with software engineering best practices in mind, this application offers real-time account balance synchronization, automated recurring transactional scheduling, structured budget enforcement, dynamic data visualization, and professional-grade server-side report generation (PDF & Excel) with complete multi-tenant tenant-like data isolation.
+> [!NOTE]
+> **Data Security**: Designed with native multi-tenant isolation. All transactions, accounts, and budgets are securely scoped to individual users using their encrypted identity token (`UserId`), preventing any data leakage.
 
 ---
 
-## 🚀 Core Features & High-End UI
+## 🎯 Core Features & Visual Highlights
 
-| Module | Feature | UI Highlights |
+| Module | Purpose | Visual / Technical Feature |
 | :--- | :--- | :--- |
-| 💳 **Account Management** | Multiple active wallets (Cash, Bank, Savings, Credit Cards) | Protective delete constraints & running balance indicators. |
-| 💸 **Transactional Engines** | Dual-track Expense & Income ledgers linked to accounts | Multi-step interactive forms, modern responsive data tables. |
-| 📈 **Budget Planning** | Monthly expense caps set by specific categories | Progress-bar metrics reflecting actual vs. budgeted spending. |
-| 🔄 **Recurring Automations** | Cron-like frequency processing (Daily, Weekly, Monthly, Yearly) | Silent opportunistic execution updates on dashboard load. |
-| 📊 **Advanced Analytics** | Dynamic periods reporting & category breakdowns | Premium typography, dark mode-ready charts via **Chart.js** & Lucide icons. |
-| 📤 **Enterprise Exports** | High-fidelity server-side reports | Headless **Playwright (Chromium)** PDFs & **ClosedXML** Spreadsheets. |
+| 💳 **Account Management** | Multiple active wallets (Cash, Bank, Savings, Credit Cards) | Real-time balance recalculation with protective database delete rules. |
+| 💸 **Ledger Entries** | Dual-track Expense & Income ledgers | Linked to distinct categories and wallets; balance adjustments happen automatically. |
+| 📈 **Budget Planning** | Monthly expense limits set by category | Progress-bar metrics reflecting actual spending vs. target goals. |
+| 🔄 **Recurring Engine** | Auto-generate future transactions (Daily/Weekly/Monthly/Yearly) | Opportunistic automation runs silently upon user dashboard load. |
+| 📊 **Advanced Analytics** | Dynamic visual period reports | Beautifully crafted **Chart.js** trends, Lucide iconography, and summary cards. |
+| 📤 **Enterprise Exports** | High-fidelity server-side reports | Headless **Playwright (Chromium)** PDFs & formatted **ClosedXML** Excel sheets. |
 
 ---
 
 ## 🛡️ Architecture & Technical Design
 
-ExpenseTracker adheres to a modern, decoupled three-tier MVC design pattern with structured services handling high-overhead automation and document compilation.
+ExpenseTracker is built on a modern decoupled three-tier MVC architecture. High-overhead operations like document generation and automated transaction posting are offloaded to dedicated services.
 
 ### 📐 System Topology & Data Flow
 
-This Mermaid blueprint visualizes how components interact:
+This blueprint illustrates how components interact:
 
 ```mermaid
 graph TD
@@ -54,14 +51,14 @@ graph TD
     Views <--> Controllers[MVC Controllers / Filter Attributes]
     Controllers <--> Services[Application Service Layer]
     
-    subgraph Core Services [Business & Rendering Services]
+    subgraph Core Services ["Business & Rendering Services"]
         RT[RecurringTransactionService]
         VR[ViewRenderService]
         EX[ExportService]
     end
     
-    subgraph Storage [Persistent Data Layer]
-        DB[ApplicationDbContext] [(SQL Server Database)]
+    subgraph Storage ["Persistent Data Layer"]
+        DB[(ApplicationDbContext - SQL Server)]
         ID[ASP.NET Core Identity]
     end
     
@@ -75,24 +72,19 @@ graph TD
     EX -->|In-Memory Workbook| CX[ClosedXML Excel Generator]
 ```
 
-### 🧠 High-Fidelity Business Logic Notes
-
+### 🧠 Core Business Logic Details
 *   **Transactional Integrity**: Account balance operations use synchronous database locking. Adding a transaction updates `CurrentBalance` in real time, and deletions or editing revert historical modifications automatically to prevent math skew.
 *   **Opportunistic Execution Engine**: The `RecurringTransactionService` processes pending recurring transactions when a user visits their dashboard, ensuring zero-overhead background scheduler costs while keeping data perfectly fresh.
 *   **Complete Tenant Isolation**: Every ledger operation is automatically queried against a scoped `UserId` resolving from the authenticated ClaimsPrincipal, preventing data leaks across registered accounts.
 
 ---
 
-## 📂 Developer Deep Dive & Setup
+## 📂 Repository Structure
 
-Click any of the dropdowns below to explore project details, schemas, local setup, and troubleshooting documentation:
-
-<details>
-<summary>📁 View Detailed Project Structure</summary>
+Below is the directory map of the primary codebase:
 
 ```text
 ExpenseTracker/
-├── assets/                     # Visual brand assets (banner, logos)
 ├── ExpenseTracker.slnx         # Modern Visual Studio Solution file
 └── ExpenseTracker/             # Primary Project Source Code
     ├── Controllers/            # Route orchestration & authorization flows
@@ -140,12 +132,12 @@ ExpenseTracker/
     ├── Program.cs              # DI Services container setup & middleware
     └── appsettings.json        # Configurations (Connection strings, logging)
 ```
-</details>
 
-<details>
-<summary>💾 View Relational Data Model Schema</summary>
+---
 
-The application utilizes an elegant relational database topology mapped via EF Core migrations:
+## 💾 Relational Data Model Schema
+
+The database utilizes a clean relational topology mapped via EF Core migrations:
 
 ```
   ┌─────────────────┐       ┌─────────────────┐
@@ -169,52 +161,50 @@ The application utilizes an elegant relational database topology mapped via EF C
 *   **`Expense` / `Income`**: Individual transaction entries. Every record links directly to both an `Account` and a `Category` / `IncomeCategory`.
 *   **`Budget`**: Configured caps scoped monthly against specific expense Categories.
 *   **`RecurringTransaction`**: Rule engines tracking automated future expenses/incomes. Features automated frequency increments.
-</details>
 
-<details>
-<summary>⚙️ View Local Setup & Dependencies</summary>
+---
 
-### Prerequisites
+## ⚙️ Local Setup & Dependencies
+
+Follow these steps to run the application on your local machine:
+
+### 1. Prerequisites
 *   **.NET SDK 10.0+**
 *   **SQL Server** (LocalDB, Express, or Full instance)
 *   **PowerShell** (for installing automated client browsers)
 
-### 1. Database Connection Configuration
+### 2. Database Connection Configuration
 Modify `ExpenseTracker/appsettings.json` with your database credentials:
-
 ```json
 "ConnectionStrings": {
   "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=ExpenseTrackerDB;Trusted_Connection=True;TrustServerCertificate=True"
 }
 ```
 
-### 2. Dependency Resolution
-Restore NuGet packages from the solution root:
+### 3. Dependency Resolution & Build
+Restore NuGet packages and compile the project from the solution root:
 ```bash
 dotnet restore
+dotnet build
 ```
 
-### 3. Apply Schema Migrations
+### 4. Apply Schema Migrations
 Construct the database tables through EF Core:
 ```bash
 dotnet ef database update --project ExpenseTracker
 ```
 
-### 4. Headless PDF Engine Installation
-The server-side PDF generator uses Microsoft Playwright to build responsive document formats. Build the project and install Chromium:
+### 5. Headless PDF Engine Installation
+The server-side PDF generator uses Microsoft Playwright to build responsive document formats. Install the headless Chromium browser utility:
 ```bash
-# Build the project first
-dotnet build
-
-# Install Chromium binaries via Playwright powershell utility
 pwsh bin/Debug/net10.0/playwright.ps1 install chromium
 ```
-</details>
 
-<details>
-<summary>🚀 View How to Run & Seed Account details</summary>
+---
 
-### Run commands
+## 🚀 How to Run & Live Testing
+
+### Launch Commands
 Launch the ASP.NET Core server directly using the CLI:
 ```bash
 dotnet run --project ExpenseTracker
@@ -227,18 +217,20 @@ Upon launching, the app runs at the following default development addresses:
 ### 🔑 Instant Testing Accounts
 If the database is initialized with zero user entries, the seeding service registers an instant demo account on startup:
 
-*   **Email Address**: `demo@example.com`
-*   **Password**: `Demo@123`
+> [!IMPORTANT]
+> **Default Seed User Credentials**
+> *   **Email Address**: `demo@example.com`
+> *   **Password**: `Demo@123`
+> 
+> You can use these credentials to immediately log in and explore the pre-seeded dashboards and transactions.
 
-You can use these credentials to immediately explore the system dashboards.
-</details>
+---
 
-<details>
-<summary>🛠️ View System Troubleshooting Guides</summary>
+## 🛠️ System Troubleshooting Guides
 
 ### 🔴 1. PDF Export Service Returns "Engine Unavailable"
 *   **Cause**: The headless Chromium environment is missing or was installed under a different user scope.
-*   **Solution**: Ensure you run `dotnet build` before the Playwright command. Execute `pwsh bin/Debug/net10.0/playwright.ps1 install chromium` with administrator rights if directory permissions block the download.
+*   **Solution**: Ensure you run `dotnet build` before running the Playwright install script. Run `pwsh bin/Debug/net10.0/playwright.ps1 install chromium` with administrator rights if directory permissions block the download.
 
 ### 🔴 2. Database Connection Failures
 *   **Cause**: SQL Server service is stopped, or the connection parameters are incorrect.
@@ -251,18 +243,8 @@ You can use these credentials to immediately explore the system dashboards.
 ### 🔴 4. "File in Use" Lock on DLLs
 *   **Cause**: An active debugging session or hot-reload process is holding an exclusive handle.
 *   **Solution**: Stop any active IIS Express, Kestrel, or Visual Studio processes before running updates or rebuilding the solution.
-</details>
 
 ---
 
-## 📈 Roadmap & Upcoming Features
-
-- [ ] **Decoupled Background Queue**: Transition recurring transaction executions into a hosted service worker (`IHostedService`) for decoupled enterprise scheduling.
-- [ ] **Branded Export Layouts**: Enable users to upload business logo layouts to overlay on PDF invoices.
-- [ ] **Custom Date Range Auditing**: Expand PDF/Excel reports to support completely custom filtering periods.
-- [ ] **Telemetry Audit Logs**: Introduce structured logging tracking all export file downloads.
-
----
-
-> [!NOTE]
+> [!TIP]
 > **Onboarding Contributor Tip**: Start exploring by reviewing `Program.cs` to understand middleware bindings, navigate into `ExportController` + `ExportService` to inspect document rendering systems, and analyze `wwwroot/css/site.css` to grasp the adaptive CSS theme system.
