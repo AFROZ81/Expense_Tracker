@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Login";
-    Layout = null; // Use a clean layout for login
+    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -10,302 +10,852 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - ExpensePro</title>
+    <title>Access Portal - ExpenseTracker</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            --card-bg: white;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --input-bg: #f8fafc;
+            --bg-main: #f4f8fa;
+            --bg-soft: #eaf1f5;
+            --text-primary: #0f172a;
+            --text-muted: #475569;
+            --line: rgba(15, 23, 42, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --brand-a: #0ea5e9;
+            --brand-b: #10b981;
+            --brand-c: #6366f1;
+            --brand-gradient: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+            --brand-gradient-hover: linear-gradient(135deg, #0284c7 0%, #059669 100%);
+            --money-grid: rgba(15, 23, 42, 0.04);
+            --money-wave: rgba(14, 165, 233, 0.08);
+            --money-wave-2: rgba(16, 185, 129, 0.06);
+            --glow-a: rgba(14, 165, 233, 0.15);
+            --glow-b: rgba(16, 185, 129, 0.12);
+            --glow-c: rgba(99, 102, 241, 0.1);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
         }
 
         [data-theme="dark"] {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
+            --bg-main: #070d19;
+            --bg-soft: #0e1726;
+            --text-primary: #f1f5f9;
             --text-muted: #94a3b8;
-            --border: #334155;
-            --input-bg: #0f172a;
+            --line: rgba(255, 255, 255, 0.08);
+            --card-bg: rgba(13, 23, 42, 0.7);
+            --money-grid: rgba(255, 255, 255, 0.03);
+            --money-wave: rgba(14, 165, 233, 0.12);
+            --money-wave-2: rgba(16, 185, 129, 0.1);
+            --glow-a: rgba(14, 165, 233, 0.2);
+            --glow-b: rgba(16, 185, 129, 0.16);
+            --glow-c: rgba(99, 102, 241, 0.15);
+            --success: #34d399;
+            --danger: #f87171;
+            --warning: #fbbf24;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg-gradient);
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
             margin: 0;
-            overflow: hidden;
-        }
-
-        .login-card {
-            background: var(--card-bg);
-            padding: 50px;
-            border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 450px;
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             position: relative;
         }
 
-        @@keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Ambient Backdrops */
+        .ambient-glows {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .bg-noise {
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 15% 15%, var(--money-wave), transparent 45%),
+                radial-gradient(circle at 85% 85%, var(--money-wave-2), transparent 45%);
+        }
+
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(to right, var(--money-grid) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--money-grid) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .bg-glow-a, .bg-glow-b {
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(130px);
+            opacity: 0.7;
+            animation: float 25s infinite alternate ease-in-out;
+        }
+
+        .bg-glow-a {
+            width: 480px;
+            height: 480px;
+            top: -120px;
+            left: -120px;
+            background: var(--glow-a);
+        }
+
+        .bg-glow-b {
+            width: 420px;
+            height: 420px;
+            right: -100px;
+            bottom: -100px;
+            background: var(--glow-b);
+            animation-delay: -8s;
+        }
+
+        @@keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(20px) scale(1.08); }
+        }
+
+        /* Premium sliding card container */
+        .auth-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 860px;
+            max-width: 95vw;
+            min-height: 600px;
+            background: var(--card-bg);
+            border: 1px solid var(--line);
+            border-radius: 32px;
+            box-shadow: 0 30px 70px -10px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin: 40px 0;
+        }
+
+        [data-theme="dark"] .auth-wrapper {
+            box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-panel {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: all 0.65s cubic-bezier(0.76, 0, 0.24, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .sign-in-panel {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+            opacity: 1;
+        }
+
+        .sign-up-panel {
+            left: 0;
+            width: 50%;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        /* Active translation state sliding card */
+        .auth-wrapper.right-panel-active .sign-in-panel {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .auth-wrapper.right-panel-active .sign-up-panel {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: showPanel 0.65s;
+        }
+
+        @@keyframes showPanel {
+            0%, 49.99% {
+                opacity: 0;
+                z-index: 1;
+            }
+            50%, 100% {
+                opacity: 1;
+                z-index: 5;
+            }
+        }
+
+        /* Inner form formatting */
+        .auth-form {
+            width: 100%;
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
         }
 
         .brand-logo {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 40px;
-            justify-content: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            text-decoration: none;
+            color: var(--text-primary);
         }
 
-        .logo-icon {
-            background: var(--primary);
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--brand-gradient);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            padding: 10px;
-            border-radius: 12px;
-            display: flex;
         }
 
         .brand-name {
+            font-family: 'Outfit', sans-serif;
             font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--text-main);
+            font-size: 1.15rem;
             letter-spacing: -0.02em;
         }
 
+        .auth-form h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .auth-form .subtext {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
         .form-label {
+            font-size: 0.72rem;
             font-weight: 700;
-            font-size: 0.85rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .form-control {
-            border-radius: 14px;
-            padding: 12px 16px;
-            border: 1.5px solid var(--border);
-            background: var(--input-bg);
-            color: var(--text-main);
+            border-radius: 12px;
+            padding: 10px 14px;
+            border: 1.5px solid var(--line);
+            background: var(--bg-soft);
+            color: var(--text-primary);
+            font-size: 0.85rem;
             font-weight: 500;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
         .form-control:focus {
-            border-color: var(--primary);
+            border-color: var(--brand-a);
             background: var(--card-bg);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-            color: var(--text-main);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+            color: var(--text-primary);
         }
 
         .form-control::placeholder {
             color: var(--text-muted);
-            font-weight: 400;
-            opacity: 0.7;
+            opacity: 0.6;
         }
 
-        .password-toggle-wrapper {
+        /* Password Wrapper toggle styling */
+        .pwd-wrap {
             position: relative;
         }
 
-        .password-toggle-btn {
+        .pwd-toggle-btn {
             position: absolute;
-            right: 15px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #94a3b8;
+            color: var(--text-muted);
             cursor: pointer;
-            padding: 5px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+
+        .pwd-toggle-btn:hover {
+            color: var(--brand-a);
+        }
+
+        .remember-toggle-row {
+            margin: 14px 0 4px;
+        }
+
+        .remember-toggle-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        .remember-toggle-input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            pointer-events: none;
+        }
+
+        .remember-toggle-track {
+            width: 46px;
+            height: 26px;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--bg-soft) 72%, var(--line));
+            border: 1px solid var(--line);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+            position: relative;
+            transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .remember-toggle-track::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .remember-toggle-input:checked + .remember-toggle-track {
+            background: var(--brand-gradient);
+            border-color: transparent;
+            box-shadow: 0 8px 18px -8px rgba(14, 165, 233, 0.55);
+        }
+
+        .remember-toggle-input:checked + .remember-toggle-track::after {
+            transform: translateX(20px);
+            box-shadow: 0 3px 10px rgba(2, 132, 199, 0.32);
+        }
+
+        .remember-toggle-input:focus-visible + .remember-toggle-track {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
+        }
+
+        .btn-auth-action {
+            background: var(--brand-gradient);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.88rem;
+            border: none;
+            margin-top: 10px;
+            box-shadow: 0 6px 20px -4px rgba(14, 165, 233, 0.3);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-auth-action:hover {
+            background: var(--brand-gradient-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px -2px rgba(14, 165, 233, 0.4);
+        }
+
+        /* sliding Overlay graphics */
+        .overlay-shell {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.65s cubic-bezier(0.76, 0, 0.24, 1);
+            z-index: 100;
+        }
+
+        .auth-wrapper.right-panel-active .overlay-shell {
+            transform: translateX(-100%);
+        }
+
+        .overlay-core {
+            background: var(--brand-gradient);
+            color: white;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform 0.65s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        .auth-wrapper.right-panel-active .overlay-core {
+            transform: translateX(50%);
+        }
+
+        .overlay-half {
+            position: absolute;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: color 0.2s;
+            flex-direction: column;
+            padding: 0 45px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: transform 0.65s cubic-bezier(0.76, 0, 0.24, 1);
         }
 
-        .password-toggle-btn:hover {
-            color: var(--primary);
+        .overlay-half h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.65rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
         }
 
-        /* Switch Toggle */
-        .form-switch .form-check-input {
-            width: 3em;
-            height: 1.5em;
-            margin-left: -3.5em;
+        .overlay-half p {
+            font-size: 0.84rem;
+            line-height: 1.55;
+            margin-bottom: 28px;
+            opacity: 0.9;
+        }
+
+        .overlay-left {
+            transform: translateX(-20%);
+        }
+
+        .auth-wrapper.right-panel-active .overlay-left {
+            transform: translateX(0);
+        }
+
+        .overlay-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .auth-wrapper.right-panel-active .overlay-right {
+            transform: translateX(20%);
+        }
+
+        .btn-ghost-switch {
+            padding: 10px 24px;
+            border-radius: 10px;
+            background: transparent;
+            border: 1.5px solid rgba(255, 255, 255, 0.7);
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-ghost-switch:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: white;
+            transform: scale(1.03);
+        }
+
+        /* Mobile Responsive adjustments */
+        .mobile-footer-toggle {
+            display: none;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 18px;
+        }
+
+        .mobile-footer-toggle span {
+            color: var(--brand-a);
+            font-weight: 800;
             cursor: pointer;
         }
 
-        .form-switch {
-            padding-left: 3.5em;
-        }
-
-        .btn-login {
-            background: var(--primary);
-            color: white;
-            padding: 14px;
-            border-radius: 14px;
-            font-weight: 700;
-            width: 100%;
-            border: none;
-            margin-top: 20px;
-            transition: all 0.3s;
-        }
-
-        .btn-login:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
-        }
-
-        .footer-text {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        .footer-text a {
-            color: var(--primary);
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .theme-toggle-btn {
+        .theme-float-btn {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(100, 116, 139, 0.1);
-            border: none;
-            width: 40px;
-            height: 40px;
+            z-index: 120;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
+            border: 1px solid var(--line);
+            background: var(--card-bg);
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
-        .theme-toggle-btn:hover {
-            color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
+        .theme-float-btn:hover {
+            transform: scale(1.05);
+            background: var(--bg-soft);
         }
-        
-        .text-main-adaptive { color: var(--text-main) !important; }
-        .text-muted { color: var(--text-muted) !important; }
+
+        /* Password Strength Meter */
+        .strength-meter {
+            height: 4px;
+            background-color: var(--bg-soft);
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .strength-meter-fill {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s ease;
+        }
+
+        .strength-text {
+            font-size: 0.68rem;
+            font-weight: 800;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .strength-weak { background-color: var(--danger); width: 33.3%; }
+        .strength-good { background-color: var(--warning); width: 66.6%; }
+        .strength-strong { background-color: var(--success); width: 100%; }
+
+        .text-weak { color: var(--danger); }
+        .text-good { color: var(--warning); }
+        .text-strong { color: var(--success); }
+
+        @@media (max-width: 768px) {
+            .auth-wrapper {
+                min-height: auto;
+                width: 440px;
+                padding: 30px 20px;
+            }
+            .form-panel {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 0;
+                display: none;
+            }
+            .sign-in-panel {
+                display: block;
+            }
+            .auth-wrapper.right-panel-active .sign-in-panel {
+                display: none;
+            }
+            .auth-wrapper.right-panel-active .sign-up-panel {
+                display: block;
+                transform: none;
+                opacity: 1;
+            }
+            .overlay-shell {
+                display: none;
+            }
+            .mobile-footer-toggle {
+                display: block;
+            }
+            .auth-form {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Dark Mode">
-            <i data-lucide="moon" id="themeIcon" size="20"></i>
-        </button>
-        <div class="brand-logo">
-            <div class="logo-icon">
-                <i data-lucide="shield-check"></i>
-            </div>
-            <div class="brand-name">ExpensePro</div>
-        </div>
-
-        <h4 class="fw-800 text-main-adaptive mb-1 text-center">Welcome back!</h4>
-        <p class="text-muted small mb-4 text-center">Enter your credentials to access your dashboard.</p>
-
-        @if (TempData["RegistrationSuccess"] != null)
-        {
-            <div class="alert alert-success border-0 shadow-sm rounded-4 small mb-4" role="alert">
-                <i data-lucide="check-circle" class="me-2" size="16"></i>
-                @TempData["RegistrationSuccess"]
-            </div>
-        }
-
-        <form asp-action="Login" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
-
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label">Email Address</label>
-                <input asp-for="Email" class="form-control" placeholder="name@example.com" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-4">
-                <label asp-for="Password" class="form-label">Password</label>
-                <div class="password-toggle-wrapper">
-                    <input asp-for="Password" id="passwordInput" class="form-control pe-5" type="password" placeholder="••••••••" />
-                    <button type="button" class="password-toggle-btn" id="togglePassword">
-                        <i data-lucide="eye" id="eyeIcon"></i>
-                    </button>
-                </div>
-                <span asp-validation-for="Password" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-4 form-check form-switch">
-                <input asp-for="RememberMe" class="form-check-input" type="checkbox" role="switch" id="rememberMeSwitch" />
-                <label class="form-check-label small fw-600 text-muted ms-2" for="rememberMeSwitch">Remember me</label>
-            </div>
-
-            <button type="submit" class="btn-login">
-                Sign In to Account
-            </button>
-        </form>
-
-        <div class="footer-text">
-            Don't have an account? <a asp-action="Register">Create one</a>
-        </div>
+    <!-- Background overlay glows -->
+    <div class="ambient-glows" aria-hidden="true">
+        <div class="bg-noise"></div>
+        <div class="bg-grid"></div>
+        <div class="bg-glow-a"></div>
+        <div class="bg-glow-b"></div>
     </div>
 
+    <!-- Floating Theme Swapper -->
+    <button class="theme-float-btn" id="themeToggle" type="button" aria-label="Toggle theme">
+        <span id="themeGlyph"><i data-lucide="moon" style="width: 16px; height: 16px;"></i></span>
+    </button>
+
+    <!-- Master Switchable Card -->
+    <div class="auth-wrapper" id="authWrapper">
+        
+        <!-- PANEL A: Sign In Form -->
+        <div class="form-panel sign-in-panel">
+            <div class="auth-form">
+                <a class="brand-logo" href="@Url.Action("Index", "Home")">
+                    <span class="brand-mark" aria-hidden="true">
+                        <i data-lucide="wallet" style="width: 16px; height: 16px;"></i>
+                    </span>
+                    <span class="brand-name">ExpenseTracker</span>
+                </a>
+                
+                <h2>Welcome Back</h2>
+                <p class="subtext">Access your personal finance console</p>
+
+                @if (TempData["RegistrationSuccess"] != null)
+                {
+                    <div class="alert alert-success border-0 rounded-3 small py-2 px-3 mb-3" role="alert" style="font-size: 0.76rem;">
+                        <i data-lucide="check-circle" class="me-1 d-inline-block" style="width: 14px; height: 14px; vertical-align: -2px;"></i>
+                        @TempData["RegistrationSuccess"]
+                    </div>
+                }
+
+                <form asp-action="Login" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3" style="font-size: 0.76rem;"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email Address</label>
+                        <input asp-for="Email" class="form-control" placeholder="name@example.com" required />
+                        <span asp-validation-for="Email" class="text-danger small" style="font-size: 0.74rem;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <div class="pwd-wrap">
+                            <input asp-for="Password" id="signInPassword" class="form-control" type="password" placeholder="••••••••" required style="padding-right: 42px;" />
+                            <button type="button" class="pwd-toggle-btn" onclick="togglePassword('signInPassword', 'signInEye')">
+                                <i data-lucide="eye" id="signInEye" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small" style="font-size: 0.74rem;"></span>
+                    </div>
+
+                    <div class="remember-toggle-row">
+                        <label class="remember-toggle-label" for="chkRememberMe">
+                            <input asp-for="RememberMe" class="remember-toggle-input" type="checkbox" id="chkRememberMe" />
+                            <span class="remember-toggle-track" aria-hidden="true"></span>
+                            <span>Remember me</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-auth-action">
+                        Sign In to Account
+                    </button>
+                </form>
+
+                <div class="mobile-footer-toggle">
+                    Don't have an account? <span onclick="setMobileView('signup')">Create one</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL B: Sign Up Form (standard inputs to prevent Razor ModelOnly compiler mismatches) -->
+        <div class="form-panel sign-up-panel">
+            <div class="auth-form">
+                <a class="brand-logo" href="@Url.Action("Index", "Home")">
+                    <span class="brand-mark" aria-hidden="true">
+                        <i data-lucide="wallet" style="width: 16px; height: 16px;"></i>
+                    </span>
+                    <span class="brand-name">ExpenseTracker</span>
+                </a>
+                
+                <h2>Create Account</h2>
+                <p class="subtext">Enforce visual budget limits today</p>
+
+                <form action="/Account/Register" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label" for="regFullName">Full Name</label>
+                        <input type="text" id="regFullName" name="FullName" class="form-control" placeholder="John Doe" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" name="Email" class="form-control" placeholder="name@example.com" required />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="regPassword">Password</label>
+                            <div class="pwd-wrap">
+                                <input type="password" id="regPassword" name="Password" class="form-control" placeholder="••••••••" required onkeyup="checkPasswordStrength(this.value)" style="padding-right: 36px;" />
+                                <button type="button" class="pwd-toggle-btn" onclick="togglePassword('regPassword', 'regEye')">
+                                    <i data-lucide="eye" id="regEye" style="width: 15px; height: 15px;"></i>
+                                </button>
+                            </div>
+                            <div class="strength-meter">
+                                <div id="strengthMeterFill" class="strength-meter-fill"></div>
+                            </div>
+                            <div id="strengthText" class="strength-text text-muted" style="font-size: 0.65rem;">Enter password</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="regConfirm">Confirm</label>
+                            <div class="pwd-wrap">
+                                <input type="password" id="regConfirm" name="ConfirmPassword" class="form-control" placeholder="••••••••" required style="padding-right: 36px;" />
+                                <button type="button" class="pwd-toggle-btn" onclick="togglePassword('regConfirm', 'confirmEye')">
+                                    <i data-lucide="eye" id="confirmEye" style="width: 15px; height: 15px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-auth-action">
+                        Register Account
+                    </button>
+                </form>
+
+                <div class="mobile-footer-toggle">
+                    Already have an account? <span onclick="setMobileView('signin')">Sign In</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL C: Overlay Graphics (Slides laterally with parallax depth effect) -->
+        <div class="overlay-shell">
+            <div class="overlay-core">
+                <div class="overlay-half overlay-left">
+                    <h3>Welcome Back!</h3>
+                    <p>Keep your daily expenses exact and organized. Access your personal dashboard now.</p>
+                    <button class="btn-ghost-switch" id="btnSlideIn">Sign In</button>
+                </div>
+                <div class="overlay-half overlay-right">
+                    <h3>Start Your Journey</h3>
+                    <p>Track cashflow, configure visual budgets, and export financial summaries today.</p>
+                    <button class="btn-ghost-switch" id="btnSlideUp">Create Account</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Controls & Animation script -->
     <script>
         lucide.createIcons();
 
-        const togglePassword = document.querySelector('#togglePassword');
-        const passwordInput = document.querySelector('#passwordInput');
-        const eyeIcon = document.querySelector('#eyeIcon');
+        // Premium lateral sliding card listeners
+        const wrapper = document.getElementById('authWrapper');
+        const btnSlideUp = document.getElementById('btnSlideUp');
+        const btnSlideIn = document.getElementById('btnSlideIn');
 
-        togglePassword.addEventListener('click', function (e) {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            
-            // Toggle icon
-            const iconName = type === 'password' ? 'eye' : 'eye-off';
-            eyeIcon.setAttribute('data-lucide', iconName);
-            lucide.createIcons();
+        btnSlideUp.addEventListener('click', () => {
+            wrapper.classList.add('right-panel-active');
         });
 
-        // Theme Toggle Logic
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        
-        // Check saved theme
-        const savedTheme = localStorage.getItem('appTheme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        themeIcon.setAttribute('data-lucide', savedTheme === 'dark' ? 'sun' : 'moon');
-        lucide.createIcons();
-
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('appTheme', newTheme);
-            
-            themeIcon.setAttribute('data-lucide', newTheme === 'dark' ? 'sun' : 'moon');
-            lucide.createIcons();
+        btnSlideIn.addEventListener('click', () => {
+            wrapper.classList.remove('right-panel-active');
         });
+
+        // Mobile responsive switchers
+        function setMobileView(view) {
+            if (view === 'signup') {
+                wrapper.classList.add('right-panel-active');
+            } else {
+                wrapper.classList.remove('right-panel-active');
+            }
+        }
+
+        // Toggle password character masking
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(iconId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        // Enforce registration password complexity metrics
+        function checkPasswordStrength(password) {
+            const strengthMeterFill = document.getElementById('strengthMeterFill');
+            const strengthText = document.getElementById('strengthText');
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/\d/) || password.match(/[^a-zA-Z\d]/)) strength++;
+            
+            strengthMeterFill.className = 'strength-meter-fill';
+            strengthText.className = 'strength-text';
+            
+            if (password.length === 0) {
+                strengthMeterFill.style.width = '0';
+                strengthText.innerText = 'Enter password';
+                strengthText.className = 'strength-text text-muted';
+            } else if (strength === 1 || password.length < 8) {
+                strengthMeterFill.classList.add('strength-weak');
+                strengthText.innerText = 'Weak Password (min 8 chars)';
+                strengthText.classList.add('text-weak');
+            } else if (strength === 2) {
+                strengthMeterFill.classList.add('strength-good');
+                strengthText.innerText = 'Good Password';
+                strengthText.classList.add('text-good');
+            } else if (strength === 3) {
+                strengthMeterFill.classList.add('strength-strong');
+                strengthText.innerText = 'Strong Password';
+                strengthText.classList.add('text-strong');
+            }
+        }
+
+        // Theme Toggle Synchronization
+        (function () {
+            const html = document.documentElement;
+            const toggleBtn = document.getElementById('themeToggle');
+            const glyph = document.getElementById('themeGlyph');
+
+            const applyTheme = (theme) => {
+                if (theme === 'dark') {
+                    html.setAttribute('data-theme', 'dark');
+                    html.setAttribute('data-bs-theme', 'dark');
+                    glyph.innerHTML = '<i data-lucide="sun" style="width: 16px; height: 16px;"></i>';
+                } else {
+                    html.removeAttribute('data-theme');
+                    html.setAttribute('data-bs-theme', 'light');
+                    glyph.innerHTML = '<i data-lucide="moon" style="width: 16px; height: 16px;"></i>';
+                }
+                localStorage.setItem('theme', theme);
+                lucide.createIcons();
+            };
+
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(savedTheme);
+
+            toggleBtn.addEventListener('click', function () {
+                const currentTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                applyTheme(currentTheme);
+            });
+        })();
     </script>
 </body>
 </html>
-
