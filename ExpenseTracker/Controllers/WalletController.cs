@@ -40,6 +40,7 @@ namespace ExpenseTracker.Controllers
                 account.CurrentBalance = account.InitialBalance;
                 _context.Accounts.Add(account);
                 _context.SaveChanges();
+                TempData["SuccessMessage"] = "Account created successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(account);
@@ -70,6 +71,7 @@ namespace ExpenseTracker.Controllers
 
                 _context.Accounts.Update(account);
                 _context.SaveChanges();
+                TempData["SuccessMessage"] = "Account updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(account);
@@ -83,12 +85,20 @@ namespace ExpenseTracker.Controllers
 
             if ((account.Expenses?.Any() ?? false) || (account.Incomes?.Any() ?? false))
             {
-                TempData["Error"] = "Cannot delete account with existing transactions.";
+                TempData["ErrorMessage"] = "Cannot delete account with existing transactions.";
                 return RedirectToAction(nameof(Index));
             }
 
-            _context.Accounts.Remove(account);
-            _context.SaveChanges();
+            try
+            {
+                _context.Accounts.Remove(account);
+                _context.SaveChanges();
+                TempData["DeleteMessage"] = "Account deleted successfully!";
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = "Failed to delete account.";
+            }
             return RedirectToAction(nameof(Index));
         }
     }

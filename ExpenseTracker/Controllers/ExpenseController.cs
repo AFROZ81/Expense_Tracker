@@ -69,11 +69,13 @@ namespace ExpenseTracker.Controllers
 
                     _context.SaveChanges();
                     transaction.Commit();
+                    TempData["SuccessMessage"] = "Expense added successfully!";
                     return RedirectToAction(nameof(Index));
                 }
                 catch
                 {
                     transaction.Rollback();
+                    TempData["ErrorMessage"] = "Failed to add expense. Please try again.";
                     ModelState.AddModelError("", "Error saving expense. Please try again.");
                 }
             }
@@ -105,11 +107,11 @@ namespace ExpenseTracker.Controllers
                 using var transaction = _context.Database.BeginTransaction();
                 try
                 {
-                    var oldExpense = _context.Expenses.AsNoTracking().FirstOrDefault(e => e.Id == expense.Id);
+                    var oldExpense = _context.Expenses.AsNoTracking().FirstOrDefault(e => e.Id == expense.Id && e.UserId == UserId);
                     if (oldExpense == null) return NotFound();
 
                     // Revert old balance
-                    var oldAccount = _context.Accounts.Find(oldExpense.AccountId);
+                    var oldAccount = _context.Accounts.FirstOrDefault(a => a.Id == oldExpense.AccountId && a.UserId == UserId);
                     if (oldAccount != null)
                     {
                         oldAccount.CurrentBalance += oldExpense.Amount;
@@ -117,21 +119,24 @@ namespace ExpenseTracker.Controllers
                     }
 
                     // Apply new balance
-                    var newAccount = _context.Accounts.Find(expense.AccountId);
+                    var newAccount = _context.Accounts.FirstOrDefault(a => a.Id == expense.AccountId && a.UserId == UserId);
                     if (newAccount != null)
                     {
                         newAccount.CurrentBalance -= expense.Amount;
                         _context.Accounts.Update(newAccount);
                     }
 
+                    expense.UserId = UserId;
                     _context.Expenses.Update(expense);
                     _context.SaveChanges();
                     transaction.Commit();
+                    TempData["SuccessMessage"] = "Expense updated successfully!";
                     return RedirectToAction(nameof(Index));
                 }
                 catch
                 {
                     transaction.Rollback();
+                    TempData["ErrorMessage"] = "Failed to update expense.";
                     ModelState.AddModelError("", "Error updating expense.");
                 }
             }
@@ -163,10 +168,12 @@ namespace ExpenseTracker.Controllers
                 _context.Expenses.Remove(expense);
                 _context.SaveChanges();
                 transaction.Commit();
+                TempData["DeleteMessage"] = "Expense deleted successfully!";
             }
             catch
             {
                 transaction.Rollback();
+                TempData["ErrorMessage"] = "Failed to delete expense.";
             }
 
             return RedirectToAction(nameof(Index));

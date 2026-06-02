@@ -38,6 +38,7 @@ namespace ExpenseTracker.Controllers
                 category.UserId = UserId;
                 _context.Categories.Add(category);
                 _context.SaveChanges();
+                TempData["SuccessMessage"] = "Category added successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -67,6 +68,7 @@ namespace ExpenseTracker.Controllers
                 category.UserId = UserId;
                 _context.Categories.Update(category);
                 _context.SaveChanges();
+                TempData["SuccessMessage"] = "Category updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -83,8 +85,16 @@ namespace ExpenseTracker.Controllers
                 return NotFound();
             }
 
-            _context.Categories.Remove(category);
-            _context.SaveChanges();
+            try
+            {
+                _context.Categories.Remove(category);
+                _context.SaveChanges();
+                TempData["DeleteMessage"] = "Category deleted successfully!";
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = "Failed to delete category.";
+            }
 
             return RedirectToAction(nameof(Index));
         }

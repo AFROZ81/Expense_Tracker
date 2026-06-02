@@ -60,11 +60,13 @@ namespace ExpenseTracker.Controllers
 
                     _context.SaveChanges();
                     transaction.Commit();
+                    TempData["SuccessMessage"] = "Income record added successfully!";
                     return RedirectToAction(nameof(Index));
                 }
                 catch
                 {
                     transaction.Rollback();
+                    TempData["ErrorMessage"] = "Failed to add income record.";
                     ModelState.AddModelError("", "Error saving income record.");
                 }
             }
@@ -118,11 +120,13 @@ namespace ExpenseTracker.Controllers
                     _context.Incomes.Update(income);
                     _context.SaveChanges();
                     transaction.Commit();
+                    TempData["SuccessMessage"] = "Income record updated successfully!";
                     return RedirectToAction(nameof(Index));
                 }
                 catch
                 {
                     transaction.Rollback();
+                    TempData["ErrorMessage"] = "Failed to update income record.";
                     ModelState.AddModelError("", "Error updating income record.");
                 }
             }
@@ -152,10 +156,12 @@ namespace ExpenseTracker.Controllers
                 _context.Incomes.Remove(income);
                 _context.SaveChanges();
                 transaction.Commit();
+                TempData["DeleteMessage"] = "Income record deleted successfully!";
             }
             catch
             {
                 transaction.Rollback();
+                TempData["ErrorMessage"] = "Failed to delete income record.";
             }
 
             return RedirectToAction(nameof(Index));

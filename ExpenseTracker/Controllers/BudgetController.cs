@@ -67,12 +67,14 @@ namespace ExpenseTracker.Controllers
                 if (existing != null)
                 {
                     ModelState.AddModelError("", "A budget already exists for this category and month.");
+                    TempData["ErrorMessage"] = "A budget already exists for this category and month.";
                 }
                 else
                 {
                     budget.UserId = UserId;
                     _context.Budgets.Add(budget);
                     _context.SaveChanges();
+                    TempData["SuccessMessage"] = "Budget created successfully!";
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -101,6 +103,7 @@ namespace ExpenseTracker.Controllers
                 budget.UserId = UserId;
                 _context.Budgets.Update(budget);
                 _context.SaveChanges();
+                TempData["SuccessMessage"] = "Budget updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -114,8 +117,16 @@ namespace ExpenseTracker.Controllers
             var budget = _context.Budgets.FirstOrDefault(b => b.Id == id && b.UserId == UserId);
             if (budget != null)
             {
-                _context.Budgets.Remove(budget);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Budgets.Remove(budget);
+                    _context.SaveChanges();
+                    TempData["DeleteMessage"] = "Budget deleted successfully!";
+                }
+                catch
+                {
+                    TempData["ErrorMessage"] = "Failed to delete budget.";
+                }
             }
             return RedirectToAction(nameof(Index));
         }

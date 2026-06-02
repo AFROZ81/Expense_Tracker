@@ -46,6 +46,7 @@ namespace ExpenseTracker.Controllers
                 
                 _context.RecurringTransactions.Add(transaction);
                 _context.SaveChanges();
+                TempData["SuccessMessage"] = "Automation rule set up successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -60,8 +61,16 @@ namespace ExpenseTracker.Controllers
             var transaction = _context.RecurringTransactions.FirstOrDefault(r => r.Id == id && r.UserId == UserId);
             if (transaction != null)
             {
-                _context.RecurringTransactions.Remove(transaction);
-                _context.SaveChanges();
+                try
+                {
+                    _context.RecurringTransactions.Remove(transaction);
+                    _context.SaveChanges();
+                    TempData["DeleteMessage"] = "Automation rule deleted successfully!";
+                }
+                catch
+                {
+                    TempData["ErrorMessage"] = "Failed to delete automation rule.";
+                }
             }
             return RedirectToAction(nameof(Index));
         }

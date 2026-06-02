@@ -8,6 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Smart Personal Finance</title>
+    <link rel="icon" type="image/x-icon" href="~/favicon1.ico" asp-append-version="true" />
     <script>
         (function () {
             var savedTheme = localStorage.getItem('theme') || 'light';
@@ -1489,7 +1490,7 @@
             </h1>
             
             <p class="hero-sub">
-                Track expenses and income, balance multiple accounts, establish budgets, configure automated recurring items, and download neat financial reports from a stunning secure console.
+                Track expenses and income, balance multiple accounts, establish budgets, and configure automated recurring items from a stunning secure console.
             </p>
             
             <div class="hero-btns">
@@ -1533,7 +1534,7 @@
                         <div class="preview-mini-card">
                             <div class="pmc-left">
                                 <p>Net Wallet Balance</p>
-                                <h4>$8,349.50</h4>
+                                <h4>₹8,349.50</h4>
                             </div>
                             <div class="pmc-icon blue">
                                 <i data-lucide="wallet"></i>
@@ -1542,7 +1543,7 @@
                         <div class="preview-mini-card">
                             <div class="pmc-left">
                                 <p>Monthly Cash Inflow</p>
-                                <h4>$6,200.00</h4>
+                                <h4>₹6,200.00</h4>
                             </div>
                             <div class="pmc-icon green">
                                 <i data-lucide="arrow-up-right"></i>
@@ -1551,7 +1552,7 @@
                         <div class="preview-mini-card">
                             <div class="pmc-left">
                                 <p>Monthly Cash Outflow</p>
-                                <h4>$3,180.20</h4>
+                                <h4>₹3,180.20</h4>
                             </div>
                             <div class="pmc-icon red">
                                 <i data-lucide="arrow-down-left"></i>
@@ -1592,7 +1593,7 @@
                                 <div class="budget-bar-fill" style="background: var(--brand-a); width: 68%;"></div>
                             </div>
                             <div class="budget-val">
-                                $408.00 <span>/ $600.00</span>
+                                ₹408.00 <span>/ ₹600.00</span>
                             </div>
                         </div>
                         <div class="budget-row">
@@ -1604,7 +1605,7 @@
                                 <div class="budget-bar-fill" style="background: var(--brand-b); width: 92%;"></div>
                             </div>
                             <div class="budget-val">
-                                $1,104.00 <span>/ $1,200.00</span>
+                                ₹1,104.00 <span>/ ₹1,200.00</span>
                             </div>
                         </div>
                         <div class="budget-row">
@@ -1616,7 +1617,7 @@
                                 <div class="budget-bar-fill" style="background: var(--danger); width: 45%;"></div>
                             </div>
                             <div class="budget-val">
-                                $180.00 <span>/ $400.00</span>
+                                ₹180.00 <span>/ ₹400.00</span>
                             </div>
                         </div>
                     </div>
@@ -1663,19 +1664,19 @@
                         <div class="category-breakdown">
                             <div class="cat-item">
                                 <span><span class="cat-dot" style="background: var(--brand-a);"></span>Food & Groceries</span>
-                                <span class="bold-num">$542.10</span>
+                                <span class="bold-num">₹542.10</span>
                             </div>
                             <div class="cat-item">
                                 <span><span class="cat-dot" style="background: var(--brand-c);"></span>Rent & Housing</span>
-                                <span class="bold-num">$1,200.00</span>
+                                <span class="bold-num">₹1,200.00</span>
                             </div>
                             <div class="cat-item">
                                 <span><span class="cat-dot" style="background: var(--brand-b);"></span>Investments</span>
-                                <span class="bold-num">$850.00</span>
+                                <span class="bold-num">₹850.00</span>
                             </div>
                             <div class="cat-item">
                                 <span><span class="cat-dot" style="background: var(--warning);"></span>Utility Payments</span>
-                                <span class="bold-num">$280.00</span>
+                                <span class="bold-num">₹280.00</span>
                             </div>
                         </div>
                     </div>
@@ -1697,7 +1698,7 @@
                     </div>
                     <div class="feature-body">
                         <h3>Secure Account Workspace</h3>
-                        <p>User-scoped databases ensure your credentials and statements are kept under lock and key, completely isolated from everyone else.</p>
+                        <p>User-scoped databases ensure your credentials and records are kept under lock and key, completely isolated from everyone else.</p>
                     </div>
                 </div>
                 
@@ -1723,11 +1724,11 @@
                 
                 <div class="glass-card feature-card">
                     <div class="feature-icon-box">
-                        <i data-lucide="download"></i>
+                        <i data-lucide="bar-chart-3"></i>
                     </div>
                     <div class="feature-body">
-                        <h3>Polished Export Engines</h3>
-                        <p>Download clean, formatted PDF summaries and standard Excel spreadsheets for quick tax filing, expense reports, and archives.</p>
+                        <h3>Insightful Financial Reports</h3>
+                        <p>Review structured statement views and category-level trends to understand spending patterns with clarity.</p>
                     </div>
                 </div>
             </div>
@@ -1750,7 +1751,7 @@
                         <div class="slider-group">
                             <div class="slider-label">
                                 <span>Input Monthly Income</span>
-                                <span class="income-val" id="incomeLabel">$5,000</span>
+                                <span class="income-val" id="incomeLabel">₹5,000</span>
                             </div>
                             <input type="range" min="1000" max="20000" step="500" value="5000" class="range-slider" id="incomeSlider">
                         </div>
@@ -1761,21 +1762,21 @@
                                     <h4>Needs & Essentials (50%)</h4>
                                     <p>Housing, Groceries, Fixed Utilities</p>
                                 </div>
-                                <span class="split-val" id="valNeeds">$2,500</span>
+                                <span class="split-val" id="valNeeds">₹2,500</span>
                             </div>
                             <div class="split-card wants">
                                 <div class="split-meta">
                                     <h4>Wants & Hobbies (30%)</h4>
                                     <p>Dining, Travel, Shopping, Subscriptions</p>
                                 </div>
-                                <span class="split-val" id="valWants">$1,500</span>
+                                <span class="split-val" id="valWants">₹1,500</span>
                             </div>
                             <div class="split-card savings">
                                 <div class="split-meta">
                                     <h4>Savings & Debt (20%)</h4>
                                     <p>Investments, Emergency Funds, Loan Payoff</p>
                                 </div>
-                                <span class="split-val" id="valSavings">$1,000</span>
+                                <span class="split-val" id="valSavings">₹1,000</span>
                             </div>
                         </div>
                     </div>
@@ -1792,7 +1793,7 @@
                         </svg>
                         <div class="donut-center-text">
                             <span>Splits</span>
-                            <strong id="donutTotal">$5,000</strong>
+                            <strong id="donutTotal">₹5,000</strong>
                         </div>
                         <div class="donut-legend">
                             <div class="legend-item"><span class="legend-dot blue"></span>Needs</div>
@@ -1820,19 +1821,19 @@
                         <div class="quick-presets">
                             <button class="preset-btn" onclick="addQuickPreset('☕ Premium Coffee', -4.50, 'outflow')">
                                 <i data-lucide="coffee" style="width: 14px; height: 14px;"></i>
-                                Coffee (-$4.50)
+                                Coffee (-₹4.50)
                             </button>
                             <button class="preset-btn" onclick="addQuickPreset('🎬 Netflix Plan', -15.49, 'outflow')">
                                 <i data-lucide="tv" style="width: 14px; height: 14px;"></i>
-                                Netflix (-$15.49)
+                                Netflix (-₹15.49)
                             </button>
                             <button class="preset-btn" onclick="addQuickPreset('🛒 Weekly Grocery', -85.00, 'outflow')">
                                 <i data-lucide="shopping-cart" style="width: 14px; height: 14px;"></i>
-                                Groceries (-$85.00)
+                                Groceries (-₹85.00)
                             </button>
                             <button class="preset-btn" onclick="addQuickPreset('💼 Freelance Project', 250.00, 'inflow')">
                                 <i data-lucide="briefcase" style="width: 14px; height: 14px;"></i>
-                                Freelance (+$250.00)
+                                Freelance (+₹250.00)
                             </button>
                         </div>
 
@@ -1843,7 +1844,7 @@
                             </div>
                             <div class="form-row-2">
                                 <div class="form-group">
-                                    <label>Amount ($)</label>
+                                    <label>Amount (₹)</label>
                                     <input type="number" id="sbAmt" class="form-input" placeholder="0.00" min="0.01" step="0.01">
                                 </div>
                                 <div class="form-group">
@@ -1868,15 +1869,15 @@
                         <div class="ledger-stats">
                             <div class="ledger-stat-box balance">
                                 <span>Net balance</span>
-                                <h5 id="ledgBalance">$1,450.00</h5>
+                                <h5 id="ledgBalance">₹1,450.00</h5>
                             </div>
                             <div class="ledger-stat-box inflow">
                                 <span>Total inflow</span>
-                                <h5 id="ledgInflow">$1,800.00</h5>
+                                <h5 id="ledgInflow">₹1,800.00</h5>
                             </div>
                             <div class="ledger-stat-box outflow">
                                 <span>Total outflow</span>
-                                <h5 id="ledgOutflow">$350.00</h5>
+                                <h5 id="ledgOutflow">₹350.00</h5>
                             </div>
                         </div>
 
@@ -1911,8 +1912,8 @@
                 </div>
                 <div class="process-step">
                     <div class="step-num">3</div>
-                    <h4>Optimize & Excel</h4>
-                    <p>Review interactive reports, maintain healthy budgets, and download statements.</p>
+                    <h4>Optimize & Improve</h4>
+                    <p>Review interactive reports and maintain healthy budgets with confident daily tracking.</p>
                 </div>
             </div>
         </section>
@@ -1952,7 +1953,7 @@
                         <li class="footer-link"><a href="#demo">Visual Dashboard</a></li>
                         <li class="footer-link"><a href="#features">Smart Budgets</a></li>
                         <li class="footer-link"><a href="#simulator">Calculator Splits</a></li>
-                        <li class="footer-link"><a href="#">PDF Export Ledger</a></li>
+                        <li class="footer-link"><a href="#">Recurring Automation</a></li>
                     </ul>
                 </div>
                 
@@ -2072,17 +2073,17 @@
             const val = parseInt(incomeVal);
             
             // Format labels
-            incomeLabel.textContent = '$' + val.toLocaleString();
-            donutTotal.textContent = '$' + val.toLocaleString();
+            incomeLabel.textContent = '₹' + val.toLocaleString();
+            donutTotal.textContent = '₹' + val.toLocaleString();
 
             // Calculate splits (50 / 30 / 20)
             const needs = val * 0.5;
             const wants = val * 0.3;
             const savings = val * 0.2;
 
-            valNeeds.textContent = '$' + needs.toLocaleString();
-            valWants.textContent = '$' + wants.toLocaleString();
-            valSavings.textContent = '$' + savings.toLocaleString();
+            valNeeds.textContent = '₹' + needs.toLocaleString();
+            valWants.textContent = '₹' + wants.toLocaleString();
+            valSavings.textContent = '₹' + savings.toLocaleString();
 
             // Circular Dash Math
             // Circumference of r=45 circle is 2 * pi * 45 = 282.74
@@ -2094,14 +2095,14 @@
             const lenSavings = circ * 0.2;
 
             // Set stroke dash arrays
-            donutNeeds.setAttribute('stroke-dasharray', `${lenNeeds} ${circ}`);
-            donutWants.setAttribute('stroke-dasharray', `${lenWants} ${circ}`);
-            donutSavings.setAttribute('stroke-dasharray', `${lenSavings} ${circ}`);
+            donutNeeds.setAttribute('stroke-dasharray', `₹{lenNeeds} ₹{circ}`);
+            donutWants.setAttribute('stroke-dasharray', `₹{lenWants} ₹{circ}`);
+            donutSavings.setAttribute('stroke-dasharray', `₹{lenSavings} ₹{circ}`);
 
             // Offset settings
             donutNeeds.setAttribute('stroke-dashoffset', '0');
-            donutWants.setAttribute('stroke-dashoffset', `-${lenNeeds}`);
-            donutSavings.setAttribute('stroke-dashoffset', `-${lenNeeds + lenWants}`);
+            donutWants.setAttribute('stroke-dashoffset', `-₹{lenNeeds}`);
+            donutSavings.setAttribute('stroke-dashoffset', `-₹{lenNeeds + lenWants}`);
         }
 
         incomeSlider.addEventListener('input', function(e) {
@@ -2126,9 +2127,27 @@
         const ledgerInflow = document.getElementById('ledgInflow');
         const ledgerOutflow = document.getElementById('ledgOutflow');
         const ledgerList = document.getElementById('sandboxLedgerList');
+        const sandboxAmountInput = document.getElementById('sbAmt');
+
+        function showSandboxValidation(message) {
+            if (!sandboxAmountInput) return;
+            let feedback = document.getElementById('sandboxAmountFeedback');
+            if (!feedback) {
+                feedback = document.createElement('div');
+                feedback.id = 'sandboxAmountFeedback';
+                feedback.className = 'text-danger small mt-2';
+                sandboxAmountInput.closest('.form-row')?.insertAdjacentElement('afterend', feedback);
+            }
+            feedback.textContent = message;
+        }
+
+        function clearSandboxValidation() {
+            const feedback = document.getElementById('sandboxAmountFeedback');
+            if (feedback) feedback.textContent = '';
+        }
 
         function formatCurrency(val) {
-            return (val < 0 ? '-' : '') + '$' + Math.abs(val).toFixed(2);
+            return (val < 0 ? '-' : '') + '₹' + Math.abs(val).toFixed(2);
         }
 
         function updateLedgerDisplays() {
@@ -2155,16 +2174,16 @@
 
             div.innerHTML = `
                 <div class="li-desc">
-                    <div class="li-icon ${iconClass}">
-                        <i data-lucide="${item.cat}" style="width: 14px; height: 14px;"></i>
+                    <div class="li-icon ₹{iconClass}">
+                        <i data-lucide="₹{item.cat}" style="width: 14px; height: 14px;"></i>
                     </div>
                     <div class="li-text">
-                        <h6>${item.desc}</h6>
-                        <p>${item.date}</p>
+                        <h6>₹{item.desc}</h6>
+                        <p>₹{item.date}</p>
                     </div>
                 </div>
-                <div class="li-amt ${amtClass}">
-                    ${sign}$${absAmt.toFixed(2)}
+                <div class="li-amt ₹{amtClass}">
+                    ₹{sign}₹₹{absAmt.toFixed(2)}
                 </div>
             `;
             return div;
@@ -2193,9 +2212,10 @@
             const type = typeInput.value;
 
             if (isNaN(rawAmt) || rawAmt <= 0) {
-                alert('Please enter a valid amount greater than zero.');
+                showSandboxValidation('Please enter a valid amount greater than zero.');
                 return;
             }
+            clearSandboxValidation();
 
             const amount = type === 'outflow' ? -rawAmt : rawAmt;
             addSandboxTransaction(desc, amount, type);

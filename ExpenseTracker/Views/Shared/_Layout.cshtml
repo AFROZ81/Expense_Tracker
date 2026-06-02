@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ExpenseTracker</title>
+    <link rel="icon" type="image/x-icon" href="~/favicon1.ico" asp-append-version="true" />
     <script>
         (function () {
             var savedTheme = localStorage.getItem('theme') || 'light';
@@ -28,7 +29,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <!-- Toastr / SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
@@ -650,10 +650,6 @@
                         <div class="nav-icon-box"><i data-lucide="line-chart"></i></div>
                         <span class="nav-label-text">Insights</span>
                     </a>
-                    <a asp-controller="Report" asp-action="Index" class="nav-item-new">
-                        <div class="nav-icon-box"><i data-lucide="file-bar-chart"></i></div>
-                        <span class="nav-label-text">Detailed Reports</span>
-                    </a>
                     <a asp-controller="RecurringTransaction" asp-action="Index" class="nav-item-new">
                         <div class="nav-icon-box"><i data-lucide="refresh-cw"></i></div>
                         <span class="nav-label-text">Automations</span>
@@ -767,39 +763,36 @@
     
     <!-- Global Toast System -->
     <script>
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            background: 'var(--card)',
-            color: 'var(--text-main)',
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
+        $(function () {
+            @if (TempData.Peek("SuccessMessage") != null)
+            {
+                <text>showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["SuccessMessage"]?.ToString())), "success");</text>
+            }
+            @if (TempData.Peek("Success") != null)
+            {
+                <text>showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"]?.ToString())), "success");</text>
+            }
+            @if (TempData.Peek("RegistrationSuccess") != null)
+            {
+                <text>showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["RegistrationSuccess"]?.ToString())), "success");</text>
+            }
+            @if (TempData.Peek("ErrorMessage") != null)
+            {
+                <text>showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["ErrorMessage"]?.ToString())), "error");</text>
+            }
+            @if (TempData.Peek("Error") != null)
+            {
+                <text>showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"]?.ToString())), "error");</text>
+            }
+            @if (TempData.Peek("DeleteMessage") != null)
+            {
+                <text>showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["DeleteMessage"]?.ToString())), "delete");</text>
+            }
+            @if (TempData.Peek("Delete") != null)
+            {
+                <text>showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Delete"]?.ToString())), "delete");</text>
             }
         });
-
-        // Auto-show TempData messages if they exist
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <text>
-            Toast.fire({
-                icon: 'success',
-                title: '@TempData["SuccessMessage"]'
-            });
-            </text>
-        }
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <text>
-            Toast.fire({
-                icon: 'error',
-                title: '@TempData["ErrorMessage"]'
-            });
-            </text>
-        }
     </script>
     
     @RenderSection("Scripts", required: false)
@@ -862,55 +855,6 @@
             });
         });
 
-        
-        function downloadPageAsPDF(elementId, fileName) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-
-            // Optional: Temporarily add a class for PDF-specific styling
-            element.classList.add('pdf-export-mode');
-
-            const options = {
-                margin: [10, 10, 10, 10],
-                filename: fileName + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true,
-                    letterRendering: true,
-                    scrollY: 0
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Generate PDF
-            html2pdf().set(options).from(element).save().then(() => {
-                element.classList.remove('pdf-export-mode');
-            });
-        }
-
-        async function exportWithFallback(serverUrl, fallbackElementId, fallbackFileName) {
-            try {
-                const response = await fetch(serverUrl, { method: 'GET', credentials: 'same-origin' });
-                if (!response.ok) throw new Error('Server export failed');
-
-                const blob = await response.blob();
-                const disposition = response.headers.get('content-disposition') || '';
-                const fileNameMatch = disposition.match(/filename="?([^"]+)"?/i);
-                const downloadName = fileNameMatch ? fileNameMatch[1] : fallbackFileName;
-
-                const objectUrl = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = objectUrl;
-                link.download = downloadName;
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-                window.URL.revokeObjectURL(objectUrl);
-            } catch (error) {
-                downloadPageAsPDF(fallbackElementId, fallbackFileName.replace('.pdf', ''));
-            }
-        }
     </script>
 </body>
 </html>

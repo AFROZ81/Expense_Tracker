@@ -33,8 +33,6 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddScoped<IRecurringTransactionService, RecurringTransactionService>();
-builder.Services.AddScoped<IViewRenderService, ViewRenderService>();
-builder.Services.AddScoped<IExportService, ExportService>();
 
 var app = builder.Build();
 

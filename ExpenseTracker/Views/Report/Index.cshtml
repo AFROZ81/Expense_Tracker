@@ -2,63 +2,77 @@
     ViewData["Title"] = "Financial Reports";
 }
 
-<div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="fw-800 text-main-adaptive mb-1">Financial Analysis & Reports</h2>
-            <p class="text-muted">Generate detailed summaries and export your data.</p>
+<div class="container-fluid py-4 animate-fade-in">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center text-md-start d-md-flex align-items-center justify-content-between gap-3">
+            <div>
+                <span class="badge bg-primary-subtle text-primary mb-2 px-3 py-2 rounded-pill fw-700 text-uppercase tracking-wider">Analysis Center</span>
+                <h1 class="fw-900 text-main-adaptive mb-1 display-5">Financial Statements</h1>
+                <p class="text-muted fs-5 mb-0">Generate deep-dive summaries and track budgets with a clean date-wise financial view.</p>
+            </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="glass-card p-4 h-100">
+    <!-- Cards Section -->
+    <div class="row g-4">
+        <!-- Custom Period Card -->
+        <div class="col-lg-6">
+            <div class="glass-card card-premium p-4 h-100">
                 <div class="d-flex align-items-center gap-3 mb-4">
-                    <div class="icon-box bg-primary text-white p-3 rounded-4">
-                        <i data-lucide="file-text"></i>
+                    <div class="icon-glow bg-primary text-white p-3 rounded-4">
+                        <i data-lucide="calendar-range" size="24"></i>
                     </div>
                     <div>
-                        <h5 class="fw-700 mb-0">Custom Period Report</h5>
-                        <small class="text-muted">Detailed transaction list with category breakdown</small>
+                        <h4 class="fw-800 mb-0 text-main-adaptive">Custom Period Statement</h4>
+                        <p class="text-muted small mb-0">Select dates to compile detailed transaction list with category breakdown</p>
                     </div>
                 </div>
 
-                <form asp-action="GetFullReport" method="get">
+                <form asp-action="GetFullReport" method="get" class="needs-validation">
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label fw-600 small text-muted text-uppercase">Start Date</label>
-                            <input type="date" name="startDate" class="form-control rounded-3" value="@DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd")" />
+                            <label class="form-label fw-700 small text-muted text-uppercase tracking-wider">Start Date</label>
+                            <div class="input-group">
+                                <span class="input-group-text border-end-0 bg-transparent text-muted"><i data-lucide="calendar" size="16"></i></span>
+                                <input type="date" name="startDate" class="form-control border-start-0 rounded-end-3" value="@DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd")" required />
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-600 small text-muted text-uppercase">End Date</label>
-                            <input type="date" name="endDate" class="form-control rounded-3" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            <label class="form-label fw-700 small text-muted text-uppercase tracking-wider">End Date</label>
+                            <div class="input-group">
+                                <span class="input-group-text border-end-0 bg-transparent text-muted"><i data-lucide="calendar" size="16"></i></span>
+                                <input type="date" name="endDate" class="form-control border-start-0 rounded-end-3" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                            </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-700 shadow-sm">
-                        Generate Report
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-700 shadow-md btn-interactive">
+                        <i data-lucide="file-text" size="18"></i> Compile Statement
                     </button>
                 </form>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="glass-card p-4 h-100 bg-dark text-white border-0">
+        <!-- Quick Actions Card -->
+        <div class="col-lg-6">
+            <div class="glass-card card-premium p-4 h-100 border-top-accent">
                 <div class="d-flex align-items-center gap-3 mb-4">
-                    <div class="icon-box bg-warning text-main-adaptive p-3 rounded-4">
-                        <i data-lucide="zap"></i>
+                    <div class="icon-glow bg-warning text-dark p-3 rounded-4">
+                        <i data-lucide="zap" size="24"></i>
                     </div>
                     <div>
-                        <h5 class="fw-700 mb-0">Quick Export</h5>
-                        <small class="text-secondary">One-click downloads for current month</small>
+                        <h4 class="fw-800 mb-0 text-main-adaptive">Quick Access</h4>
+                        <p class="text-muted small mb-0">Open frequently used summaries for faster monthly review</p>
                     </div>
                 </div>
 
-                <div class="d-grid gap-3">
-                    <a asp-action="GetFullReport" asp-route-startDate="@(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToString("yyyy-MM-dd"))" class="btn btn-outline-light py-3 rounded-3 fw-600 d-flex align-items-center justify-content-center gap-2">
-                        <i data-lucide="download" size="18"></i> Current Month Summary
+                <div class="d-grid gap-3 mb-4">
+                    <a asp-action="GetFullReport" asp-route-startDate="@(new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToString("yyyy-MM-dd"))" class="btn btn-outline-primary py-3 rounded-3 fw-700 d-flex align-items-center justify-content-center gap-2 btn-interactive-outline">
+                        <i data-lucide="calendar-check" size="18"></i> Open Current Month Summary
                     </a>
-                    <a href="#" onclick="Toast.fire({ icon: 'info', title: 'Excel export coming soon!' })" class="btn btn-outline-light py-3 rounded-3 fw-600 d-flex align-items-center justify-content-center gap-2">
-                        <i data-lucide="file-spreadsheet" size="18"></i> Export to Excel
+                    
+                    <a asp-action="GetFullReport" asp-route-startDate="@(DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd"))" asp-route-endDate="@(DateTime.Now.ToString("yyyy-MM-dd"))" class="btn btn-outline-secondary py-3 rounded-3 fw-700 d-flex align-items-center justify-content-center gap-2 btn-interactive-outline">
+                        <i data-lucide="history" size="18"></i> Open Last 30 Days
                     </a>
                 </div>
             </div>
@@ -66,3 +80,96 @@
     </div>
 </div>
 
+<style>
+    /* Styling elements for a premium feel */
+    .animate-fade-in {
+        animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-card {
+        background: var(--card) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 20px !important;
+        box-shadow: var(--shadow-sm) !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .glass-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg) !important;
+        border-color: var(--primary) !important;
+    }
+    
+    .card-premium {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .border-top-accent {
+        border-top: 4px solid var(--warning) !important;
+    }
+
+    .icon-glow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 52px;
+        height: 52px;
+        box-shadow: 0 8px 20px -6px currentColor;
+    }
+
+    .btn-interactive {
+        transition: all 0.25s ease;
+    }
+    .btn-interactive:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(79, 70, 229, 0.35) !important;
+    }
+
+    .btn-interactive-outline {
+        transition: all 0.25s ease;
+        border-width: 2px;
+    }
+    .btn-interactive-outline:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Dashed border custom */
+    .border-dashed {
+        border-style: dashed !important;
+    }
+    
+    [data-theme="dark"] .bg-light {
+        background-color: rgba(255, 255, 255, 0.03) !important;
+    }
+    
+    /* Pulse Green dot */
+    .status-indicator-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .pulse-green {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        animation: pulseGreenAnim 2s infinite;
+    }
+    @@keyframes pulseGreenAnim {
+        0% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        }
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+        }
+        100% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+</style>

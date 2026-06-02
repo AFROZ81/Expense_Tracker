@@ -4,84 +4,166 @@
     ViewData["Title"] = "Financial Report";
 }
 
-<div class="container-fluid py-4" id="reportContent">
-    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
-        <div>
-            <h2 class="fw-800 text-dark mb-1">Financial Statement</h2>
-            <p class="text-muted">Period: @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</p>
+<div class="container-fluid py-4 animate-fade-in" id="reportContent">
+    <!-- Report Top Header Card -->
+    <div class="glass-card mb-4 p-4 border-0 shadow-lg-soft position-relative overflow-hidden header-report-gradient text-white">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative z-index-2">
+            <div>
+                <span class="badge bg-white-subtle text-white mb-2 px-3 py-2 rounded-pill fw-700 text-uppercase tracking-wider">Statement Compilation</span>
+                <h1 class="fw-900 text-white mb-1 display-6">Financial Statement</h1>
+                <p class="text-white-80 mb-0 d-flex align-items-center gap-2">
+                    <i data-lucide="calendar" size="18"></i> Reporting Period: 
+                    <strong class="fw-700">@Model.StartDate.ToString("MMM dd, yyyy")</strong> to <strong class="fw-700">@Model.EndDate.ToString("MMM dd, yyyy")</strong>
+                </p>
+            </div>
         </div>
-        <div class="d-flex gap-2">
-            <button onclick="window.print()" class="btn btn-outline-primary rounded-3 px-4">
-                <i data-lucide="printer" class="me-2"></i> Print
-            </button>
-            <button id="downloadPdf" class="btn btn-primary rounded-3 px-4 shadow-sm">
-                <i data-lucide="download-cloud" class="me-2"></i> Export PDF
-            </button>
-        </div>
+        
+        <!-- Decorative abstract backdrop shape -->
+        <div class="header-circle-bg"></div>
     </div>
 
-    <!-- Summary Cards -->
+    <!-- Summary Widgets Grid -->
     <div class="row g-4 mb-4">
+        <!-- Total Income Widget -->
         <div class="col-md-4">
-            <div class="glass-card p-4 border-start border-primary border-4">
-                <div class="text-muted small fw-600 text-uppercase mb-1">Total Income</div>
-                <h3 class="fw-800 text-success">@Model.TotalIncome.ToString("C")</h3>
+            <div class="glass-card p-4 border-start border-success border-5 position-relative overflow-hidden hover-lift-subtle">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="text-muted small fw-700 text-uppercase tracking-wider">Total Income</span>
+                        <h2 class="fw-900 text-success mt-2 mb-0">@Model.TotalIncome.ToString("C")</h2>
+                    </div>
+                    <div class="widget-icon bg-success-subtle text-success rounded-3 p-2">
+                        <i data-lucide="trending-up" size="24"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-1 mt-3">
+                    <span class="badge bg-success-subtle text-success fw-700">Active Logs</span>
+                    <span class="text-muted small">@Model.Incomes.Count records loaded</span>
+                </div>
             </div>
         </div>
+
+        <!-- Total Expenses Widget -->
         <div class="col-md-4">
-            <div class="glass-card p-4 border-start border-danger border-4">
-                <div class="text-muted small fw-600 text-uppercase mb-1">Total Expenses</div>
-                <h3 class="fw-800 text-danger">@Model.TotalExpense.ToString("C")</h3>
+            <div class="glass-card p-4 border-start border-danger border-5 position-relative overflow-hidden hover-lift-subtle">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="text-muted small fw-700 text-uppercase tracking-wider">Total Expenses</span>
+                        <h2 class="fw-900 text-danger mt-2 mb-0">@Model.TotalExpense.ToString("C")</h2>
+                    </div>
+                    <div class="widget-icon bg-danger-subtle text-danger rounded-3 p-2">
+                        <i data-lucide="trending-down" size="24"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-1 mt-3">
+                    <span class="badge bg-danger-subtle text-danger fw-700">Active Logs</span>
+                    <span class="text-muted small">@Model.Expenses.Count records loaded</span>
+                </div>
             </div>
         </div>
+
+        <!-- Net Savings Widget -->
         <div class="col-md-4">
-            <div class="glass-card p-4 border-start border-indigo border-4">
-                <div class="text-muted small fw-600 text-uppercase mb-1">Net Savings</div>
-                <h3 class="fw-800 text-primary">@Model.NetSavings.ToString("C")</h3>
+            @{
+                var isPositive = Model.NetSavings >= 0;
+                var netColor = isPositive ? "text-indigo" : "text-warning";
+                var netBorder = isPositive ? "border-indigo" : "border-warning";
+                var netIconBg = isPositive ? "bg-indigo-subtle" : "bg-warning-subtle";
+                var netIconColor = isPositive ? "text-indigo" : "text-warning";
+            }
+            <div class="glass-card p-4 border-start @netBorder border-5 position-relative overflow-hidden hover-lift-subtle">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="text-muted small fw-700 text-uppercase tracking-wider">Net Savings</span>
+                        <h2 class="fw-900 @netColor mt-2 mb-0">@Model.NetSavings.ToString("C")</h2>
+                    </div>
+                    <div class="widget-icon @netIconBg @netIconColor rounded-3 p-2">
+                        <i data-lucide="@(isPositive ? "wallet" : "alert-circle")" size="24"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-1 mt-3">
+                    <span class="badge @(isPositive ? "bg-indigo-subtle text-indigo" : "bg-warning-subtle text-warning") fw-700">
+                        @(isPositive ? "Surplus" : "Deficit")
+                    </span>
+                    <span class="text-muted small">Net cashflow status</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Details Table -->
-    <div class="glass-card p-4">
-        <h5 class="fw-700 mb-4">Transaction Details</h5>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="bg-light">
-                    <tr>
-                        <th class="border-0">Date</th>
-                        <th class="border-0">Description</th>
-                        <th class="border-0">Category</th>
-                        <th class="border-0">Account</th>
-                        <th class="border-0 text-end">Amount</th>
+    <!-- Details Table Section -->
+    <div class="glass-card p-4 shadow-sm border-0">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+            <div>
+                <h4 class="fw-800 text-main-adaptive mb-1">Detailed Transactions</h4>
+                <p class="text-muted small mb-0">Unified statement listing incoming and outgoing ledger actions</p>
+            </div>
+            
+            <div class="no-print">
+                <input type="text" id="reportSearch" class="form-control rounded-pill px-3 py-2 text-muted bg-light border-0 search-bar-premium" placeholder="Search transactions..." onkeyup="filterReportTable()" />
+            </div>
+        </div>
+
+        <div class="table-responsive rounded-4 border overflow-hidden">
+            <table class="table table-hover align-middle mb-0" id="reportTable">
+                <thead>
+                    <tr class="bg-table-header text-muted">
+                        <th class="border-0 px-4 py-3 fw-700 text-uppercase tracking-wider small">Type</th>
+                        <th class="border-0 px-4 py-3 fw-700 text-uppercase tracking-wider small">Date</th>
+                        <th class="border-0 px-4 py-3 fw-700 text-uppercase tracking-wider small">Description</th>
+                        <th class="border-0 px-4 py-3 fw-700 text-uppercase tracking-wider small">Category</th>
+                        <th class="border-0 px-4 py-3 fw-700 text-uppercase tracking-wider small">Account</th>
+                        <th class="border-0 px-4 py-3 fw-700 text-uppercase tracking-wider small text-end">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var income in Model.Incomes)
                     {
-                        <tr>
-                            <td>@income.IncomeDate.ToShortDateString()</td>
-                            <td>@income.Description</td>
-                            <td><span class="badge bg-success-subtle text-success border border-success-subtle">@income.IncomeCategory?.Name</span></td>
-                            <td>@income.Account?.Name</td>
-                            <td class="text-end text-success fw-600">+ @income.Amount.ToString("N2")</td>
+                        <tr class="transaction-row" data-search-content="@income.Description @income.IncomeCategory?.Name @income.Account?.Name">
+                            <td class="px-4 py-3">
+                                <span class="badge bg-success-subtle text-success d-inline-flex align-items-center gap-1 py-2 px-3 fw-700">
+                                    <i data-lucide="arrow-down-left" size="14"></i> Income
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-muted fw-600">@income.IncomeDate.ToString("MMM dd, yyyy")</td>
+                            <td class="px-4 py-3 fw-700 text-main-adaptive">@income.Description</td>
+                            <td class="px-4 py-3">
+                                <span class="badge-category bg-emerald-subtle">
+                                    @income.IncomeCategory?.Name
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-muted">
+                                <span class="account-pill"><i data-lucide="wallet" size="14" class="text-secondary me-1"></i> @income.Account?.Name</span>
+                            </td>
+                            <td class="px-4 py-3 text-end text-success fw-800 fs-5">+ @income.Amount.ToString("N2")</td>
                         </tr>
                     }
                     @foreach (var expense in Model.Expenses)
                     {
-                        <tr>
-                            <td>@expense.ExpenseDate.ToShortDateString()</td>
-                            <td>@expense.Description</td>
-                            <td><span class="badge bg-danger-subtle text-danger border border-danger-subtle">@expense.Category?.Name</span></td>
-                            <td>@expense.Account?.Name</td>
-                            <td class="text-end text-danger fw-600">- @expense.Amount.ToString("N2")</td>
+                        <tr class="transaction-row" data-search-content="@expense.Description @expense.Category?.Name @expense.Account?.Name">
+                            <td class="px-4 py-3">
+                                <span class="badge bg-danger-subtle text-danger d-inline-flex align-items-center gap-1 py-2 px-3 fw-700">
+                                    <i data-lucide="arrow-up-right" size="14"></i> Expense
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-muted fw-600">@expense.ExpenseDate.ToString("MMM dd, yyyy")</td>
+                            <td class="px-4 py-3 fw-700 text-main-adaptive">@expense.Description</td>
+                            <td class="px-4 py-3">
+                                <span class="badge-category bg-danger-subtle">
+                                    @expense.Category?.Name
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-muted">
+                                <span class="account-pill"><i data-lucide="wallet" size="14" class="text-primary me-1"></i> @expense.Account?.Name</span>
+                            </td>
+                            <td class="px-4 py-3 text-end text-danger fw-800 fs-5">- @expense.Amount.ToString("N2")</td>
                         </tr>
                     }
                 </tbody>
-                <tfoot class="bg-light">
-                    <tr>
-                        <th colspan="4" class="text-end">Balance for Period</th>
-                        <th class="text-end fw-800 fs-5">@Model.NetSavings.ToString("C")</th>
+                <tfoot>
+                    <tr class="bg-table-footer border-top border-2">
+                        <th colspan="5" class="text-end px-4 py-3 text-muted fw-700 text-uppercase tracking-wider">Statement Net Savings</th>
+                        <th class="text-end px-4 py-3 fw-900 fs-4 @netColor">@Model.NetSavings.ToString("C")</th>
                     </tr>
                 </tfoot>
             </table>
@@ -91,31 +173,172 @@
 
 @section Scripts {
     <script>
-        document.getElementById('downloadPdf').addEventListener('click', function () {
-            const element = document.getElementById('reportContent');
-            const options = {
-                margin: 10,
-                filename: 'Financial_Report_@(Model.StartDate.ToString("yyyyMMdd")).pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+        // Interactive Table Filtering
+        function filterReportTable() {
+            const input = document.getElementById("reportSearch");
+            const filter = input.value.toLowerCase();
+            const rows = document.getElementsByClassName("transaction-row");
 
-            // Temporarily hide buttons for PDF
-            const buttons = document.querySelectorAll('.no-print');
-            buttons.forEach(b => b.style.display = 'none');
-
-            html2pdf().set(options).from(element).save().then(() => {
-                buttons.forEach(b => b.style.display = 'flex');
-            });
-        });
+            for (let i = 0; i < rows.length; i++) {
+                const searchContent = rows[i].getAttribute("data-search-content").toLowerCase();
+                if (searchContent.indexOf(filter) > -1) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
     </script>
 }
 
 <style>
+    /* Styling variables and aesthetics */
+    :root {
+        --indigo-color: #6366f1;
+        --indigo-light: #e0e7ff;
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-card {
+        background: var(--card) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 20px !important;
+        box-shadow: var(--shadow-sm) !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    .hover-lift-subtle:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md) !important;
+    }
+
+    .header-report-gradient {
+        background: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%) !important;
+        color: white !important;
+    }
+    
+    .header-circle-bg {
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 250px;
+        height: 250px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .text-white-80 {
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .bg-white-subtle {
+        background: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* Primary Bright Button override */
+    .btn-primary-bright {
+        background: white !important;
+        color: #4f46e5 !important;
+        border: 1px solid transparent !important;
+    }
+    .btn-primary-bright:hover {
+        background: rgba(255, 255, 255, 0.9) !important;
+        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .btn-interactive {
+        transition: all 0.2s ease;
+    }
+    .btn-interactive:hover {
+        transform: translateY(-2px);
+    }
+
+    .widget-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .text-indigo {
+        color: #4f46e5 !important;
+    }
+    .border-indigo {
+        border-color: #4f46e5 !important;
+    }
+    .bg-indigo-subtle {
+        background-color: #e0e7ff !important;
+        color: #4f46e5 !important;
+    }
+
+    /* Table styling additions */
+    [data-theme="dark"] .bg-table-header {
+        background-color: #111c31 !important;
+    }
+    [data-theme="dark"] .bg-table-footer {
+        background-color: #111c31 !important;
+    }
+    .bg-table-header {
+        background-color: #f8fafc;
+    }
+    .bg-table-footer {
+        background-color: #f8fafc;
+    }
+
+    .badge-category {
+        padding: 6px 12px;
+        font-weight: 700;
+        font-size: 0.78rem;
+        border-radius: 12px;
+        display: inline-block;
+    }
+
+    .bg-emerald-subtle {
+        background-color: rgba(16, 185, 129, 0.12) !important;
+        color: #059669 !important;
+    }
+
+    .account-pill {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(100, 116, 139, 0.08);
+        padding: 4px 10px;
+        border-radius: 30px;
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+
+    .search-bar-premium {
+        border-radius: 20px;
+        min-width: 250px;
+        transition: all 0.25s ease;
+    }
+    .search-bar-premium:focus {
+        background-color: var(--card) !important;
+        border: 1px solid var(--primary) !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+
+    /* Print styling overrides */
     @@media print {
         .no-print { display: none !important; }
         .glass-card { box-shadow: none !important; border: 1px solid #ddd !important; }
-        body { background: white !important; }
+        body { background: white !important; color: black !important; }
+        .header-report-gradient {
+            background: #4f46e5 !important;
+            color: white !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
     }
 </style>

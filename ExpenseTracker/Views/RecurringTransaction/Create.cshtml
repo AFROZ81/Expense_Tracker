@@ -4,78 +4,317 @@
     ViewData["Title"] = "New Recurring Rule";
 }
 
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="glass-card p-5">
-                <h3 class="fw-800 text-main-adaptive mb-4 text-center">Setup Automated Transaction</h3>
-                
-                <form asp-action="Create" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+<style>
+    :root {
+        --auto-accent: #4f46e5;
+        --auto-accent-2: #6366f1;
+        --auto-expense: #ef4444;
+        --auto-income: #10b981;
+    }
 
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label asp-for="Type" class="form-label fw-700 small text-muted text-uppercase">Type</label>
-                            <select asp-for="Type" class="form-select rounded-3 p-3 fw-600" id="typeSelector" asp-items="Html.GetEnumSelectList<ExpenseTracker.Models.Entities.TransactionType>()"></select>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="Frequency" class="form-label fw-700 small text-muted text-uppercase">Frequency</label>
-                            <select asp-for="Frequency" class="form-select rounded-3 p-3 fw-600" asp-items="Html.GetEnumSelectList<ExpenseTracker.Models.Entities.Frequency>()"></select>
-                        </div>
-                    </div>
+    .auto-create-wrap {
+        animation: autoFadeIn 0.45s ease-out;
+    }
 
-                    <div class="mb-4">
-                        <label asp-for="Description" class="form-label fw-700 small text-muted text-uppercase">Description</label>
-                        <input asp-for="Description" class="form-control rounded-3 p-3 fw-600" placeholder="e.g., Netflix Subscription" />
-                        <span asp-validation-for="Description" class="text-danger small"></span>
-                    </div>
+    @@keyframes autoFadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-                    <div class="mb-4">
-                        <label asp-for="Amount" class="form-label fw-700 small text-muted text-uppercase">Amount</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0 rounded-start-3">₹</span>
-                            <input asp-for="Amount" class="form-control border-start-0 rounded-end-3 p-3 fw-800" placeholder="0.00" />
-                        </div>
-                        <span asp-validation-for="Amount" class="text-danger small"></span>
-                    </div>
+    .auto-hero {
+        background: linear-gradient(120deg, #1e293b 0%, #0f172a 100%);
+        border-radius: 28px;
+        padding: 28px 30px;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+        color: #f8fafc;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.3);
+    }
 
-                    <div class="row mb-4">
-                        <div class="col-md-6" id="expenseCategoryGroup">
-                            <label class="form-label fw-700 small text-muted text-uppercase">Expense Category</label>
-                            <select name="ExpenseCategoryId" class="form-select rounded-3 p-3 fw-600" asp-items="ViewBag.ExpenseCategoryList"></select>
-                        </div>
-                        <div class="col-md-6 d-none" id="incomeCategoryGroup">
-                            <label class="form-label fw-700 small text-muted text-uppercase">Income Category</label>
-                            <select name="IncomeCategoryId" class="form-select rounded-3 p-3 fw-600" asp-items="ViewBag.IncomeCategoryList"></select>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="AccountId" class="form-label fw-700 small text-muted text-uppercase">Pay From/To Account</label>
-                            <select asp-for="AccountId" class="form-select rounded-3 p-3 fw-600" asp-items="ViewBag.AccountList"></select>
-                        </div>
-                    </div>
+    .auto-hero::after {
+        content: '';
+        position: absolute;
+        width: 240px;
+        height: 240px;
+        right: -90px;
+        top: -120px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(129, 140, 248, 0.4), transparent 70%);
+        pointer-events: none;
+    }
 
-                    <div class="mb-4">
-                        <label asp-for="StartDate" class="form-label fw-700 small text-muted text-uppercase">Start From</label>
-                        <input asp-for="StartDate" type="date" class="form-control rounded-3 p-3 fw-600" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                    </div>
+    .auto-hero h2 {
+        margin: 0 0 8px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: #f8fafc;
+        position: relative;
+        z-index: 2;
+    }
 
-                    <div class="d-flex gap-3 mt-5">
-                        <a asp-action="Index" class="btn btn-light w-100 py-3 rounded-3 fw-700">Cancel</a>
-                        <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-700 shadow-sm">Save Rule</button>
-                    </div>
-                </form>
+    .auto-hero p {
+        margin: 0;
+        color: rgba(226, 232, 240, 0.92);
+        max-width: 680px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .auto-form-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.07);
+    }
+
+    .auto-label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 8px;
+    }
+
+    .auto-input, .auto-select {
+        height: 52px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text-main);
+        font-weight: 600;
+        padding: 0 14px;
+        transition: all 0.2s ease;
+    }
+
+    .auto-input:focus, .auto-select:focus {
+        border-color: rgba(99, 102, 241, 0.65);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+        outline: none;
+    }
+
+    .auto-input-group {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--bg);
+        overflow: hidden;
+        height: 52px;
+    }
+
+    .auto-input-group .input-group-text {
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        font-weight: 700;
+        padding-left: 14px;
+        padding-right: 10px;
+    }
+
+    .auto-input-group .form-control {
+        border: none;
+        background: transparent;
+        color: var(--text-main);
+        font-weight: 700;
+    }
+
+    .auto-input-group .form-control:focus {
+        box-shadow: none;
+    }
+
+    .type-pills {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .type-pill {
+        height: 46px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 700;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+    .type-pill.active.expense {
+        border-color: rgba(239, 68, 68, 0.35);
+        background: rgba(239, 68, 68, 0.11);
+        color: #b91c1c;
+    }
+
+    .type-pill.active.income {
+        border-color: rgba(16, 185, 129, 0.35);
+        background: rgba(16, 185, 129, 0.11);
+        color: #047857;
+    }
+
+    [data-theme="dark"] .type-pill.active.expense {
+        color: #fda4af;
+    }
+
+    [data-theme="dark"] .type-pill.active.income {
+        color: #6ee7b7;
+    }
+
+    .auto-btn-primary {
+        background: linear-gradient(135deg, var(--auto-accent-2) 0%, var(--auto-accent) 100%);
+        border: none;
+        color: #fff;
+        border-radius: 14px;
+        padding: 13px 20px;
+        font-weight: 800;
+        box-shadow: 0 12px 24px rgba(79, 70, 229, 0.28);
+        transition: all 0.2s ease;
+    }
+
+    .auto-btn-primary:hover {
+        transform: translateY(-1px);
+        color: #fff;
+        box-shadow: 0 16px 28px rgba(79, 70, 229, 0.38);
+    }
+
+    .auto-btn-secondary {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        border-radius: 14px;
+        padding: 13px 20px;
+        font-weight: 700;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .auto-btn-secondary:hover {
+        background: var(--border);
+        color: var(--text-main);
+    }
+
+    @@media (max-width: 767.98px) {
+        .auto-form-card {
+            padding: 20px;
+        }
+
+        .auto-hero {
+            padding: 22px;
+        }
+
+        .type-pills {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="auto-create-wrap">
+    <div class="auto-hero">
+        <h2>Create Recurring Rule</h2>
+        <p>Automate recurring income and expenses with schedule-aware rules that keep your account balances and ledgers always up to date.</p>
+    </div>
+
+    <div class="auto-form-card">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            <div class="type-pills">
+                <button type="button" id="expenseTypePill" class="type-pill expense active"><i data-lucide="arrow-down-right" style="width:14px;height:14px;"></i>Expense Rule</button>
+                <button type="button" id="incomeTypePill" class="type-pill income"><i data-lucide="arrow-up-right" style="width:14px;height:14px;"></i>Income Rule</button>
             </div>
-        </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Type" class="auto-label"></label>
+                    <select asp-for="Type" class="form-select auto-select" id="typeSelector" asp-items="Html.GetEnumSelectList<ExpenseTracker.Models.Entities.TransactionType>()"></select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Frequency" class="auto-label"></label>
+                    <select asp-for="Frequency" class="form-select auto-select" asp-items="Html.GetEnumSelectList<ExpenseTracker.Models.Entities.Frequency>()"></select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="auto-label"></label>
+                <input asp-for="Description" class="form-control auto-input" placeholder="e.g. Netflix subscription, Monthly salary" />
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Amount" class="auto-label"></label>
+                <div class="input-group auto-input-group">
+                    <span class="input-group-text">₹</span>
+                    <input asp-for="Amount" class="form-control" placeholder="0.00" />
+                </div>
+                <span asp-validation-for="Amount" class="text-danger small"></span>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6" id="expenseCategoryGroup">
+                    <label class="auto-label">Expense Category</label>
+                    <select name="ExpenseCategoryId" class="form-select auto-select" asp-items="ViewBag.ExpenseCategoryList"></select>
+                </div>
+                <div class="col-md-6 d-none" id="incomeCategoryGroup">
+                    <label class="auto-label">Income Category</label>
+                    <select name="IncomeCategoryId" class="form-select auto-select" asp-items="ViewBag.IncomeCategoryList"></select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="AccountId" class="auto-label">Account</label>
+                    <select asp-for="AccountId" class="form-select auto-select" asp-items="ViewBag.AccountList"></select>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="StartDate" class="auto-label"></label>
+                <input asp-for="StartDate" type="date" class="form-control auto-input" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="d-flex gap-3 mt-4">
+                <a asp-action="Index" class="auto-btn-secondary w-100">Cancel</a>
+                <button type="submit" class="auto-btn-primary w-100">Save Rule</button>
+            </div>
+        </form>
     </div>
 </div>
 
 @section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        document.getElementById('typeSelector').addEventListener('change', function() {
-            const isExpense = this.value == "0"; // Assuming Expense is 0
-            document.getElementById('expenseCategoryGroup').classList.toggle('d-none', !isExpense);
-            document.getElementById('incomeCategoryGroup').classList.toggle('d-none', isExpense);
-        });
+        (function () {
+            const typeSelector = document.getElementById('typeSelector');
+            const expenseGroup = document.getElementById('expenseCategoryGroup');
+            const incomeGroup = document.getElementById('incomeCategoryGroup');
+            const expensePill = document.getElementById('expenseTypePill');
+            const incomePill = document.getElementById('incomeTypePill');
+
+            function syncTypeUI() {
+                const isExpense = typeSelector.value === "0";
+                expenseGroup.classList.toggle('d-none', !isExpense);
+                incomeGroup.classList.toggle('d-none', isExpense);
+                expensePill.classList.toggle('active', isExpense);
+                incomePill.classList.toggle('active', !isExpense);
+            }
+
+            expensePill.addEventListener('click', function () {
+                typeSelector.value = "0";
+                syncTypeUI();
+            });
+
+            incomePill.addEventListener('click', function () {
+                typeSelector.value = "1";
+                syncTypeUI();
+            });
+
+            typeSelector.addEventListener('change', syncTypeUI);
+
+            syncTypeUI();
+            lucide.createIcons();
+        })();
     </script>
 }
-
