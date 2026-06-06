@@ -10,7 +10,7 @@ namespace ExpenseTracker.Models.ViewModels
 
         public decimal TotalIncome { get; set; }
         public decimal ThisMonthIncome { get; set; }
-        public decimal NetBalance => TotalIncome - TotalExpense;
+        public decimal NetBalance => Accounts?.Sum(a => a.CurrentBalance) ?? 0m;
 
         public List<MonthlySummaryViewModel> CategorySummary { get; set; } = new();
         public List<BudgetStatusViewModel> BudgetSummary { get; set; } = new();

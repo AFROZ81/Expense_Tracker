@@ -5,2263 +5,471 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Smart Personal Finance</title>
-    <link rel="icon" type="image/x-icon" href="~/favicon1.ico" asp-append-version="true" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>@ViewData["Title"] — Smart Personal Finance Tracker</title>
+    <link rel="icon" type="image/x-icon" href="~/favicon1.ico" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <script>
-        (function () {
-            var savedTheme = localStorage.getItem('theme') || 'light';
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                document.documentElement.setAttribute('data-bs-theme', 'dark');
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-                document.documentElement.setAttribute('data-bs-theme', 'light');
-            }
-        })();
+        (function(){var t=localStorage.getItem('theme')||'light';if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.documentElement.setAttribute('data-bs-theme','dark');}else{document.documentElement.removeAttribute('data-theme');document.documentElement.setAttribute('data-bs-theme','light');}})();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <style>
         :root {
-            --bg-main: #f4f8fa;
-            --bg-soft: #eaf1f5;
-            --text-primary: #0f172a;
-            --text-muted: #475569;
-            --line: rgba(15, 23, 42, 0.08);
-            --card-bg: rgba(255, 255, 255, 0.8);
-            --brand-a: #0ea5e9;
-            --brand-b: #10b981;
-            --brand-c: #6366f1;
-            --brand-gradient: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
-            --brand-gradient-hover: linear-gradient(135deg, #0284c7 0%, #059669 100%);
-            --money-grid: rgba(15, 23, 42, 0.04);
-            --money-wave: rgba(14, 165, 233, 0.08);
-            --money-wave-2: rgba(16, 185, 129, 0.06);
-            --glow-a: rgba(14, 165, 233, 0.15);
-            --glow-b: rgba(16, 185, 129, 0.12);
-            --glow-c: rgba(99, 102, 241, 0.1);
-            --topbar-bg: rgba(244, 248, 250, 0.7);
-            
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #0ea5e9;
+            --bg-main:#f4f8fa;--bg-soft:#eaf1f5;--text-primary:#0f172a;--text-muted:#475569;
+            --line:rgba(15,23,42,0.08);--card-bg:rgba(255,255,255,0.85);
+            --brand-a:#0ea5e9;--brand-b:#10b981;--brand-c:#059669;
+            --brand-gradient:linear-gradient(135deg,#0ea5e9 0%,#10b981 100%);
+            --brand-gradient-hover:linear-gradient(135deg,#0284c7 0%,#059669 100%);
+            --money-grid:rgba(15,23,42,0.04);--money-wave:rgba(14,165,233,0.08);--money-wave-2:rgba(16,185,129,0.06);
+            --glow-a:rgba(14,165,233,0.15);--glow-b:rgba(16,185,129,0.12);--glow-c:rgba(5,150,105,0.1);
+            --topbar-bg:rgba(244,248,250,0.75);
+            --success:#10b981;--danger:#ef4444;--warning:#f59e0b;--info:#0ea5e9;
         }
-
         [data-theme="dark"] {
-            --bg-main: #070d19;
-            --bg-soft: #0e1726;
-            --text-primary: #f1f5f9;
-            --text-muted: #94a3b8;
-            --line: rgba(255, 255, 255, 0.08);
-            --card-bg: rgba(13, 23, 42, 0.65);
-            --money-grid: rgba(255, 255, 255, 0.03);
-            --money-wave: rgba(14, 165, 233, 0.12);
-            --money-wave-2: rgba(16, 185, 129, 0.1);
-            --glow-a: rgba(14, 165, 233, 0.2);
-            --glow-b: rgba(16, 185, 129, 0.16);
-            --glow-c: rgba(99, 102, 241, 0.15);
-            --topbar-bg: rgba(7, 13, 25, 0.7);
-            
-            --success: #34d399;
-            --danger: #f87171;
-            --warning: #fbbf24;
-            --info: #38bdf8;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Manrope', sans-serif;
-            color: var(--text-primary);
-            background: var(--bg-main);
-            overflow-x: hidden;
-            position: relative;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            line-height: 1.6;
-        }
-
-        .wrap {
-            width: min(1280px, 92vw);
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        /* Ambient Backdrops */
-        .ambient-glows {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .bg-noise {
-            position: absolute;
-            inset: 0;
-            background-image:
-                radial-gradient(circle at 10% 20%, var(--money-wave), transparent 40%),
-                radial-gradient(circle at 90% 80%, var(--money-wave-2), transparent 45%);
-        }
-
-        .bg-grid {
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(to right, var(--money-grid) 1px, transparent 1px),
-                linear-gradient(to bottom, var(--money-grid) 1px, transparent 1px);
-            background-size: 50px 50px;
-        }
-
-        .bg-glow-a, .bg-glow-b, .bg-glow-c {
-            position: absolute;
-            border-radius: 999px;
-            filter: blur(140px);
-            opacity: 0.8;
-            animation: float 20s infinite alternate ease-in-out;
-        }
-
-        .bg-glow-a {
-            width: 500px;
-            height: 500px;
-            top: -100px;
-            left: -150px;
-            background: var(--glow-a);
-        }
-
-        .bg-glow-b {
-            width: 450px;
-            height: 450px;
-            right: -100px;
-            top: 40%;
-            background: var(--glow-b);
-            animation-delay: -5s;
-        }
-
-        .bg-glow-c {
-            width: 400px;
-            height: 400px;
-            bottom: -50px;
-            left: 25%;
-            background: var(--glow-c);
-            animation-delay: -10s;
-        }
-
-        @@keyframes float {
-            0% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(30px) scale(1.1); }
-        }
-
-        /* Glassmorphic Styles */
-        .glass-card {
-            background: var(--card-bg);
-            border: 1px solid var(--line);
-            border-radius: 24px;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.04);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Header Navigation */
-        .topbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid transparent;
-            background: transparent;
-            transition: all 0.3s ease;
-        }
-
-        .topbar.scrolled {
-            height: 70px;
-            background: var(--topbar-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--line);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
-        }
-
-        .topbar-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 0 16px;
-        }
-
-        .brand {
-            text-decoration: none;
-            color: var(--text-primary);
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.35rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-        }
-
-        .brand-mark {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: var(--brand-gradient);
-            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.25);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            transition: transform 0.3s ease;
-        }
-
-        .brand:hover .brand-mark {
-            transform: scale(1.08) rotate(5deg);
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 0.92rem;
-            font-weight: 600;
-            transition: color 0.2s ease;
-            position: relative;
-        }
-
-        .nav-link:hover {
-            color: var(--text-primary);
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -6px;
-            left: 0;
-            background: var(--brand-a);
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        .top-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .theme-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid var(--line);
-            background: var(--card-bg);
-            color: var(--text-primary);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .theme-btn:hover {
-            transform: rotate(20deg) scale(1.05);
-            background: var(--bg-soft);
-        }
-
-        .btn-auth {
-            text-decoration: none;
-            border-radius: 12px;
-            padding: 10px 20px;
-            font-weight: 700;
-            font-size: 0.88rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .btn-signin {
-            color: var(--text-primary);
-            border: 1px solid var(--line);
-            background: var(--card-bg);
-        }
-
-        .btn-signin:hover {
-            background: var(--bg-soft);
-            transform: translateY(-2px);
-        }
-
-        .btn-signup {
-            color: white;
-            border: none;
-            background: var(--brand-gradient);
-            box-shadow: 0 8px 24px -6px rgba(14, 165, 233, 0.35);
-        }
-
-        .btn-signup:hover {
-            background: var(--brand-gradient-hover);
-            box-shadow: 0 12px 28px -4px rgba(14, 165, 233, 0.45);
-            transform: translateY(-2px);
-        }
-
-        /* Hero Fold */
-        .hero {
-            position: relative;
-            z-index: 10;
-            padding-top: 150px;
-            padding-bottom: 80px;
-            text-align: center;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            border-radius: 99px;
-            background: rgba(14, 165, 233, 0.08);
-            border: 1px solid rgba(14, 165, 233, 0.2);
-            color: var(--brand-a);
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 24px;
-            animation: pulse-border 2s infinite;
-        }
-
-        [data-theme="dark"] .hero-badge {
-            background: rgba(14, 165, 233, 0.15);
-        }
-
-        @@keyframes pulse-border {
-            0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
-            70% { box-shadow: 0 0 0 8px rgba(14, 165, 233, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
-        }
-
-        .hero-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(2.4rem, 5.5vw, 4.4rem);
-            font-weight: 900;
-            line-height: 1.1;
-            letter-spacing: -0.04em;
-            max-width: 25ch;
-            margin: 0 auto 20px;
-            color: var(--text-primary);
-        }
-
-        .text-gradient {
-            background: var(--brand-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-sub {
-            font-size: 1.15rem;
-            color: var(--text-muted);
-            max-width: 68ch;
-            margin: 0 auto 36px;
-            line-height: 1.6;
-        }
-
-        .hero-btns {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 60px;
-        }
-
-        .hero-btn-primary {
-            padding: 14px 32px;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: white;
-            background: var(--brand-gradient);
-            box-shadow: 0 10px 30px -5px rgba(14, 165, 233, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .hero-btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px -5px rgba(14, 165, 233, 0.5);
-            background: var(--brand-gradient-hover);
-        }
-
-        .hero-btn-secondary {
-            padding: 14px 32px;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: var(--text-primary);
-            border: 1px solid var(--line);
-            background: var(--card-bg);
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-        }
-
-        .hero-btn-secondary:hover {
-            transform: translateY(-3px);
-            background: var(--bg-soft);
-        }
-
-        /* Mock Dashboard Frame */
-        .dashboard-preview {
-            max-width: 1060px;
-            margin: 0 auto;
-            border-radius: 28px;
-            box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            position: relative;
-            background: var(--bg-soft);
-        }
-
-        [data-theme="dark"] .dashboard-preview {
-            box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.5);
-            background: #091122;
-        }
-
-        .dashboard-header {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--line);
-            padding: 18px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .dashboard-controls {
-            display: flex;
-            gap: 6px;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .dot-red { background: #ef4444; }
-        .dot-yellow { background: #f59e0b; }
-        .dot-green { background: #10b981; }
-
-        .dashboard-tabs {
-            display: flex;
-            gap: 4px;
-            background: var(--bg-soft);
-            padding: 4px;
-            border-radius: 10px;
-        }
-
-        .dashboard-tab {
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .dashboard-tab.active {
-            background: var(--card-bg);
-            color: var(--text-primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .dashboard-view {
-            padding: 24px;
-            min-height: 380px;
-            display: none;
-            animation: fadeIn 0.4s ease forwards;
-        }
-
-        .dashboard-view.active {
-            display: block;
-        }
-
-        @@keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Overview Tab Grid */
-        .preview-grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .preview-mini-card {
-            background: var(--card-bg);
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            padding: 16px;
-            text-align: left;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .pmc-left p {
-            font-size: 0.76rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .pmc-left h4 {
-            font-size: 1.4rem;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            margin-top: 4px;
-            color: var(--text-primary);
-        }
-
-        .pmc-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pmc-icon.blue { background: rgba(14, 165, 233, 0.12); color: var(--brand-a); }
-        .pmc-icon.green { background: rgba(16, 185, 129, 0.12); color: var(--brand-b); }
-        .pmc-icon.red { background: rgba(239, 68, 68, 0.12); color: var(--danger); }
-
-        .preview-main-card {
-            background: var(--card-bg);
-            border: 1px solid var(--line);
-            border-radius: 18px;
-            padding: 20px;
-            text-align: left;
-        }
-
-        .pmc-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .pmc-header h5 {
-            font-size: 0.95rem;
-            font-weight: 800;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .badge-success {
-            font-size: 0.72rem;
-            background: rgba(16, 185, 129, 0.12);
-            color: var(--brand-b);
-            padding: 4px 8px;
-            border-radius: 99px;
-            font-weight: 700;
-        }
-
-        /* Budget Tab */
-        .budget-grid-list {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .budget-row {
-            background: var(--card-bg);
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            padding: 16px 20px;
-            display: grid;
-            grid-template-columns: 1.5fr 2fr 1fr;
-            align-items: center;
-            gap: 20px;
-            text-align: left;
-        }
-
-        .budget-info h6 {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: var(--text-primary);
-        }
-
-        .budget-info p {
-            font-size: 0.74rem;
-            color: var(--text-muted);
-        }
-
-        .budget-bar-shell {
-            width: 100%;
-            height: 8px;
-            background: var(--bg-soft);
-            border-radius: 99px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .budget-bar-fill {
-            height: 100%;
-            border-radius: 99px;
-            width: 0%; /* Animated via JS */
-            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .budget-val {
-            text-align: right;
-            font-size: 0.88rem;
-            font-weight: 700;
-        }
-
-        .budget-val span {
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        /* Analytics Tab */
-        .analytics-wrap {
-            display: grid;
-            grid-template-columns: 1.6fr 1fr;
-            gap: 20px;
-            text-align: left;
-        }
-
-        .chart-card {
-            background: var(--card-bg);
-            border: 1px solid var(--line);
-            border-radius: 18px;
-            padding: 20px;
-        }
-
-        .category-breakdown {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .cat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            padding: 8px 12px;
-            border-radius: 10px;
-            background: var(--card-bg);
-            border: 1px solid var(--line);
-        }
-
-        .cat-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-        }
-
-        .bold-num {
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        /* Section Global Settings */
-        .section-header {
-            text-align: center;
-            margin-bottom: 48px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .section-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(1.8rem, 3.2vw, 2.5rem);
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            color: var(--text-primary);
-        }
-
-        .section-sub {
-            color: var(--text-muted);
-            font-size: 1rem;
-            max-width: 60ch;
-            margin: 8px auto 0;
-        }
-
-        .section-pad {
-            padding: 80px 0;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* Feature Showcase */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-        }
-
-        .feature-card {
-            padding: 28px;
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(14, 165, 233, 0.3);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.06);
-        }
-
-        .feature-icon-box {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            background: rgba(14, 165, 233, 0.12);
-            color: var(--brand-a);
-        }
-
-        .feature-card:nth-child(2) .feature-icon-box {
-            background: rgba(16, 185, 129, 0.12);
-            color: var(--brand-b);
-        }
-
-        .feature-card:nth-child(3) .feature-icon-box {
-            background: rgba(99, 102, 241, 0.12);
-            color: var(--brand-c);
-        }
-
-        .feature-card:nth-child(4) .feature-icon-box {
-            background: rgba(245, 158, 11, 0.12);
-            color: var(--warning);
-        }
-
-        .feature-body h3 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.12rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-
-        .feature-body p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.55;
-        }
-
-        /* Interactive Simulator Section */
-        .simulator-layout {
-            display: grid;
-            grid-template-columns: 1.1fr 1fr;
-            gap: 40px;
-            align-items: center;
-        }
-
-        .sim-controls {
-            padding: 30px;
-        }
-
-        .slider-group {
-            margin-bottom: 30px;
-        }
-
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.92rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: var(--text-muted);
-        }
-
-        .slider-label .income-val {
-            font-size: 1.6rem;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            color: var(--brand-a);
-        }
-
-        /* Range Slider Styling */
-        .range-slider {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 8px;
-            border-radius: 99px;
-            background: var(--bg-soft);
-            outline: none;
-            cursor: pointer;
-        }
-
-        .range-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: var(--brand-a);
-            border: 4px solid var(--card-bg);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            transition: transform 0.1s ease;
-        }
-
-        .range-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.15);
-        }
-
-        .sim-splits {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .split-card {
-            padding: 14px 18px;
-            border-radius: 16px;
-            background: var(--bg-soft);
-            border-left: 5px solid transparent;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .split-card.needs { border-left-color: var(--brand-a); }
-        .split-card.wants { border-left-color: var(--brand-c); }
-        .split-card.savings { border-left-color: var(--brand-b); }
-
-        .split-meta h4 {
-            font-size: 0.88rem;
-            font-weight: 800;
-            color: var(--text-primary);
-        }
-
-        .split-meta p {
-            font-size: 0.74rem;
-            color: var(--text-muted);
-        }
-
-        .split-val {
-            font-size: 1.15rem;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            color: var(--text-primary);
-        }
-
-        .chart-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        /* SVG Donut Chart */
-        .donut-svg {
-            transform: rotate(-90deg);
-        }
-
-        .donut-circle-bg {
-            fill: none;
-            stroke: var(--bg-soft);
-            stroke-width: 14;
-        }
-
-        .donut-segment {
-            fill: none;
-            stroke-width: 14;
-            stroke-linecap: round;
-            transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease;
-        }
-
-        .donut-segment.needs { stroke: var(--brand-a); }
-        .donut-segment.wants { stroke: var(--brand-c); }
-        .donut-segment.savings { stroke: var(--brand-b); }
-
-        .donut-center-text {
-            position: absolute;
-            text-align: center;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .donut-center-text span {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            display: block;
-        }
-
-        .donut-center-text strong {
-            font-size: 1.8rem;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            color: var(--text-primary);
-        }
-
-        .donut-legend {
-            display: flex;
-            gap: 16px;
-            margin-top: 24px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: var(--text-muted);
-        }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .legend-dot.blue { background: var(--brand-a); }
-        .legend-dot.purple { background: var(--brand-c); }
-        .legend-dot.green { background: var(--brand-b); }
-
-        /* Interactive Expense Sandbox */
-        .sandbox-layout {
-            display: grid;
-            grid-template-columns: 1fr 1.25fr;
-            gap: 30px;
-        }
-
-        .sandbox-panel {
-            padding: 26px;
-        }
-
-        .sandbox-title {
-            font-size: 1rem;
-            font-weight: 800;
-            margin-bottom: 16px;
-            font-family: 'Outfit', sans-serif;
-            border-bottom: 1px solid var(--line);
-            padding-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sandbox-reset {
-            font-size: 0.72rem;
-            color: var(--brand-a);
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-        .sandbox-reset:hover {
-            text-decoration: underline;
-        }
-
-        .quick-presets {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .preset-btn {
-            padding: 10px;
-            border-radius: 12px;
-            background: var(--bg-soft);
-            border: 1px solid transparent;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            cursor: pointer;
-            text-align: left;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .preset-btn:hover {
-            border-color: var(--brand-a);
-            background: var(--card-bg);
-            transform: translateY(-1px);
-        }
-
-        .sandbox-form {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .form-row-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .form-group label {
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: var(--text-muted);
-        }
-
-        .form-input {
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid var(--line);
-            background: var(--bg-soft);
-            color: var(--text-primary);
-            outline: none;
-            font-family: inherit;
-            font-size: 0.82rem;
-            transition: border-color 0.2s ease;
-        }
-
-        .form-input:focus {
-            border-color: var(--brand-a);
-            background: var(--card-bg);
-        }
-
-        .btn-add-sandbox {
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            background: var(--brand-gradient);
-            color: white;
-            font-weight: 800;
-            font-size: 0.82rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 6px;
-            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .btn-add-sandbox:hover {
-            background: var(--brand-gradient-hover);
-            box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3);
-            transform: translateY(-2px);
-        }
-
-        /* Sandbox Ledger Display */
-        .ledger-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .ledger-stat-box {
-            background: var(--bg-soft);
-            border-radius: 14px;
-            padding: 12px;
-            text-align: left;
-        }
-
-        .ledger-stat-box span {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .ledger-stat-box h5 {
-            font-size: 1.05rem;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            margin-top: 2px;
-        }
-
-        .ledger-stat-box.balance h5 { color: var(--brand-a); }
-        .ledger-stat-box.inflow h5 { color: var(--brand-b); }
-        .ledger-stat-box.outflow h5 { color: var(--danger); }
-
-        .sandbox-ledger-list {
-            max-height: 210px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding-right: 4px;
-        }
-
-        /* Scrollbar styles for list */
-        .sandbox-ledger-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        .sandbox-ledger-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .sandbox-ledger-list::-webkit-scrollbar-thumb {
-            background: var(--line);
-            border-radius: 99px;
-        }
-
-        .ledger-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 14px;
-            background: var(--card-bg);
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            font-size: 0.8rem;
-            animation: slideIn 0.3s ease forwards;
-        }
-
-        @@keyframes slideIn {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .li-desc {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .li-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .li-icon.inflow { background: rgba(16, 185, 129, 0.12); color: var(--brand-b); }
-        .li-icon.outflow { background: rgba(239, 68, 68, 0.12); color: var(--danger); }
-
-        .li-text h6 {
-            font-size: 0.82rem;
-            font-weight: 800;
-            color: var(--text-primary);
-        }
-
-        .li-text p {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-        }
-
-        .li-amt {
-            font-weight: 800;
-            font-size: 0.85rem;
-        }
-
-        .li-amt.inflow { color: var(--brand-b); }
-        .li-amt.outflow { color: var(--danger); }
-
-        /* How it Works Pipeline */
-        .process-pipeline {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            position: relative;
-        }
-
-        .process-pipeline::before {
-            content: '';
-            position: absolute;
-            height: 2px;
-            background: var(--line);
-            top: 40px;
-            left: 10%;
-            right: 10%;
-            z-index: 1;
-        }
-
-        .process-step {
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-
-        .step-num {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--brand-gradient);
-            color: white;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            font-size: 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            border: 6px solid var(--bg-main);
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .process-step:hover .step-num {
-            transform: scale(1.1);
-            box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4);
-        }
-
-        .process-step h4 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.05rem;
-            font-weight: 800;
-            margin-bottom: 6px;
-            color: var(--text-primary);
-        }
-
-        .process-step p {
-            font-size: 0.84rem;
-            color: var(--text-muted);
-            max-width: 32ch;
-            margin: 0 auto;
-        }
-
-        /* Testimonials section removed */
-
-        /* Bottom CTA Banner */
-        .cta-banner {
-            text-align: center;
-            padding: 80px 40px;
-            position: relative;
-            overflow: hidden;
-            border-radius: 32px;
-            background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(16, 185, 129, 0.05) 100%);
-            border: 1px solid var(--line);
-        }
-
-        [data-theme="dark"] .cta-banner {
-            background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
-        }
-
-        .cta-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            font-weight: 900;
-            letter-spacing: -0.03em;
-            margin-bottom: 12px;
-            color: var(--text-primary);
-        }
-
-        .cta-sub {
-            font-size: 1.05rem;
-            color: var(--text-muted);
-            max-width: 60ch;
-            margin: 0 auto 30px;
-        }
-
-        /* Footer */
-        .footer {
-            border-top: 1px solid var(--line);
-            padding: 60px 0 30px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 1.5fr repeat(3, 1fr);
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-logo {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .footer-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            max-width: 32ch;
-        }
-
-        .footer-col h5 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 16px;
-            color: var(--text-primary);
-        }
-
-        .footer-links {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            list-style: none;
-        }
-
-        .footer-link a {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 0.82rem;
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-
-        .footer-link a:hover {
-            color: var(--text-primary);
-        }
-
-        .footer-bottom {
-            border-top: 1px solid var(--line);
-            padding-top: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 12px;
-        }
-
-        .social-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            border: 1px solid var(--line);
-            background: var(--card-bg);
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .social-icon:hover {
-            color: var(--text-primary);
-            background: var(--bg-soft);
-            transform: scale(1.05);
-        }
-
-        /* Responsive Breakpoints */
-        @@media (max-width: 1024px) {
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-            .simulator-layout {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
-            .sandbox-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @@media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            .preview-grid-3 {
-                grid-template-columns: 1fr;
-            }
-            .analytics-wrap {
-                grid-template-columns: 1fr;
-            }
-            .budget-row {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            .budget-val {
-                text-align: left;
-            }
-            .process-pipeline {
-                grid-template-columns: 1fr;
-            }
-            .process-pipeline::before {
-                display: none;
-            }
-
-            .footer-grid {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
+            --bg-main:#070d19;--bg-soft:#0e1726;--text-primary:#f1f5f9;--text-muted:#94a3b8;
+            --line:rgba(255,255,255,0.08);--card-bg:rgba(13,23,42,0.7);
+            --money-grid:rgba(255,255,255,0.03);--money-wave:rgba(14,165,233,0.12);--money-wave-2:rgba(16,185,129,0.1);
+            --glow-a:rgba(14,165,233,0.2);--glow-b:rgba(16,185,129,0.16);--glow-c:rgba(5,150,105,0.15);
+            --topbar-bg:rgba(7,13,25,0.7);
+            --success:#34d399;--danger:#f87171;--warning:#fbbf24;--info:#38bdf8;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{font-family:'Manrope',system-ui,sans-serif;color:var(--text-primary);background:var(--bg-main);overflow-x:hidden;line-height:1.6;transition:background-color .3s,color .3s}
+        h1,h2,h3,h4,h5{font-family:'Outfit','Manrope',sans-serif}
+        a{text-decoration:none;color:inherit}
+        .wrap{width:min(1160px,92vw);margin:0 auto;padding:0 20px}
+
+        /* ── Ambient ── */
+        .ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+        .bg-noise{position:absolute;inset:0;background-image:radial-gradient(circle at 15% 15%,var(--money-wave),transparent 45%),radial-gradient(circle at 85% 85%,var(--money-wave-2),transparent 45%)}
+        .bg-grid{position:absolute;inset:0;background-image:linear-gradient(to right,var(--money-grid) 1px,transparent 1px),linear-gradient(to bottom,var(--money-grid) 1px,transparent 1px);background-size:60px 60px}
+        .bg-glow{position:absolute;border-radius:999px;filter:blur(130px);opacity:.7;animation:fl 22s infinite alternate ease-in-out}
+        .bg-glow-a{width:500px;height:500px;top:-100px;left:-120px;background:var(--glow-a)}
+        .bg-glow-b{width:450px;height:450px;right:-90px;top:35%;background:var(--glow-b);animation-delay:-7s}
+        .bg-glow-c{width:380px;height:380px;bottom:-60px;left:25%;background:var(--glow-c);animation-delay:-13s}
+        @@keyframes fl{0%{transform:translateY(0) scale(1)}100%{transform:translateY(25px) scale(1.1)}}
+
+        /* ── Glass Card ── */
+        .glass{background:var(--card-bg);border:1px solid var(--line);border-radius:20px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 10px 40px -10px rgba(0,0,0,0.06);transition:all .3s}
+        [data-theme="dark"] .glass{box-shadow:0 10px 40px -10px rgba(0,0,0,0.3)}
+
+        /* ── Topbar ── */
+        .topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;transition:all .35s;padding:16px 0}
+        .topbar.scrolled{padding:10px 0;background:var(--topbar-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line);box-shadow:0 4px 30px rgba(0,0,0,0.03)}
+        .topbar-inner{display:flex;justify-content:space-between;align-items:center;width:100%;padding:0 16px}
+        .brand{display:inline-flex;align-items:center;gap:9px;font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-0.03em;color:var(--text-primary)}
+        .brand-mark{width:34px;height:34px;border-radius:9px;background:var(--brand-gradient);box-shadow:0 5px 14px rgba(14,165,233,0.25);display:inline-flex;align-items:center;justify-content:center;color:white;transition:transform .3s}
+        .brand:hover .brand-mark{transform:scale(1.06) rotate(4deg)}
+        .nav-links{display:flex;align-items:center;gap:22px}
+        .nav-link{font-size:.85rem;font-weight:600;color:var(--text-muted);transition:color .2s;position:relative}
+        .nav-link:hover{color:var(--text-primary)}
+        .nav-link::after{content:'';position:absolute;width:0;height:2px;bottom:-5px;left:0;background:var(--brand-a);transition:width .3s}
+        .nav-link:hover::after{width:100%}
+        .top-actions{display:flex;align-items:center;gap:8px}
+        .theme-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card-bg);color:var(--text-primary);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s}
+        .theme-btn:hover{transform:rotate(15deg) scale(1.05);background:var(--bg-soft)}
+        .btn-auth{border-radius:9px;padding:8px 16px;font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;justify-content:center;transition:all .25s;cursor:pointer;border:none}
+        .btn-signin{color:var(--text-primary);border:1px solid var(--line);background:var(--card-bg)}
+        .btn-signin:hover{background:var(--bg-soft);transform:translateY(-1px)}
+        .btn-signup{color:white;background:var(--brand-gradient);box-shadow:0 5px 16px rgba(14,165,233,0.25)}
+        .btn-signup:hover{background:var(--brand-gradient-hover);box-shadow:0 8px 22px rgba(14,165,233,0.35);transform:translateY(-1px)}
+
+        /* ── Hero ── */
+        .hero{position:relative;z-index:10;padding:150px 0 70px;text-align:center}
+        .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px 6px 10px;border-radius:99px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);color:var(--brand-a);font-size:.78rem;font-weight:700;margin-bottom:24px;animation:pulse 2.5s infinite}
+        [data-theme="dark"] .hero-badge{background:rgba(14,165,233,0.15)}
+        @@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(14,165,233,0.35)}70%{box-shadow:0 0 0 8px rgba(14,165,233,0)}100%{box-shadow:0 0 0 0 rgba(14,165,233,0)}}
+        .hero-title{font-size:clamp(2.4rem,5.5vw,4.2rem);font-weight:900;line-height:1.08;letter-spacing:-0.04em;max-width:20ch;margin:0 auto 18px;color:var(--text-primary)}
+        .text-grad{background:var(--brand-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .hero-sub{font-size:1.08rem;color:var(--text-muted);max-width:58ch;margin:0 auto 34px;line-height:1.7}
+        .hero-btns{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+        .hero-btn-p{padding:14px 30px;border-radius:13px;font-size:1rem;font-weight:700;color:white;background:var(--brand-gradient);box-shadow:0 8px 28px rgba(14,165,233,0.3);transition:all .3s;display:inline-flex;align-items:center;gap:8px}
+        .hero-btn-p:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(14,165,233,0.45);background:var(--brand-gradient-hover);color:white}
+        .hero-btn-s{padding:14px 28px;border-radius:13px;font-size:1rem;font-weight:700;color:var(--text-primary);border:1px solid var(--line);background:var(--card-bg);backdrop-filter:blur(8px);transition:all .3s;display:inline-flex;align-items:center;gap:8px}
+        .hero-btn-s:hover{transform:translateY(-2px);background:var(--bg-soft);color:var(--text-primary)}
+        .hero-note{font-size:.78rem;color:var(--text-muted);margin-top:12px}
+
+        /* ── Dashboard Preview ── */
+        .dash-preview{max-width:960px;margin:48px auto 0;border-radius:20px;overflow:hidden;position:relative;box-shadow:0 25px 60px -12px rgba(0,0,0,0.12);background:var(--bg-soft);border:1px solid var(--line);transition:transform .4s ease,box-shadow .4s ease}
+        .dash-preview:hover{transform:translateY(-4px);box-shadow:0 35px 70px -8px rgba(0,0,0,0.18)}
+        [data-theme="dark"] .dash-preview{box-shadow:0 25px 70px -12px rgba(0,0,0,0.5);background:#0d1525}
+        .dash-head{background:var(--card-bg);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+        .dots{display:flex;gap:4px}
+        .dot{width:9px;height:9px;border-radius:50%}
+        .dot-r{background:#ef4444}.dot-y{background:#f59e0b}.dot-g{background:#10b981}
+        .dash-tabs{display:flex;gap:2px;background:var(--bg-soft);padding:3px;border-radius:8px}
+        .dash-tab{padding:6px 14px;border-radius:6px;font-size:.74rem;font-weight:700;color:var(--text-muted);border:none;background:transparent;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .2s;white-space:nowrap}
+        .dash-tab.active{background:var(--card-bg);color:var(--text-primary);box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+        .dash-view{padding:16px;display:none;animation:fadeUp .4s ease forwards}
+        .dash-view.active{display:block}
+        @@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+        .ov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+        .ov-card{background:var(--card-bg);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center}
+        .ov-card p{font-size:.66rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+        .ov-card h4{font-size:1.1rem;font-family:'Outfit',sans-serif;font-weight:800;margin-top:2px;color:var(--text-primary)}
+        .ov-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .ov-icon.sky{background:rgba(14,165,233,0.1);color:var(--brand-a)}
+        .ov-icon.grn{background:rgba(16,185,129,0.1);color:var(--brand-b)}
+        .ov-icon.red{background:rgba(239,68,68,0.1);color:var(--danger)}
+        .ov-main{background:var(--card-bg);border:1px solid var(--line);border-radius:14px;padding:14px}
+        .ov-main-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
+        .ov-main-header h5{font-size:.84rem;font-weight:800}
+        .badge-up{font-size:.66rem;background:rgba(16,185,129,0.1);color:var(--brand-b);padding:3px 7px;border-radius:99px;font-weight:700;white-space:nowrap}
+
+        .bud-list{display:flex;flex-direction:column;gap:10px}
+        .bud-row{background:var(--card-bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:1.5fr 2fr 1fr;align-items:center;gap:12px}
+        .bud-row h6{font-size:.82rem;font-weight:800;color:var(--text-primary)}
+        .bud-row p{font-size:.7rem;color:var(--text-muted)}
+        .bud-track{width:100%;height:6px;background:var(--bg-soft);border-radius:99px;overflow:hidden}
+        .bud-fill{height:100%;border-radius:99px;width:0;transition:width 1s ease}
+        .bud-val{text-align:right;font-size:.82rem;font-weight:700}
+        .bud-val span{color:var(--text-muted);font-weight:500}
+
+        .an-wrap{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}
+        .an-chart{background:var(--card-bg);border:1px solid var(--line);border-radius:14px;padding:14px}
+        .an-cats{display:flex;flex-direction:column;gap:8px}
+        .an-cat{display:flex;justify-content:space-between;align-items:center;font-size:.76rem;padding:6px 10px;border-radius:9px;background:var(--card-bg);border:1px solid var(--line)}
+        .cat-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+        .bold{font-weight:700;color:var(--text-primary)}
+
+        /* ── Sections ── */
+        .sec{position:relative;z-index:10;padding:80px 0}
+        .sec-head{text-align:center;margin-bottom:44px}
+        .sec-head h2{font-size:clamp(1.7rem,3.2vw,2.4rem);font-weight:900;letter-spacing:-0.03em;color:var(--text-primary);margin-bottom:8px}
+        .sec-head p{font-size:.98rem;color:var(--text-muted);max-width:54ch;margin:0 auto}
+
+        /* ── Stats ── */
+        .stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:36px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+        .stat-item{text-align:center;padding:16px}
+        .stat-item .num{font-size:2rem;font-family:'Outfit',sans-serif;font-weight:900;letter-spacing:-0.03em;background:var(--brand-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+        .stat-item .desc{font-size:.8rem;font-weight:600;color:var(--text-muted)}
+
+        /* ── Bento Features ── */
+        .bento{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+        .bento-card{padding:28px;transition:all .3s;position:relative;overflow:hidden}
+        .bento-card:hover{transform:translateY(-4px);border-color:rgba(14,165,233,0.3);box-shadow:0 18px 40px -8px rgba(0,0,0,0.08)}
+        [data-theme="dark"] .bento-card:hover{box-shadow:0 18px 40px -8px rgba(0,0,0,0.3)}
+        .bento-card.span{grid-column:1 / -1}
+        .bento-card .icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+        .bento-card .icon.sky{background:rgba(14,165,233,0.1);color:var(--brand-a)}
+        .bento-card .icon.grn{background:rgba(16,185,129,0.1);color:var(--brand-b)}
+        .bento-card .icon.vio{background:rgba(5,150,105,0.1);color:var(--brand-c)}
+        .bento-card .icon.amb{background:rgba(245,158,11,0.1);color:var(--warning)}
+        .bento-card .icon.red{background:rgba(239,68,68,0.1);color:var(--danger)}
+        .bento-card h3{font-size:1.05rem;font-weight:800;margin-bottom:8px;color:var(--text-primary)}
+        .bento-card p{font-size:.85rem;color:var(--text-muted);line-height:1.6}
+        .mini-chart{display:flex;align-items:flex-end;gap:4px;height:44px;margin-top:16px}
+        .mini-bar{width:14px;border-radius:4px;background:var(--brand-a);opacity:.4;transition:opacity .3s}
+        .bento-card:hover .mini-bar{opacity:.7}
+        .wallet-row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+        .wallet-chip{padding:5px 10px;border-radius:8px;background:var(--bg-soft);border:1px solid var(--line);font-size:.72rem;font-weight:700;color:var(--text-muted);display:inline-flex;align-items:center;gap:5px}
+
+        /* ── Steps ── */
+        .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+        .step-card{text-align:center;padding:32px 24px;transition:all .3s}
+        .step-card:hover{transform:translateY(-3px);border-color:rgba(14,165,233,0.25)}
+        .step-num{width:52px;height:52px;border-radius:50%;background:var(--brand-gradient);color:white;font-family:'Outfit',sans-serif;font-weight:800;font-size:1.2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:5px solid var(--bg-main);box-shadow:0 4px 16px rgba(14,165,233,0.2);transition:all .3s}
+        .step-card:hover .step-num{transform:scale(1.08);box-shadow:0 6px 20px rgba(14,165,233,0.35)}
+        .step-card h4{font-size:1rem;font-weight:800;margin-bottom:6px;color:var(--text-primary)}
+        .step-card p{font-size:.84rem;color:var(--text-muted);max-width:30ch;margin:0 auto;line-height:1.6}
+
+        /* ── CTA ── */
+        .cta-box{text-align:center;padding:64px 36px;border-radius:28px;background:linear-gradient(135deg,rgba(14,165,233,0.06),rgba(16,185,129,0.04));border:1px solid var(--line);position:relative;overflow:hidden}
+        [data-theme="dark"] .cta-box{background:linear-gradient(135deg,rgba(14,165,233,0.12),rgba(16,185,129,0.08))}
+        .cta-box h2{font-size:clamp(1.7rem,3.8vw,2.6rem);font-weight:900;letter-spacing:-0.035em;margin-bottom:10px;color:var(--text-primary)}
+        .cta-box p{font-size:1rem;color:var(--text-muted);max-width:52ch;margin:0 auto 28px}
+
+        /* ── Footer ── */
+        .footer{border-top:1px solid var(--line);padding:36px 0 20px;position:relative;z-index:10}
+        .foot-grid{display:grid;grid-template-columns:1.4fr repeat(2,1fr);gap:24px;margin-bottom:24px}
+        .foot-brand p{font-size:.8rem;color:var(--text-muted);margin-top:8px;max-width:28ch;line-height:1.5}
+        .foot-col h5{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;color:var(--text-primary)}
+        .foot-col ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+        .foot-col a{font-size:.8rem;color:var(--text-muted);transition:color .2s}
+        .foot-col a:hover{color:var(--text-primary)}
+        .foot-bottom{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-content:space-between;align-items:center;font-size:.72rem;color:var(--text-muted)}
+        .socials{display:flex;gap:8px}
+        .soc{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--card-bg);color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:all .2s}
+        .soc:hover{color:var(--text-primary);background:var(--bg-soft);transform:scale(1.05)}
+
+        /* ── Responsive ── */
+        @@media(max-width:1024px){
+            .bento,.an-wrap{grid-template-columns:1fr 1fr}
+            .bento-card.span{grid-column:1 / -1}
+        }
+        @@media(max-width:768px){
+            .topbar-inner{padding:0 12px}
+            .nav-links{display:none}
+            .btn-signin{display:none}
+            .top-actions{gap:6px}
+            .brand{font-size:1rem;gap:7px}
+            .brand-mark{width:30px;height:30px;border-radius:8px}
+            .btn-signup{padding:7px 14px;font-size:.78rem}
+            .theme-btn{width:34px;height:34px}
+
+            .hero{padding:120px 0 50px}
+            .hero-title{font-size:clamp(2rem,8vw,2.8rem)}
+            .hero-sub{font-size:.95rem;margin-bottom:28px}
+            .hero-btns{flex-direction:column;gap:10px}
+            .hero-btn-p,.hero-btn-s{width:100%;justify-content:center;padding:13px 24px}
+
+            .dash-preview{margin:36px 0 0;border-radius:16px}
+            .dots{display:none}
+            .dash-head{padding:10px 12px;justify-content:center}
+            .dash-tabs{width:100%;justify-content:center}
+            .dash-tab{padding:5px 10px;font-size:.7rem;gap:3px}
+            .dash-tab i{display:none}
+            .dash-view{padding:12px}
+
+            .ov-grid{grid-template-columns:1fr;gap:8px}
+            .ov-card{padding:10px 12px}
+            .ov-card h4{font-size:1rem}
+            .ov-card p{font-size:.62rem}
+            .ov-icon{width:28px;height:28px;border-radius:7px}
+            .ov-icon svg{width:14px;height:14px}
+            .ov-main{padding:12px}
+            .ov-main-header{gap:6px}
+            .ov-main-header h5{font-size:.8rem}
+
+            .bud-row{grid-template-columns:1fr;gap:6px;padding:10px 12px}
+            .bud-val{text-align:left}
+            .bud-track{height:5px}
+
+            .an-wrap{grid-template-columns:1fr}
+            .an-chart{padding:12px}
+            .an-cat{padding:5px 8px;font-size:.72rem}
+
+            .bento,.steps-grid{grid-template-columns:1fr}
+            .bento-card.span{grid-column:span 1}
+            .stats-strip{grid-template-columns:repeat(2,1fr)}
+            .foot-grid{grid-template-columns:1fr;gap:24px}
+            .cta-box{padding:40px 20px}
+            .foot-bottom{flex-direction:column;gap:12px;text-align:center}
+        }
+        @@media(max-width:400px){
+            .wrap{padding:0 14px}
+            .hero{padding:100px 0 40px}
+            .hero-title{font-size:1.8rem}
+            .hero-badge{font-size:.72rem;padding:5px 12px 5px 8px}
+            .dash-preview{border-radius:12px;margin:28px -4px 0}
+            .dash-tabs{gap:1px;padding:2px}
+            .dash-tab{padding:5px 8px;font-size:.66rem}
+            .ov-card h4{font-size:.92rem}
+            .stats-strip{grid-template-columns:1fr 1fr;gap:8px}
+            .stat-item .num{font-size:1.5rem}
+            .stat-item .desc{font-size:.72rem}
         }
     </style>
 </head>
 <body>
-    <!-- Background elements -->
-    <div class="ambient-glows" aria-hidden="true">
+    <div class="ambient" aria-hidden="true">
         <div class="bg-noise"></div>
         <div class="bg-grid"></div>
-        <div class="bg-glow-a"></div>
-        <div class="bg-glow-b"></div>
-        <div class="bg-glow-c"></div>
+        <div class="bg-glow bg-glow-a"></div>
+        <div class="bg-glow bg-glow-b"></div>
+        <div class="bg-glow bg-glow-c"></div>
     </div>
 
-    <!-- Navigation Header -->
     <header id="mainHeader" class="topbar">
         <div class="wrap topbar-inner">
-            <a class="brand" href="@Url.Action("Index", "Home")">
-                <span class="brand-mark" aria-hidden="true">
-                    <i data-lucide="wallet" style="width: 20px; height: 20px;"></i>
-                </span>
+            <a class="brand" href="@Url.Action("Index","Home")">
+                <span class="brand-mark"><i data-lucide="wallet" style="width:17px;height:17px"></i></span>
                 ExpenseTracker
             </a>
-
-            <nav class="nav-links">
-                <a href="#features" class="nav-link">Features</a>
-                <a href="#demo" class="nav-link">Dashboard Demo</a>
-                <a href="#simulator" class="nav-link">Budget Calculator</a>
-            </nav>
-
             <div class="top-actions">
                 <button id="themeToggle" class="theme-btn" type="button" aria-label="Toggle theme">
-                    <span id="themeGlyph"><i data-lucide="moon" style="width: 18px; height: 18px;"></i></span>
+                    <span id="themeGlyph"><i data-lucide="moon" style="width:16px;height:16px"></i></span>
                 </button>
-                <a href="@Url.Action("Login", "Account")" class="btn-auth btn-signin">Sign In</a>
-                <a href="@Url.Action("Register", "Account")" class="btn-auth btn-signup">Get Started</a>
             </div>
         </div>
     </header>
 
-    <!-- Hero Fold -->
     <main class="wrap">
         <section class="hero">
-            <div class="hero-badge">
-                <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
-                Bank-Grade Security for Peace of Mind
-            </div>
-            
-            <h1 class="hero-title">
-                A smarter way to <span class="text-gradient">manage personal finance</span>.
-            </h1>
-            
-            <p class="hero-sub">
-                Track expenses and income, balance multiple accounts, establish budgets, and configure automated recurring items from a stunning secure console.
-            </p>
-            
+            <h1 class="hero-title">Take control of your <span class="text-grad">personal finances</span></h1>
+            <p class="hero-sub">Track expenses and income, manage multiple accounts, set smart budgets, and automate recurring transactions from one beautiful, secure dashboard.</p>
             <div class="hero-btns">
-                <a href="@Url.Action("Register", "Account")" class="hero-btn-primary">
-                    Start Tracking Free
-                    <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-                </a>
-                <a href="#demo" class="hero-btn-secondary">
-                    View Live Preview
-                    <i data-lucide="play" style="width: 16px; height: 16px;"></i>
-                </a>
+                <a href="@Url.Action("Login","Account")" class="hero-btn-p">Sign In <i data-lucide="log-in" style="width:16px;height:16px"></i></a>
+                <a href="@Url.Action("Register","Account")" class="hero-btn-s">Get Started <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
             </div>
+            <p class="hero-note">No credit card required · Your data stays private · Free forever</p>
+        </section>
 
-            <!-- Dashboard Preview Widget -->
-            <div id="demo" class="dashboard-preview">
-                <div class="dashboard-header">
-                    <div class="dashboard-controls">
-                        <span class="dot dot-red"></span>
-                        <span class="dot dot-yellow"></span>
-                        <span class="dot dot-green"></span>
+        <!-- Dashboard Preview -->
+        <div id="demo" class="dash-preview">
+            <div class="dash-head">
+                <div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+                <div class="dash-tabs">
+                    <button class="dash-tab active" onclick="switchTab('overview')"><i data-lucide="layout-dashboard" style="width:12px;height:12px"></i> Overview</button>
+                    <button class="dash-tab" onclick="switchTab('budgets')"><i data-lucide="pie-chart" style="width:12px;height:12px"></i> Budgets</button>
+                    <button class="dash-tab" onclick="switchTab('analytics')"><i data-lucide="trending-up" style="width:12px;height:12px"></i> Analytics</button>
+                </div>
+            </div>
+            <div id="view-overview" class="dash-view active">
+                <div class="ov-grid">
+                    <div class="ov-card"><div><p>Net Balance</p><h4>₹8,349.00</h4></div><div class="ov-icon sky"><i data-lucide="wallet"></i></div></div>
+                    <div class="ov-card"><div><p>Monthly Income</p><h4>₹6,200.00</h4></div><div class="ov-icon grn"><i data-lucide="arrow-up-right"></i></div></div>
+                    <div class="ov-card"><div><p>Monthly Expenses</p><h4>₹3,180.00</h4></div><div class="ov-icon red"><i data-lucide="arrow-down-left"></i></div></div>
+                </div>
+                <div class="ov-main">
+                    <div class="ov-main-header"><h5>Recent Activity</h5><span class="badge-up">+12.4% vs Last Month</span></div>
+                    <svg viewBox="0 0 700 110" style="width:100%;height:auto;overflow:visible">
+                        <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.25"/><stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/></linearGradient></defs>
+                        <path d="M0 100 L0 70 Q70 30 140 50 T280 15 T420 70 T560 25 L700 8 L700 110 Z" fill="url(#cg)"/>
+                        <path d="M0 70 Q70 30 140 50 T280 15 T420 70 T560 25 L700 8" fill="none" stroke="#0ea5e9" stroke-width="3.5" stroke-linecap="round"/>
+                        <circle cx="280" cy="15" r="5" fill="#10b981" stroke="#fff" stroke-width="2"/>
+                        <circle cx="560" cy="25" r="5" fill="#0ea5e9" stroke="#fff" stroke-width="2"/>
+                        <circle cx="700" cy="8" r="5" fill="#0ea5e9" stroke="#fff" stroke-width="2"/>
+                    </svg>
+                </div>
+            </div>
+            <div id="view-budgets" class="dash-view">
+                <div class="bud-list">
+                    <div class="bud-row"><div><h6>🍔 Food & Dining</h6><p>Monthly allocation</p></div><div class="bud-track"><div class="bud-fill" style="background:var(--brand-a);width:68%"></div></div><div class="bud-val">₹408.00 <span>/ ₹600.00</span></div></div>
+                    <div class="bud-row"><div><h6>🏠 Utilities & Rent</h6><p>Fixed bills</p></div><div class="bud-track"><div class="bud-fill" style="background:var(--brand-b);width:92%"></div></div><div class="bud-val">₹1,104.00 <span>/ ₹1,200.00</span></div></div>
+                    <div class="bud-row"><div><h6>🍿 Entertainment</h6><p>Discretionary</p></div><div class="bud-track"><div class="bud-fill" style="background:var(--danger);width:45%"></div></div><div class="bud-val">₹180.00 <span>/ ₹400.00</span></div></div>
+                </div>
+            </div>
+            <div id="view-analytics" class="dash-view">
+                <div class="an-wrap">
+                    <div class="an-chart">
+                        <h5 style="font-size:.85rem;font-weight:800;margin-bottom:10px">Cashflow Trend</h5>
+                        <div style="display:flex;align-items:flex-end;justify-content:space-between;height:150px;padding-top:8px">
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:12%"><div style="height:90px;width:100%;background:var(--bg-soft);border-radius:5px;display:flex;align-items:flex-end"><div style="height:60%;width:100%;background:var(--brand-a);border-radius:5px"></div></div><span style="font-size:.6rem;font-weight:700;color:var(--text-muted)">Jan</span></div>
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:12%"><div style="height:90px;width:100%;background:var(--bg-soft);border-radius:5px;display:flex;align-items:flex-end"><div style="height:75%;width:100%;background:var(--brand-a);border-radius:5px"></div></div><span style="font-size:.6rem;font-weight:700;color:var(--text-muted)">Feb</span></div>
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:12%"><div style="height:90px;width:100%;background:var(--bg-soft);border-radius:5px;display:flex;align-items:flex-end"><div style="height:40%;width:100%;background:var(--brand-a);border-radius:5px"></div></div><span style="font-size:.6rem;font-weight:700;color:var(--text-muted)">Mar</span></div>
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:12%"><div style="height:90px;width:100%;background:var(--bg-soft);border-radius:5px;display:flex;align-items:flex-end"><div style="height:90%;width:100%;background:var(--brand-a);border-radius:5px"></div></div><span style="font-size:.6rem;font-weight:700;color:var(--text-muted)">Apr</span></div>
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:12%"><div style="height:90px;width:100%;background:var(--bg-soft);border-radius:5px;display:flex;align-items:flex-end"><div style="height:82%;width:100%;background:var(--brand-b);border-radius:5px"></div></div><span style="font-size:.6rem;font-weight:700;color:var(--text-muted)">May</span></div>
+                        </div>
                     </div>
-                    <div class="dashboard-tabs">
-                        <button class="dashboard-tab active" onclick="switchTab('overview')">
-                            <i data-lucide="layout-dashboard" style="width: 13px; height: 13px;"></i>
-                            Overview
-                        </button>
-                        <button class="dashboard-tab" onclick="switchTab('budgets')">
-                            <i data-lucide="pie-chart" style="width: 13px; height: 13px;"></i>
-                            Budgets
-                        </button>
-                        <button class="dashboard-tab" onclick="switchTab('analytics')">
-                            <i data-lucide="trending-up" style="width: 13px; height: 13px;"></i>
-                            Analytics
-                        </button>
+                    <div class="an-cats">
+                        <div class="an-cat"><span><span class="cat-dot" style="background:var(--brand-a)"></span>Food & Groceries</span><span class="bold">₹542.00</span></div>
+                        <div class="an-cat"><span><span class="cat-dot" style="background:var(--brand-c)"></span>Rent & Housing</span><span class="bold">₹1,200.00</span></div>
+                        <div class="an-cat"><span><span class="cat-dot" style="background:var(--brand-b)"></span>Investments</span><span class="bold">₹850.00</span></div>
+                        <div class="an-cat"><span><span class="cat-dot" style="background:var(--warning)"></span>Utilities</span><span class="bold">₹280.00</span></div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Tab: Overview -->
-                <div id="view-overview" class="dashboard-view active">
-                    <div class="preview-grid-3">
-                        <div class="preview-mini-card">
-                            <div class="pmc-left">
-                                <p>Net Wallet Balance</p>
-                                <h4>₹8,349.50</h4>
-                            </div>
-                            <div class="pmc-icon blue">
-                                <i data-lucide="wallet"></i>
-                            </div>
-                        </div>
-                        <div class="preview-mini-card">
-                            <div class="pmc-left">
-                                <p>Monthly Cash Inflow</p>
-                                <h4>₹6,200.00</h4>
-                            </div>
-                            <div class="pmc-icon green">
-                                <i data-lucide="arrow-up-right"></i>
-                            </div>
-                        </div>
-                        <div class="preview-mini-card">
-                            <div class="pmc-left">
-                                <p>Monthly Cash Outflow</p>
-                                <h4>₹3,180.20</h4>
-                            </div>
-                            <div class="pmc-icon red">
-                                <i data-lucide="arrow-down-left"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="preview-main-card">
-                        <div class="pmc-header">
-                            <h5>Recent Activity Overview</h5>
-                            <span class="badge-success">+12.4% vs Last Month</span>
-                        </div>
-                        <!-- Mini SVG Chart -->
-                        <svg viewBox="0 0 700 120" style="width: 100%; height: auto; overflow: visible;">
-                            <defs>
-                                <linearGradient id="chartGlow" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.25"/>
-                                    <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/>
-                                </linearGradient>
-                            </defs>
-                            <path d="M 0 110 L 0 80 Q 70 40 140 60 T 280 20 T 420 80 T 560 30 L 700 10 L 700 120 Z" fill="url(#chartGlow)"/>
-                            <path d="M 0 80 Q 70 40 140 60 T 280 20 T 420 80 T 560 30 L 700 10" fill="none" stroke="url(#brand-gradient)" stroke-width="4" stroke-linecap="round"/>
-                            <circle cx="280" cy="20" r="6" fill="#10b981" stroke="#fff" stroke-width="2"/>
-                            <circle cx="560" cy="30" r="6" fill="#0ea5e9" stroke="#fff" stroke-width="2"/>
-                            <circle cx="700" cy="10" r="6" fill="#0ea5e9" stroke="#fff" stroke-width="2"/>
-                        </svg>
+        <!-- Stats -->
+        <section class="sec" style="padding:30px 0 0">
+            <div class="stats-strip">
+                <div class="stat-item"><div class="num">100%</div><div class="desc">Free Forever</div></div>
+                <div class="stat-item"><div class="num">6+</div><div class="desc">Account Types</div></div>
+                <div class="stat-item"><div class="num">∞</div><div class="desc">Transactions</div></div>
+                <div class="stat-item"><div class="num">4</div><div class="desc">Automation Frequencies</div></div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section id="features" class="sec">
+            <div class="sec-head">
+                <h2>Built for Financial Clarity</h2>
+                <p>A powerful suite of tools designed to take the friction out of budgeting and accounting.</p>
+            </div>
+            <div class="bento">
+                <div class="glass bento-card span">
+                    <div class="icon sky"><i data-lucide="layout-dashboard"></i></div>
+                    <h3>Real-Time Financial Dashboard</h3>
+                    <p>See your net balance, monthly income vs. expenses, category breakdowns with interactive charts, and budget health — all at a glance on one powerful screen.</p>
+                    <div class="mini-chart">
+                        <div class="mini-bar" style="height:60%"></div><div class="mini-bar" style="height:80%"></div><div class="mini-bar" style="height:45%"></div><div class="mini-bar" style="height:90%"></div><div class="mini-bar" style="height:70%"></div><div class="mini-bar" style="height:55%"></div><div class="mini-bar" style="height:85%"></div>
                     </div>
                 </div>
-
-                <!-- Tab: Budgets -->
-                <div id="view-budgets" class="dashboard-view">
-                    <div class="budget-grid-list">
-                        <div class="budget-row">
-                            <div class="budget-info">
-                                <h6>🍔 Food & Dining</h6>
-                                <p>Monthly budget allocation</p>
-                            </div>
-                            <div class="budget-bar-shell">
-                                <div class="budget-bar-fill" style="background: var(--brand-a); width: 68%;"></div>
-                            </div>
-                            <div class="budget-val">
-                                ₹408.00 <span>/ ₹600.00</span>
-                            </div>
-                        </div>
-                        <div class="budget-row">
-                            <div class="budget-info">
-                                <h6>🏠 Utilities & Rent</h6>
-                                <p>Fixed monthly bill allocation</p>
-                            </div>
-                            <div class="budget-bar-shell">
-                                <div class="budget-bar-fill" style="background: var(--brand-b); width: 92%;"></div>
-                            </div>
-                            <div class="budget-val">
-                                ₹1,104.00 <span>/ ₹1,200.00</span>
-                            </div>
-                        </div>
-                        <div class="budget-row">
-                            <div class="budget-info">
-                                <h6>🍿 Hobbies & Entertainment</h6>
-                                <p>Discretionary spending limit</p>
-                            </div>
-                            <div class="budget-bar-shell">
-                                <div class="budget-bar-fill" style="background: var(--danger); width: 45%;"></div>
-                            </div>
-                            <div class="budget-val">
-                                ₹180.00 <span>/ ₹400.00</span>
-                            </div>
-                        </div>
+                <div class="glass bento-card">
+                    <div class="icon grn"><i data-lucide="wallet"></i></div>
+                    <h3>Multi-Account Wallets</h3>
+                    <p>Manage cash, bank, credit cards, savings, and investments — each with live balance tracking.</p>
+                    <div class="wallet-row">
+                        <span class="wallet-chip"><i data-lucide="landmark" style="width:12px;height:12px"></i> Bank</span>
+                        <span class="wallet-chip"><i data-lucide="credit-card" style="width:12px;height:12px"></i> Card</span>
+                        <span class="wallet-chip"><i data-lucide="piggy-bank" style="width:12px;height:12px"></i> Savings</span>
                     </div>
                 </div>
-
-                <!-- Tab: Analytics -->
-                <div id="view-analytics" class="dashboard-view">
-                    <div class="analytics-wrap">
-                        <div class="chart-card">
-                            <h5 style="font-size: 0.9rem; font-weight: 800; margin-bottom: 12px;">Cashflow Trend</h5>
-                            <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 180px; padding-top: 10px;">
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 12%;">
-                                    <div style="height: 100px; width: 100%; background: var(--bg-soft); border-radius: 6px; display: flex; align-items: flex-end;">
-                                        <div style="height: 60%; width: 100%; background: var(--brand-a); border-radius: 6px;"></div>
-                                    </div>
-                                    <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted);">Jan</span>
-                                </div>
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 12%;">
-                                    <div style="height: 100px; width: 100%; background: var(--bg-soft); border-radius: 6px; display: flex; align-items: flex-end;">
-                                        <div style="height: 75%; width: 100%; background: var(--brand-a); border-radius: 6px;"></div>
-                                    </div>
-                                    <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted);">Feb</span>
-                                </div>
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 12%;">
-                                    <div style="height: 100px; width: 100%; background: var(--bg-soft); border-radius: 6px; display: flex; align-items: flex-end;">
-                                        <div style="height: 40%; width: 100%; background: var(--brand-a); border-radius: 6px;"></div>
-                                    </div>
-                                    <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted);">Mar</span>
-                                </div>
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 12%;">
-                                    <div style="height: 100px; width: 100%; background: var(--bg-soft); border-radius: 6px; display: flex; align-items: flex-end;">
-                                        <div style="height: 90%; width: 100%; background: var(--brand-a); border-radius: 6px;"></div>
-                                    </div>
-                                    <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted);">Apr</span>
-                                </div>
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 12%;">
-                                    <div style="height: 100px; width: 100%; background: var(--bg-soft); border-radius: 6px; display: flex; align-items: flex-end;">
-                                        <div style="height: 85%; width: 100%; background: var(--brand-b); border-radius: 6px;"></div>
-                                    </div>
-                                    <span style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted);">May</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="category-breakdown">
-                            <div class="cat-item">
-                                <span><span class="cat-dot" style="background: var(--brand-a);"></span>Food & Groceries</span>
-                                <span class="bold-num">₹542.10</span>
-                            </div>
-                            <div class="cat-item">
-                                <span><span class="cat-dot" style="background: var(--brand-c);"></span>Rent & Housing</span>
-                                <span class="bold-num">₹1,200.00</span>
-                            </div>
-                            <div class="cat-item">
-                                <span><span class="cat-dot" style="background: var(--brand-b);"></span>Investments</span>
-                                <span class="bold-num">₹850.00</span>
-                            </div>
-                            <div class="cat-item">
-                                <span><span class="cat-dot" style="background: var(--warning);"></span>Utility Payments</span>
-                                <span class="bold-num">₹280.00</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="glass bento-card">
+                    <div class="icon vio"><i data-lucide="pie-chart"></i></div>
+                    <h3>Smart Budgets</h3>
+                    <p>Set category-level spending limits and track progress with color-coded alerts before you overspend.</p>
+                </div>
+                <div class="glass bento-card span">
+                    <div class="icon amb"><i data-lucide="repeat"></i></div>
+                    <h3>Recurring Automation</h3>
+                    <p>Schedule daily, weekly, monthly, or yearly transactions for both income and expenses. Set and forget — your ledger stays exact with zero manual effort.</p>
+                </div>
+                <div class="glass bento-card span">
+                    <div class="icon red"><i data-lucide="bar-chart-3"></i></div>
+                    <h3>Visual Reports & Analytics</h3>
+                    <p>Interactive doughnut charts, bar charts for monthly trends, and detailed monthly summary statements with percentage breakdowns — understand your money visually.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Feature Grid Section -->
-        <section id="features" class="section-pad">
-            <div class="section-header">
-                <h2 class="section-title">Finely Crafted for Financial Clarity</h2>
-                <p class="section-sub">A powerful suite of tools designed to take the friction out of budgeting and accounting.</p>
+        <!-- How It Works -->
+        <section id="how" class="sec">
+            <div class="sec-head">
+                <h2>Get Started in 3 Steps</h2>
+                <p>Achieve financial clarity in minutes without complicated setup.</p>
             </div>
-            
-            <div class="features-grid">
-                <div class="glass-card feature-card">
-                    <div class="feature-icon-box">
-                        <i data-lucide="shield-check"></i>
-                    </div>
-                    <div class="feature-body">
-                        <h3>Secure Account Workspace</h3>
-                        <p>User-scoped databases ensure your credentials and records are kept under lock and key, completely isolated from everyone else.</p>
-                    </div>
-                </div>
-                
-                <div class="glass-card feature-card">
-                    <div class="feature-icon-box">
-                        <i data-lucide="pie-chart"></i>
-                    </div>
-                    <div class="feature-body">
-                        <h3>Intelligent Budget Guards</h3>
-                        <p>Establish customizable budget envelopes for categories and monitor real-time progression alerts before you cross the limit.</p>
-                    </div>
-                </div>
-                
-                <div class="glass-card feature-card">
-                    <div class="feature-icon-box">
-                        <i data-lucide="repeat"></i>
-                    </div>
-                    <div class="feature-body">
-                        <h3>Recurring Automation</h3>
-                        <p>Configure automated salary inflows, monthly subscriptions, and utility bills so your ledger stays exact with minimal manual inputs.</p>
-                    </div>
-                </div>
-                
-                <div class="glass-card feature-card">
-                    <div class="feature-icon-box">
-                        <i data-lucide="bar-chart-3"></i>
-                    </div>
-                    <div class="feature-body">
-                        <h3>Insightful Financial Reports</h3>
-                        <p>Review structured statement views and category-level trends to understand spending patterns with clarity.</p>
-                    </div>
-                </div>
+            <div class="steps-grid">
+                <div class="glass step-card"><div class="step-num">1</div><h4>Create Your Wallet</h4><p>Register and set up your cash, bank, or card accounts.</p></div>
+                <div class="glass step-card"><div class="step-num">2</div><h4>Record Transactions</h4><p>Add daily entries or set up automated recurring rules.</p></div>
+                <div class="glass step-card"><div class="step-num">3</div><h4>Optimize & Grow</h4><p>Review reports and maintain healthy budgets.</p></div>
             </div>
         </section>
 
-        <!-- Interactive Budget Simulator & Interactive Sandbox Ledger -->
-        <section id="simulator" class="section-pad">
-            <div class="section-header">
-                <h2 class="section-title">Interact & Explore the App</h2>
-                <p class="section-sub">Try our live client-side tools to calculate budgets or mock up expenses instantly.</p>
-            </div>
-
-            <!-- Part A: 50/30/20 Budget Simulator -->
-            <div class="glass-card" style="padding: 40px; margin-bottom: 40px;">
-                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 800; text-align: center; margin-bottom: 30px;">
-                    📊 The 50/30/20 Budgeting Simulator
-                </h3>
-                <div class="simulator-layout">
-                    <div class="sim-controls">
-                        <div class="slider-group">
-                            <div class="slider-label">
-                                <span>Input Monthly Income</span>
-                                <span class="income-val" id="incomeLabel">₹5,000</span>
-                            </div>
-                            <input type="range" min="1000" max="20000" step="500" value="5000" class="range-slider" id="incomeSlider">
-                        </div>
-
-                        <div class="sim-splits">
-                            <div class="split-card needs">
-                                <div class="split-meta">
-                                    <h4>Needs & Essentials (50%)</h4>
-                                    <p>Housing, Groceries, Fixed Utilities</p>
-                                </div>
-                                <span class="split-val" id="valNeeds">₹2,500</span>
-                            </div>
-                            <div class="split-card wants">
-                                <div class="split-meta">
-                                    <h4>Wants & Hobbies (30%)</h4>
-                                    <p>Dining, Travel, Shopping, Subscriptions</p>
-                                </div>
-                                <span class="split-val" id="valWants">₹1,500</span>
-                            </div>
-                            <div class="split-card savings">
-                                <div class="split-meta">
-                                    <h4>Savings & Debt (20%)</h4>
-                                    <p>Investments, Emergency Funds, Loan Payoff</p>
-                                </div>
-                                <span class="split-val" id="valSavings">₹1,000</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Column SVG Donut -->
-                    <div class="chart-box">
-                        <svg class="donut-svg" width="220" height="220" viewBox="0 0 120 120">
-                            <!-- Background track -->
-                            <circle class="donut-circle-bg" cx="60" cy="60" r="45"></circle>
-                            <!-- Segments -->
-                            <circle id="donutNeeds" class="donut-segment needs" cx="60" cy="60" r="45" stroke-dasharray="141.37 282.74" stroke-dashoffset="0"></circle>
-                            <circle id="donutWants" class="donut-segment wants" cx="60" cy="60" r="45" stroke-dasharray="84.82 282.74" stroke-dashoffset="-141.37"></circle>
-                            <circle id="donutSavings" class="donut-segment savings" cx="60" cy="60" r="45" stroke-dasharray="56.55 282.74" stroke-dashoffset="-226.19"></circle>
-                        </svg>
-                        <div class="donut-center-text">
-                            <span>Splits</span>
-                            <strong id="donutTotal">₹5,000</strong>
-                        </div>
-                        <div class="donut-legend">
-                            <div class="legend-item"><span class="legend-dot blue"></span>Needs</div>
-                            <div class="legend-item"><span class="legend-dot purple"></span>Wants</div>
-                            <div class="legend-item"><span class="legend-dot green"></span>Savings</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Part B: Sandbox Ledger Sandbox -->
-            <div class="glass-card" style="padding: 40px;">
-                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 800; text-align: center; margin-bottom: 30px;">
-                    ✍️ Live Transaction Sandbox
-                </h3>
-                
-                <div class="sandbox-layout">
-                    <!-- Left: Control Column -->
-                    <div class="sandbox-panel" style="background: var(--bg-soft); border-radius: 20px;">
-                        <h4 class="sandbox-title">
-                            Quick Add Panel
-                            <a href="#" class="sandbox-reset" onclick="resetSandbox(event)">Reset</a>
-                        </h4>
-                        
-                        <div class="quick-presets">
-                            <button class="preset-btn" onclick="addQuickPreset('☕ Premium Coffee', -4.50, 'outflow')">
-                                <i data-lucide="coffee" style="width: 14px; height: 14px;"></i>
-                                Coffee (-₹4.50)
-                            </button>
-                            <button class="preset-btn" onclick="addQuickPreset('🎬 Netflix Plan', -15.49, 'outflow')">
-                                <i data-lucide="tv" style="width: 14px; height: 14px;"></i>
-                                Netflix (-₹15.49)
-                            </button>
-                            <button class="preset-btn" onclick="addQuickPreset('🛒 Weekly Grocery', -85.00, 'outflow')">
-                                <i data-lucide="shopping-cart" style="width: 14px; height: 14px;"></i>
-                                Groceries (-₹85.00)
-                            </button>
-                            <button class="preset-btn" onclick="addQuickPreset('💼 Freelance Project', 250.00, 'inflow')">
-                                <i data-lucide="briefcase" style="width: 14px; height: 14px;"></i>
-                                Freelance (+₹250.00)
-                            </button>
-                        </div>
-
-                        <div class="sandbox-form">
-                            <div class="form-group">
-                                <label>Transaction Description</label>
-                                <input type="text" id="sbDesc" class="form-input" placeholder="e.g. Electric Bill, Salary Deposit">
-                            </div>
-                            <div class="form-row-2">
-                                <div class="form-group">
-                                    <label>Amount (₹)</label>
-                                    <input type="number" id="sbAmt" class="form-input" placeholder="0.00" min="0.01" step="0.01">
-                                </div>
-                                <div class="form-group">
-                                    <label>Flow Type</label>
-                                    <select id="sbType" class="form-input">
-                                        <option value="outflow">Expense</option>
-                                        <option value="inflow">Income</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="button" class="btn-add-sandbox" onclick="addCustomSandboxItem()">
-                                <i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i>
-                                Add to Ledger
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Right: Ledger Screen -->
-                    <div class="sandbox-panel" style="border: 1px solid var(--line); border-radius: 20px;">
-                        <h4 class="sandbox-title">Financial Sandbox Ledger</h4>
-                        
-                        <div class="ledger-stats">
-                            <div class="ledger-stat-box balance">
-                                <span>Net balance</span>
-                                <h5 id="ledgBalance">₹1,450.00</h5>
-                            </div>
-                            <div class="ledger-stat-box inflow">
-                                <span>Total inflow</span>
-                                <h5 id="ledgInflow">₹1,800.00</h5>
-                            </div>
-                            <div class="ledger-stat-box outflow">
-                                <span>Total outflow</span>
-                                <h5 id="ledgOutflow">₹350.00</h5>
-                            </div>
-                        </div>
-
-                        <h5 style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
-                            Transaction Activity Log
-                        </h5>
-                        <div class="sandbox-ledger-list" id="sandboxLedgerList">
-                            <!-- Populated dynamically via JS -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Process / Steps Section -->
-        <section class="section-pad">
-            <div class="section-header">
-                <h2 class="section-title">Get Started in 3 Simple Steps</h2>
-                <p class="section-sub">Achieve financial clarity in minutes without any complicated setup loops.</p>
-            </div>
-            
-            <div class="process-pipeline">
-                <div class="process-step">
-                    <div class="step-num">1</div>
-                    <h4>Create Your Wallet</h4>
-                    <p>Register a secure profile and setup your initial cash, bank, or card wallets.</p>
-                </div>
-                <div class="process-step">
-                    <div class="step-num">2</div>
-                    <h4>Record Inflows & Outflows</h4>
-                    <p>Add daily transactions as they happen or setup automated recurring rules.</p>
-                </div>
-                <div class="process-step">
-                    <div class="step-num">3</div>
-                    <h4>Optimize & Improve</h4>
-                    <p>Review interactive reports and maintain healthy budgets with confident daily tracking.</p>
-                </div>
-            </div>
-        </section>
-
-
-
-        <!-- Final CTA Banner -->
-        <section class="section-pad">
-            <div class="cta-banner">
-                <h2 class="cta-title">Ready to master your money?</h2>
-                <p class="cta-sub">Join thousands of smart budgeters planning their cashflow accurately with ExpenseTracker.</p>
-                <a href="@Url.Action("Register", "Account")" class="hero-btn-primary">
-                    Create Your Account Free
-                    <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-                </a>
+        <!-- CTA -->
+        <section class="sec">
+            <div class="cta-box">
+                <h2>Ready to master your money?</h2>
+                <p>Join thousands of smart users planning their cashflow accurately with ExpenseTracker.</p>
+                <a href="@Url.Action("Register","Account")" class="hero-btn-p">Create Free Account <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="wrap">
-            <div class="footer-grid">
-                <div class="footer-logo">
-                    <a class="brand" href="#" style="font-size: 1.25rem;">
-                        <span class="brand-mark" aria-hidden="true">
-                            <i data-lucide="wallet" style="width: 18px; height: 18px;"></i>
-                        </span>
-                        ExpenseTracker
-                    </a>
-                    <p class="footer-desc">Your ultimate companion for secure, interactive, and seamless personal financial tracking.</p>
+            <div class="foot-grid">
+                <div class="foot-brand">
+                    <a class="brand" href="#" style="font-size:1.1rem"><span class="brand-mark"><i data-lucide="wallet" style="width:15px;height:15px"></i></span>ExpenseTracker</a>
+                    <p>Your companion for secure, interactive personal finance tracking.</p>
                 </div>
-                
-                <div class="footer-col">
-                    <h5>Features</h5>
-                    <ul class="footer-links">
-                        <li class="footer-link"><a href="#demo">Visual Dashboard</a></li>
-                        <li class="footer-link"><a href="#features">Smart Budgets</a></li>
-                        <li class="footer-link"><a href="#simulator">Calculator Splits</a></li>
-                        <li class="footer-link"><a href="#">Recurring Automation</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-col">
-                    <h5>Auth Portal</h5>
-                    <ul class="footer-links">
-                        <li class="footer-link"><a href="@Url.Action("Login", "Account")">Sign In to Dashboard</a></li>
-                        <li class="footer-link"><a href="@Url.Action("Register", "Account")">Register Account</a></li>
-                        <li class="footer-link"><a href="#">Reset Password</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-col">
-                    <h5>Security & Trust</h5>
-                    <ul class="footer-links">
-                        <li class="footer-link"><a href="#">Data Encryption</a></li>
-                        <li class="footer-link"><a href="#">Privacy Policy</a></li>
-                        <li class="footer-link"><a href="#">Terms of Use</a></li>
-                    </ul>
-                </div>
+                <div class="foot-col"><h5>Features</h5><ul><li><a href="#demo">Dashboard</a></li><li><a href="#features">Budgets</a></li><li><a href="#how">How It Works</a></li></ul></div>
+                <div class="foot-col"><h5>Portal</h5><ul><li><a href="@Url.Action("Login","Account")">Sign In</a></li><li><a href="@Url.Action("Register","Account")">Register</a></li><li><a href="@Url.Action("Privacy","Home")">Privacy Policy</a></li></ul></div>
             </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2026 ExpenseTracker Corp. All rights reserved. Created with absolute visual premium care.</p>
-                <div class="social-links">
-                    <a href="#" class="social-icon" aria-label="Twitter"><i data-lucide="twitter" style="width: 16px; height: 16px;"></i></a>
-                    <a href="#" class="social-icon" aria-label="GitHub"><i data-lucide="github" style="width: 16px; height: 16px;"></i></a>
-                    <a href="#" class="social-icon" aria-label="LinkedIn"><i data-lucide="linkedin" style="width: 16px; height: 16px;"></i></a>
+            <div class="foot-bottom">
+                <span>&copy; 2026 ExpenseTracker &mdash; Built by <strong>Afroz</strong></span>
+                <div class="socials">
+                    <a href="#" class="soc"><i data-lucide="globe" style="width:13px;height:13px"></i></a>
+                    <a href="#" class="soc"><i data-lucide="mail" style="width:13px;height:13px"></i></a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Javascript Controls -->
     <script>
-        // Init Lucide
         lucide.createIcons();
-
-        // Sticky Header scroll script
-        window.addEventListener('scroll', function () {
-            const header = document.getElementById('mainHeader');
-            if (window.scrollY > 20) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-
-        // Theme Toggle Logic
-        (function () {
-            const html = document.documentElement;
-            const toggleBtn = document.getElementById('themeToggle');
-            const glyph = document.getElementById('themeGlyph');
-
-            const applyTheme = (theme) => {
-                if (theme === 'dark') {
-                    html.setAttribute('data-theme', 'dark');
-                    html.setAttribute('data-bs-theme', 'dark');
-                    glyph.innerHTML = '<i data-lucide="sun" style="width: 18px; height: 18px;"></i>';
-                } else {
-                    html.removeAttribute('data-theme');
-                    html.setAttribute('data-bs-theme', 'light');
-                    glyph.innerHTML = '<i data-lucide="moon" style="width: 18px; height: 18px;"></i>';
-                }
-                localStorage.setItem('theme', theme);
-                lucide.createIcons(); // Refresh dynamic icon injection
-            };
-
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
-
-            toggleBtn.addEventListener('click', function () {
-                const currentTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-                applyTheme(currentTheme);
-            });
+        window.addEventListener('scroll',function(){document.getElementById('mainHeader').classList.toggle('scrolled',window.scrollY>20);});
+        (function(){
+            const h=document.documentElement,b=document.getElementById('themeToggle'),g=document.getElementById('themeGlyph');
+            const apply=(t)=>{if(t==='dark'){h.setAttribute('data-theme','dark');h.setAttribute('data-bs-theme','dark');g.innerHTML='<i data-lucide="sun" style="width:16px;height:16px"></i>';}else{h.removeAttribute('data-theme');h.setAttribute('data-bs-theme','light');g.innerHTML='<i data-lucide="moon" style="width:16px;height:16px"></i>';}localStorage.setItem('theme',t);lucide.createIcons();};
+            apply(localStorage.getItem('theme')||'light');
+            b.addEventListener('click',function(){apply(h.getAttribute('data-theme')==='dark'?'light':'dark');});
         })();
-
-        // Mock Dashboard Tab Switching
-        function switchTab(tabId) {
-            // Deactivate all tabs & views
-            document.querySelectorAll('.dashboard-tab').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.dashboard-view').forEach(view => view.classList.remove('active'));
-
-            // Activate select tab
-            const activeBtn = Array.from(document.querySelectorAll('.dashboard-tab')).find(btn => btn.textContent.toLowerCase().includes(tabId));
-            if (activeBtn) activeBtn.classList.add('active');
-
-            const targetView = document.getElementById('view-' + tabId);
-            if (targetView) targetView.classList.add('active');
-
-            // Trigger animation elements specifically
-            if (tabId === 'budgets') {
-                document.querySelectorAll('.budget-bar-fill').forEach(bar => {
-                    const originalWidth = bar.style.width;
-                    bar.style.width = '0%';
-                    setTimeout(() => {
-                        bar.style.width = originalWidth;
-                    }, 50);
-                });
-            }
+        function switchTab(id){
+            document.querySelectorAll('.dash-tab').forEach(b=>b.classList.remove('active'));
+            document.querySelectorAll('.dash-view').forEach(v=>v.classList.remove('active'));
+            Array.from(document.querySelectorAll('.dash-tab')).find(b=>b.textContent.toLowerCase().includes(id))?.classList.add('active');
+            document.getElementById('view-'+id)?.classList.add('active');
+            if(id==='budgets')document.querySelectorAll('.bud-fill').forEach(b=>{const w=b.style.width;b.style.width='0%';setTimeout(()=>{b.style.width=w;},50);});
         }
-
-        // Budget Simulator Calculations & SVG Donut Animating
-        const incomeSlider = document.getElementById('incomeSlider');
-        const incomeLabel = document.getElementById('incomeLabel');
-        const donutTotal = document.getElementById('donutTotal');
-        
-        const valNeeds = document.getElementById('valNeeds');
-        const valWants = document.getElementById('valWants');
-        const valSavings = document.getElementById('valSavings');
-
-        const donutNeeds = document.getElementById('donutNeeds');
-        const donutWants = document.getElementById('donutWants');
-        const donutSavings = document.getElementById('donutSavings');
-
-        function updateBudgetSimulator(incomeVal) {
-            const val = parseInt(incomeVal);
-            
-            // Format labels
-            incomeLabel.textContent = '₹' + val.toLocaleString();
-            donutTotal.textContent = '₹' + val.toLocaleString();
-
-            // Calculate splits (50 / 30 / 20)
-            const needs = val * 0.5;
-            const wants = val * 0.3;
-            const savings = val * 0.2;
-
-            valNeeds.textContent = '₹' + needs.toLocaleString();
-            valWants.textContent = '₹' + wants.toLocaleString();
-            valSavings.textContent = '₹' + savings.toLocaleString();
-
-            // Circular Dash Math
-            // Circumference of r=45 circle is 2 * pi * 45 = 282.74
-            const circ = 282.74;
-
-            // Wedge lengths
-            const lenNeeds = circ * 0.5;
-            const lenWants = circ * 0.3;
-            const lenSavings = circ * 0.2;
-
-            // Set stroke dash arrays
-            donutNeeds.setAttribute('stroke-dasharray', `₹{lenNeeds} ₹{circ}`);
-            donutWants.setAttribute('stroke-dasharray', `₹{lenWants} ₹{circ}`);
-            donutSavings.setAttribute('stroke-dasharray', `₹{lenSavings} ₹{circ}`);
-
-            // Offset settings
-            donutNeeds.setAttribute('stroke-dashoffset', '0');
-            donutWants.setAttribute('stroke-dashoffset', `-₹{lenNeeds}`);
-            donutSavings.setAttribute('stroke-dashoffset', `-₹{lenNeeds + lenWants}`);
-        }
-
-        incomeSlider.addEventListener('input', function(e) {
-            updateBudgetSimulator(e.target.value);
-        });
-
-        // Initialize Simulator
-        updateBudgetSimulator(5000);
-
-        // Transaction Ledger Sandbox Logic
-        let sandboxBalance = 1450.00;
-        let sandboxInflow = 1800.00;
-        let sandboxOutflow = 350.00;
-        
-        const initialSandboxItems = [
-            { desc: '💼 Monthly Salary', amount: 1800.00, type: 'inflow', cat: 'briefcase', date: 'Just now' },
-            { desc: '🏠 Rent Payment', amount: -300.00, type: 'outflow', cat: 'home', date: '5 mins ago' },
-            { desc: '🍕 Dinner Outing', amount: -50.00, type: 'outflow', cat: 'coffee', date: '10 mins ago' }
-        ];
-
-        const ledgerBalance = document.getElementById('ledgBalance');
-        const ledgerInflow = document.getElementById('ledgInflow');
-        const ledgerOutflow = document.getElementById('ledgOutflow');
-        const ledgerList = document.getElementById('sandboxLedgerList');
-        const sandboxAmountInput = document.getElementById('sbAmt');
-
-        function showSandboxValidation(message) {
-            if (!sandboxAmountInput) return;
-            let feedback = document.getElementById('sandboxAmountFeedback');
-            if (!feedback) {
-                feedback = document.createElement('div');
-                feedback.id = 'sandboxAmountFeedback';
-                feedback.className = 'text-danger small mt-2';
-                sandboxAmountInput.closest('.form-row')?.insertAdjacentElement('afterend', feedback);
-            }
-            feedback.textContent = message;
-        }
-
-        function clearSandboxValidation() {
-            const feedback = document.getElementById('sandboxAmountFeedback');
-            if (feedback) feedback.textContent = '';
-        }
-
-        function formatCurrency(val) {
-            return (val < 0 ? '-' : '') + '₹' + Math.abs(val).toFixed(2);
-        }
-
-        function updateLedgerDisplays() {
-            ledgerBalance.textContent = formatCurrency(sandboxBalance);
-            ledgerInflow.textContent = formatCurrency(sandboxInflow);
-            ledgerOutflow.textContent = formatCurrency(sandboxOutflow);
-
-            if (sandboxBalance < 0) {
-                ledgerBalance.style.color = 'var(--danger)';
-            } else {
-                ledgerBalance.style.color = 'var(--brand-a)';
-            }
-        }
-
-        function createLedgerItemDOM(item) {
-            const div = document.createElement('div');
-            div.className = 'ledger-item';
-            
-            const isOut = item.type === 'outflow';
-            const sign = isOut ? '-' : '+';
-            const amtClass = isOut ? 'outflow' : 'inflow';
-            const iconClass = isOut ? 'outflow' : 'inflow';
-            const absAmt = Math.abs(item.amount);
-
-            div.innerHTML = `
-                <div class="li-desc">
-                    <div class="li-icon ₹{iconClass}">
-                        <i data-lucide="₹{item.cat}" style="width: 14px; height: 14px;"></i>
-                    </div>
-                    <div class="li-text">
-                        <h6>₹{item.desc}</h6>
-                        <p>₹{item.date}</p>
-                    </div>
-                </div>
-                <div class="li-amt ₹{amtClass}">
-                    ₹{sign}₹₹{absAmt.toFixed(2)}
-                </div>
-            `;
-            return div;
-        }
-
-        function renderSandboxList() {
-            ledgerList.innerHTML = '';
-            initialSandboxItems.forEach(item => {
-                const dom = createLedgerItemDOM(item);
-                ledgerList.appendChild(dom);
-            });
-            lucide.createIcons();
-        }
-
-        function addQuickPreset(name, amount, type) {
-            addSandboxTransaction(name, amount, type);
-        }
-
-        function addCustomSandboxItem() {
-            const descInput = document.getElementById('sbDesc');
-            const amtInput = document.getElementById('sbAmt');
-            const typeInput = document.getElementById('sbType');
-
-            const desc = descInput.value.trim() || 'Custom Activity';
-            const rawAmt = parseFloat(amtInput.value);
-            const type = typeInput.value;
-
-            if (isNaN(rawAmt) || rawAmt <= 0) {
-                showSandboxValidation('Please enter a valid amount greater than zero.');
-                return;
-            }
-            clearSandboxValidation();
-
-            const amount = type === 'outflow' ? -rawAmt : rawAmt;
-            addSandboxTransaction(desc, amount, type);
-
-            // Clean inputs
-            descInput.value = '';
-            amtInput.value = '';
-        }
-
-        function addSandboxTransaction(desc, amount, type) {
-            const cat = type === 'inflow' ? 'arrow-up-right' : 'arrow-down-left';
-            const item = { desc, amount, type, cat, date: 'Just now' };
-
-            // Update local totals
-            if (type === 'inflow') {
-                sandboxInflow += Math.abs(amount);
-                sandboxBalance += Math.abs(amount);
-            } else {
-                sandboxOutflow += Math.abs(amount);
-                sandboxBalance -= Math.abs(amount);
-            }
-
-            updateLedgerDisplays();
-
-            // Prepend DOM
-            const dom = createLedgerItemDOM(item);
-            if (ledgerList.firstChild) {
-                ledgerList.insertBefore(dom, ledgerList.firstChild);
-            } else {
-                ledgerList.appendChild(dom);
-            }
-            lucide.createIcons();
-        }
-
-        function resetSandbox(e) {
-            if (e) e.preventDefault();
-            sandboxBalance = 1450.00;
-            sandboxInflow = 1800.00;
-            sandboxOutflow = 350.00;
-            updateLedgerDisplays();
-            renderSandboxList();
-        }
-
-        // Initialize Ledger Sandbox
-        updateLedgerDisplays();
-        renderSandboxList();
     </script>
 </body>
 </html>

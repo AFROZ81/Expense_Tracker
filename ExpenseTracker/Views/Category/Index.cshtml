@@ -6,300 +6,283 @@
 
 <style>
     :root {
-        --accent: #6366f1;
-        --accent-soft: rgba(99, 102, 241, 0.1);
-        --card-radius: 24px;
+        --accent: #0ea5e9;
+        --accent-hover: #0284c7;
+        --accent-soft: rgba(14,165,233,0.08);
+        --danger: #ef4444;
+        --danger-soft: rgba(239, 68, 68, 0.08);
     }
 
-    .category-page-wrapper {
-        animation: fadeIn 0.5s ease-out;
+    /* ── Animations ── */
+    .cat-page { animation: pageIn 0.45s ease-out; }
+    @@keyframes pageIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @@keyframes cardIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    /* ── Page Header ── */
+    .cat-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 28px; gap: 16px; flex-wrap: wrap;
+    }
+    .cat-header-text h1 { font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin: 0; letter-spacing: -0.02em; }
+    .cat-header-text p { font-size: 0.84rem; color: var(--muted); margin: 4px 0 0; }
+
+    .btn-create {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: var(--accent); color: white; border: none;
+        padding: 11px 24px; border-radius: 12px; font-weight: 700; font-size: 0.88rem;
+        text-decoration: none; transition: all 0.22s ease;
+        box-shadow: 0 4px 16px rgba(14,165,233,0.2);
+    }
+    .btn-create:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(14,165,233,0.3); color: white; }
+    .btn-create:active { transform: scale(0.97); }
+
+    /* ── Stats Row ── */
+    .cat-stats {
+        display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap;
+    }
+    .cat-stat-chip {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 8px 16px; border-radius: 10px; font-size: 0.78rem; font-weight: 700;
+        background: var(--card); border: 1px solid var(--border);
+    }
+    .cat-stat-chip .stat-dot {
+        width: 8px; height: 8px; border-radius: 50%;
+    }
+    .cat-stat-chip .stat-dot.green { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.4); }
+    .cat-stat-chip .stat-dot.gray { background: var(--muted); }
+    .cat-stat-chip .stat-dot.purple { background: var(--accent); box-shadow: 0 0 8px rgba(14,165,233,0.4); }
+
+    /* ── Card Grid ── */
+    .cat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 14px;
     }
 
-    @@keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    /* ── Category Card ── */
+    .cat-card {
+        background: var(--card); border: 1px solid var(--border);
+        border-radius: 16px; padding: 18px 20px;
+        display: flex; align-items: center; gap: 16px;
+        transition: all 0.22s ease;
+        animation: cardIn 0.35s ease-out both;
+        position: relative; overflow: hidden;
+    }
+    .cat-card::before {
+        content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+        border-radius: 4px 0 0 4px; background: var(--accent); opacity: 0;
+        transition: opacity 0.22s ease;
+    }
+    .cat-card:hover { border-color: rgba(14,165,233,0.2); box-shadow: 0 8px 24px rgba(0,0,0,0.06); transform: translateY(-2px); }
+    .cat-card:hover::before { opacity: 1; }
+    .cat-card:active { transform: translateY(0) scale(0.995); }
+
+    .cat-card:nth-child(1) { animation-delay: 0.02s; }
+    .cat-card:nth-child(2) { animation-delay: 0.04s; }
+    .cat-card:nth-child(3) { animation-delay: 0.06s; }
+    .cat-card:nth-child(4) { animation-delay: 0.08s; }
+    .cat-card:nth-child(5) { animation-delay: 0.10s; }
+    .cat-card:nth-child(6) { animation-delay: 0.12s; }
+    .cat-card:nth-child(7) { animation-delay: 0.14s; }
+    .cat-card:nth-child(8) { animation-delay: 0.16s; }
+    .cat-card:nth-child(9) { animation-delay: 0.18s; }
+    .cat-card:nth-child(10) { animation-delay: 0.20s; }
+
+    /* Card Icon */
+    .cat-card-icon {
+        width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+        background: var(--accent-soft); color: var(--accent);
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.22s ease;
+    }
+    .cat-card:hover .cat-card-icon { background: var(--accent); color: white; }
+
+    /* Card Body */
+    .cat-card-body { flex: 1; min-width: 0; }
+    .cat-card-name { font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cat-card-sub { font-size: 0.74rem; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 6px; }
+
+    /* Status dot indicator */
+    .status-dot-label {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 0.72rem; font-weight: 600;
+    }
+    .status-dot-label .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot-label.active .dot { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .status-dot-label.active { color: #16a34a; }
+    .status-dot-label.inactive .dot { background: var(--muted); }
+    .status-dot-label.inactive { color: var(--muted); }
+
+    [data-theme="dark"] .status-dot-label.active { color: #4ade80; }
+    [data-theme="dark"] .status-dot-label.inactive { color: #94a3b8; }
+
+    /* Card Actions */
+    .cat-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .act-btn {
+        width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border);
+        background: var(--card); color: var(--muted); cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s ease; text-decoration: none;
+    }
+    .act-btn:hover { transform: translateY(-1px); }
+    .act-btn.edit:hover { background: var(--accent-soft); color: var(--accent); border-color: rgba(14,165,233,0.25); }
+    .act-btn.delete:hover { background: var(--danger-soft); color: var(--danger); border-color: rgba(239,68,68,0.2); }
+
+    /* ── Empty State ── */
+    .empty-state-card {
+        grid-column: 1 / -1; text-align: center; padding: 60px 24px;
+        background: var(--card); border: 1px dashed var(--border); border-radius: 20px;
+    }
+    .empty-icon-wrap {
+        width: 80px; height: 80px; border-radius: 24px;
+        background: var(--accent-soft); color: var(--accent);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 20px;
+    }
+    .empty-state-card h5 { font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin: 0 0 6px; }
+    .empty-state-card p { font-size: 0.85rem; color: var(--muted); margin: 0 0 24px; line-height: 1.6; }
+
+    /* ── Delete Modal ── */
+    .del-modal .modal-content { border-radius: 24px; border: none; box-shadow: 0 30px 80px rgba(0,0,0,0.18); background: var(--card); }
+    .del-modal-icon {
+        width: 72px; height: 72px; border-radius: 50%;
+        background: var(--danger-soft); color: var(--danger);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 20px;
+    }
+    .modal-btn-del {
+        background: var(--danger); color: white; border: none; padding: 12px 28px;
+        border-radius: 12px; font-weight: 700; transition: all 0.2s ease; text-decoration: none;
+    }
+    .modal-btn-del:hover { background: #dc2626; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(239,68,68,0.25); color: white; }
+    .modal-btn-cancel {
+        background: var(--bg); color: var(--muted); border: 1px solid var(--border);
+        padding: 12px 28px; border-radius: 12px; font-weight: 700; transition: all 0.2s ease;
+    }
+    .modal-btn-cancel:hover { background: var(--border); color: var(--text-main); }
+
+    /* ── Mobile ── */
+    @@media (max-width: 767.98px) {
+        .cat-header { flex-direction: column; align-items: stretch; margin-bottom: 20px; }
+        .cat-header-text h1 { font-size: 1.2rem; }
+        .btn-create { justify-content: center; padding: 13px 20px; }
+        .cat-stats { gap: 8px; }
+        .cat-stat-chip { padding: 6px 12px; font-size: 0.72rem; }
+        .cat-grid { grid-template-columns: 1fr; gap: 10px; }
+        .cat-card { padding: 14px 16px; gap: 12px; border-radius: 14px; }
+        .cat-card-icon { width: 40px; height: 40px; border-radius: 10px; }
+        .cat-card-icon svg { width: 18px; height: 18px; }
+        .cat-card-name { font-size: 0.9rem; }
+        .act-btn { width: 38px; height: 38px; border-radius: 10px; }
+        .empty-state-card { padding: 40px 16px; border-radius: 16px; }
+        .empty-icon-wrap { width: 64px; height: 64px; border-radius: 18px; }
+        .del-modal .modal-content { border-radius: 20px; }
     }
 
-    /* Premium Table Card */
-    .premium-card {
-        background: var(--card);
-        border-radius: var(--card-radius);
-        border: 1px solid rgba(0,0,0,0.03);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        overflow: hidden;
-    }
-
-    .premium-card-header {
-        padding: 24px 32px;
-        background: var(--card);
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    /* Table Styling */
-    .modern-table {
-        margin-bottom: 0;
-    }
-
-    .modern-table thead th {
-        background: var(--bg);
-        padding: 18px 32px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--muted);
-        border-bottom: 1px solid var(--border);
-    }
-
-    .modern-table tbody td {
-        padding: 20px 32px;
-        border-bottom: 1px solid var(--border);
-        vertical-align: middle;
-        color: var(--text-main);
-    }
-
-    .modern-table tbody tr {
-        transition: all 0.2s ease;
-    }
-
-    .modern-table tbody tr:hover {
-        background-color: #fcfdfe;
-    }
-
-    /* Status Badges */
-    .status-badge {
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .status-active {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .status-inactive {
-        background: var(--border);
-        color: var(--muted);
-    }
-
-    /* Action Buttons */
-    .action-btn-group {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-    }
-
-    .btn-action {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        border: 1px solid var(--border);
-        background: var(--card);
-        color: var(--muted);
-        text-decoration: none;
-    }
-
-    .btn-edit:hover {
-        background: var(--accent-soft);
-        color: var(--accent);
-        border-color: var(--accent);
-    }
-
-    .btn-delete:hover {
-        background: var(--card);
-        color: #ef4444;
-        border-color: #fecaca;
-    }
-
-    /* Category Icon Box */
-    .category-icon-box {
-        width: 32px;
-        height: 32px;
-        background: var(--accent-soft);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--accent);
-    }
-
-    /* Modal Styling */
-    .premium-modal .modal-content {
-        border-radius: 30px;
-        border: none;
-        box-shadow: 0 25px 70px rgba(0,0,0,0.2);
-    }
-
-    .modal-confirm-icon {
-        width: 80px;
-        height: 80px;
-        background: var(--card);
-        color: #ef4444;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 24px;
-    }
-
-    .btn-modal-confirm {
-        background: #ef4444;
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 14px;
-        font-weight: 700;
-        transition: all 0.2s ease;
-    }
-
-    .btn-modal-confirm:hover {
-        background: #dc2626;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
-        color: white;
-    }
-
-    .btn-modal-cancel {
-        background: var(--border);
-        color: var(--muted);
-        border: none;
-        padding: 12px 30px;
-        border-radius: 14px;
-        font-weight: 700;
-        transition: all 0.2s ease;
-    }
-
-    .btn-modal-cancel:hover {
-        background: #e2e8f0;
-        color: var(--text-main);
+    @@media (max-width: 400px) {
+        .cat-card-actions { flex-direction: column; gap: 4px; }
     }
 </style>
 
-<div class="category-page-wrapper">
+<div class="cat-page">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
-        <div>
-            <h1 class="h3 fw-800 text-main-adaptive m-0">Expense Categories</h1>
-            <p class="text-muted small m-0">Organize your expenses by creating relevant categories.</p>
+    <div class="cat-header">
+        <div class="cat-header-text">
+            <h1>Expense Categories</h1>
+            <p>Organize your spending by creating relevant categories.</p>
         </div>
-        <a asp-action="Create" class="btn btn-indigo rounded-pill px-4 py-2 fw-bold shadow-sm" style="background: var(--accent); color: white">
-            <i data-lucide="plus" class="me-2" style="width: 18px"></i> New Category
+        <a asp-action="Create" class="btn-create">
+            <i data-lucide="plus" style="width:18px;height:18px"></i> New Category
         </a>
     </div>
 
-    <!-- Main Table Card -->
-    <div class="premium-card">
-        <div class="premium-card-header">
-            <h5 class="fw-700 m-0 d-flex align-items-center gap-2">
-                <i data-lucide="tag" style="width: 20px; color: var(--accent)"></i>
-                All Categories
-            </h5>
-            <span class="badge bg-light text-main-adaptive rounded-pill px-3 py-2 border">
-                @Model.Count() Active Lists
+    <!-- Stats -->
+    @if (Model.Any())
+    {
+        var activeCount = Model.Count(c => c.IsActive);
+        <div class="cat-stats">
+            <span class="cat-stat-chip">
+                <span class="stat-dot purple"></span> @Model.Count() Total
+            </span>
+            <span class="cat-stat-chip">
+                <span class="stat-dot green"></span> @activeCount Active
+            </span>
+            <span class="cat-stat-chip">
+                <span class="stat-dot gray"></span> @(Model.Count() - activeCount) Inactive
             </span>
         </div>
+    }
 
-        <div class="table-responsive">
-            <table class="table modern-table align-middle">
-                <thead>
-                    <tr>
-                        <th>Category Info</th>
-                        <th>Availability</th>
-                        <th class="text-end">Management</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (!Model.Any())
-                    {
-                        <tr>
-                            <td colspan="3">
-                                <div class="empty-state">
-                                    <i data-lucide="folder-open" style="width: 48px; height: 48px; color: #cbd5e1" class="mb-3"></i>
-                                    <h6 class="fw-bold">No Categories Found</h6>
-                                    <p class="text-muted small">Start by creating your first expense category above.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="category-icon-box">
-                                            <i data-lucide="hash" style="width: 16px"></i>
-                                        </div>
-                                        <div>
-                                            <span class="fw-700 text-main-adaptive d-block">@item.Name</span>
-                                            <span class="text-muted small">Category ID: #@item.Id</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    @if (item.IsActive)
-                                    {
-                                        <span class="status-badge status-active">
-                                            <i data-lucide="check-circle-2" style="width: 14px"></i> Active
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="status-badge status-inactive">
-                                            <i data-lucide="slash" style="width: 14px"></i> Inactive
-                                        </span>
-                                    }
-                                </td>
-                                <td>
-                                    <div class="action-btn-group">
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit" title="Edit Category">
-                                            <i data-lucide="pencil" style="width: 16px"></i>
-                                        </a>
-                                        <button type="button" 
-                                                class="btn-action btn-delete delete-trigger" 
-                                                data-id="@item.Id"
-                                                data-name="@item.Name"
-                                                title="Delete Category">
-                                            <i data-lucide="trash-2" style="width: 16px"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
+    <!-- Card Grid -->
+    <div class="cat-grid">
+        @if (!Model.Any())
+        {
+            <div class="empty-state-card">
+                <div class="empty-icon-wrap">
+                    <i data-lucide="tags" style="width:32px;height:32px"></i>
+                </div>
+                <h5>No Categories Yet</h5>
+                <p>Create your first category to start organizing<br class="d-none d-sm-inline" /> your expenses effortlessly.</p>
+                <a asp-action="Create" class="btn-create">
+                    <i data-lucide="plus" style="width:18px;height:18px"></i> Create Category
+                </a>
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <div class="cat-card">
+                    <div class="cat-card-icon">
+                        <i data-lucide="shopping-bag" style="width:18px;height:18px"></i>
+                    </div>
+                    <div class="cat-card-body">
+                        <p class="cat-card-name">@item.Name</p>
+                        <div class="cat-card-sub">
+                            @if (item.IsActive)
+                            {
+                                <span class="status-dot-label active">
+                                    <span class="dot"></span> Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-dot-label inactive">
+                                    <span class="dot"></span> Inactive
+                                </span>
+                            }
+                        </div>
+                    </div>
+                    <div class="cat-card-actions">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="act-btn edit" title="Edit">
+                            <i data-lucide="pencil" style="width:15px;height:15px"></i>
+                        </a>
+                        <button type="button" class="act-btn delete delete-trigger"
+                                data-id="@item.Id" data-name="@item.Name" title="Delete">
+                            <i data-lucide="trash-2" style="width:15px;height:15px"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        }
     </div>
 </div>
 
-<!-- Premium Delete Confirmation Modal -->
-<div class="modal fade premium-modal" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+<!-- Delete Confirmation Modal -->
+<div class="modal fade del-modal" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
         <div class="modal-content">
             <div class="modal-body p-5 text-center">
-                <div class="modal-confirm-icon">
-                    <i data-lucide="alert-circle" style="width: 40px; height: 40px"></i>
+                <div class="del-modal-icon">
+                    <i data-lucide="alert-triangle" style="width:32px;height:32px"></i>
                 </div>
-                <h4 class="fw-800 text-main-adaptive mb-2">Delete Category?</h4>
-                <p class="text-muted mb-4">Are you sure you want to delete <strong id="deleteTargetName" class="text-main-adaptive"></strong>? This action cannot be undone.</p>
-                
+                <h4 class="fw-800 text-main-adaptive mb-2" style="font-size:1.15rem">Delete Category?</h4>
+                <p class="text-muted mb-4" style="font-size:0.88rem">
+                    Are you sure you want to delete <strong id="deleteTargetName" class="text-main-adaptive"></strong>? This can't be undone.
+                </p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <button type="button" class="btn-modal-cancel flex-grow-1" data-bs-dismiss="modal">Cancel</button>
-                    <a id="confirmDeleteBtn" href="#" class="btn-modal-confirm flex-grow-1 text-decoration-none">Delete</a>
+                    <button type="button" class="modal-btn-cancel flex-grow-1" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmDeleteBtn" href="#" class="modal-btn-del flex-grow-1 text-decoration-none text-center">Delete</a>
                 </div>
             </div>
         </div>
@@ -310,18 +293,12 @@
     <script>
         $(function() {
             lucide.createIcons();
-
-            // Handle Delete Modal
             $('.delete-trigger').on('click', function() {
                 const id = $(this).data('id');
                 const name = $(this).data('name');
-                const deleteUrl = `/Category/Delete/${id}`;
-
                 $('#deleteTargetName').text(name);
-                $('#confirmDeleteBtn').attr('href', deleteUrl);
-                
-                const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-                modal.show();
+                $('#confirmDeleteBtn').attr('href', `/Category/Delete/${id}`);
+                new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
             });
         });
     </script>

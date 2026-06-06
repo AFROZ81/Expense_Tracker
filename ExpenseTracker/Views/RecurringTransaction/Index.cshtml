@@ -5,367 +5,162 @@
 }
 
 <style>
-    :root {
-        --rule-accent: #4f46e5;
-        --rule-expense: #ef4444;
-        --rule-income: #10b981;
-    }
+    :root { --accent:#0ea5e9; --accent-hover:#0284c7; --accent-soft:rgba(14,165,233,0.08); --success:#10b981; --success-soft:rgba(16,185,129,0.08); --danger:#ef4444; --danger-soft:rgba(239,68,68,0.08); }
+    .rec-page { animation:pageIn 0.45s ease-out; }
+    @@keyframes pageIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @@keyframes cardIn { from{opacity:0;transform:translateY(10px) scale(0.98)} to{opacity:1;transform:translateY(0) scale(1)} }
 
-    .rules-page-wrapper {
-        animation: fadeInRules 0.5s ease-out;
-    }
+    /* Hero */
+    .rec-hero { background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%); border-radius:22px; padding:30px 34px; color:#f8fafc; margin-bottom:28px; display:flex; justify-content:space-between; align-items:center; position:relative; overflow:hidden; box-shadow:0 16px 40px rgba(0,0,0,0.2); gap:20px; flex-wrap:wrap; }
+    .rec-hero::after { content:''; position:absolute; width:220px; height:220px; right:-80px; top:-100px; border-radius:50%; background:radial-gradient(circle,rgba(14,165,233,0.3),transparent 70%); pointer-events:none; }
+    .rec-hero h1 { font-size:1.5rem; font-weight:800; margin:0 0 6px; letter-spacing:-0.02em; color:#f8fafc; position:relative; z-index:2; }
+    .rec-hero p { font-size:0.84rem; color:rgba(226,232,240,0.85); margin:0; max-width:500px; position:relative; z-index:2; }
+    .btn-add { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,#0ea5e9,#10b981); color:white; border:none; padding:12px 24px; border-radius:12px; font-weight:700; font-size:0.88rem; text-decoration:none; transition:all 0.22s; box-shadow:0 8px 20px rgba(14,165,233,0.3); position:relative; z-index:2; }
+    .btn-add:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(14,165,233,0.4); color:white; }
 
-    @@keyframes fadeInRules {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+    .rec-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:16px; }
 
-    .rules-hero-card {
-        background: linear-gradient(120deg, #1e293b 0%, #0f172a 100%);
-        border-radius: 30px;
-        padding: 32px;
-        color: #f8fafc;
-        margin-bottom: 30px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 22px 50px rgba(15, 23, 42, 0.28);
-    }
+    /* Rule Card */
+    .rec-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:22px 24px; transition:all 0.25s; animation:cardIn 0.35s ease-out both; }
+    .rec-card:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(0,0,0,0.07); }
+    .rec-card:nth-child(1){animation-delay:.03s} .rec-card:nth-child(2){animation-delay:.06s} .rec-card:nth-child(3){animation-delay:.09s}
+    .rec-card:nth-child(4){animation-delay:.12s} .rec-card:nth-child(5){animation-delay:.15s} .rec-card:nth-child(6){animation-delay:.18s}
 
-    .rules-hero-card::after {
-        content: '';
-        position: absolute;
-        width: 280px;
-        height: 280px;
-        right: -120px;
-        top: -130px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(129, 140, 248, 0.35), transparent 65%);
-        pointer-events: none;
-    }
+    .rec-card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+    .rec-type-icon { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .rec-type-icon.expense { background:var(--danger-soft); color:var(--danger); }
+    .rec-type-icon.income { background:var(--success-soft); color:var(--success); }
+    [data-theme="dark"] .rec-type-icon.expense { background:rgba(239,68,68,0.15); color:#f87171; }
+    [data-theme="dark"] .rec-type-icon.income { background:rgba(16,185,129,0.15); color:#4ade80; }
 
-    .rules-title {
-        font-size: 2rem;
-        font-weight: 800;
-        margin-bottom: 8px;
-        letter-spacing: -0.02em;
-        color: #f8fafc;
-        text-shadow: 0 2px 10px rgba(2, 6, 23, 0.35);
-    }
+    .rec-card-actions { display:flex; align-items:center; gap:8px; }
+    .rec-status { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:4px 12px; border-radius:20px; }
+    .rec-status.active { background:var(--success-soft); color:var(--success); }
+    .rec-status.paused { background:rgba(100,116,139,0.1); color:var(--muted); }
+    [data-theme="dark"] .rec-status.active { background:rgba(34,197,94,0.15); color:#4ade80; }
+    [data-theme="dark"] .rec-status.paused { background:rgba(148,163,184,0.12); color:#94a3b8; }
 
-    .rules-subtitle {
-        margin-bottom: 0;
-        color: rgba(226, 232, 240, 0.92);
-        max-width: 520px;
-    }
+    .rec-del-btn { width:36px; height:36px; border-radius:10px; border:1px solid transparent; background:var(--danger-soft); color:var(--danger); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; }
+    .rec-del-btn:hover { background:var(--danger); color:white; transform:translateY(-1px); }
+    [data-theme="dark"] .rec-del-btn { background:rgba(248,113,113,0.15); color:#f87171; }
+    [data-theme="dark"] .rec-del-btn:hover { background:var(--danger); color:white; }
 
-    .rules-add-btn {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-        border: none;
-        color: #fff;
-        border-radius: 14px;
-        padding: 12px 22px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.25s ease;
-        box-shadow: 0 10px 24px rgba(79, 70, 229, 0.32);
-        text-decoration: none;
-        position: relative;
-        z-index: 3;
-    }
+    .rec-desc { font-size:1.1rem; font-weight:800; color:var(--text-main); margin:0 0 6px; }
+    .rec-amount-row { display:flex; align-items:baseline; gap:8px; margin-bottom:16px; }
+    .rec-amount { font-size:1.4rem; font-weight:800; letter-spacing:-0.01em; }
+    .rec-amount.expense { color:var(--danger); }
+    .rec-amount.income { color:var(--success); }
+    [data-theme="dark"] .rec-amount.expense { color:#f87171; }
+    [data-theme="dark"] .rec-amount.income { color:#4ade80; }
+    .rec-freq { font-size:0.82rem; font-weight:700; color:var(--muted); }
 
-    .rules-add-btn:hover {
-        transform: translateY(-2px);
-        color: #fff;
-        box-shadow: 0 16px 30px rgba(79, 70, 229, 0.45);
-    }
+    .rec-info { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:14px 16px; }
+    .rec-info-row { display:flex; justify-content:space-between; font-size:0.82rem; }
+    .rec-info-row + .rec-info-row { margin-top:8px; }
+    .rec-info-row span:first-child { color:var(--muted); font-weight:600; }
+    .rec-info-row span:last-child { color:var(--text-main); font-weight:700; text-align:right; }
 
-    .rule-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-        gap: 22px;
-    }
+    /* Empty */
+    .empty-card { grid-column:1/-1; text-align:center; padding:56px 24px; background:var(--card); border:1px dashed var(--border); border-radius:20px; }
+    .empty-icon { width:72px; height:72px; border-radius:20px; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+    .empty-card h5 { font-size:1.05rem; font-weight:800; color:var(--text-main); margin:0 0 6px; }
+    .empty-card p { font-size:0.84rem; color:var(--muted); margin:0 0 20px; }
 
-    .rule-card {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        padding: 24px;
-        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-        transition: all 0.25s ease;
-    }
+    /* Modal */
+    .del-modal .modal-content { border-radius:24px; border:none; box-shadow:0 30px 80px rgba(0,0,0,0.18); background:var(--card); }
+    .del-modal-icon { width:68px; height:68px; border-radius:50%; background:var(--danger-soft); color:var(--danger); display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+    .modal-btn-del { background:var(--danger); color:white; border:none; padding:12px 28px; border-radius:12px; font-weight:700; transition:all 0.2s; text-decoration:none; }
+    .modal-btn-del:hover { background:#dc2626; transform:translateY(-1px); box-shadow:0 8px 20px rgba(239,68,68,0.25); color:white; }
+    .modal-btn-cancel { background:var(--bg); color:var(--muted); border:1px solid var(--border); padding:12px 28px; border-radius:12px; font-weight:700; transition:all 0.2s; }
+    .modal-btn-cancel:hover { background:var(--border); color:var(--text-main); }
 
-    .rule-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 18px 30px rgba(15, 23, 42, 0.1);
-    }
-
-    .rule-meta {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 18px;
-    }
-
-    .rule-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .rule-icon.expense {
-        color: var(--rule-expense);
-        background: rgba(239, 68, 68, 0.12);
-    }
-
-    .rule-icon.income {
-        color: var(--rule-income);
-        background: rgba(16, 185, 129, 0.14);
-    }
-
-    .rule-state {
-        font-size: 0.72rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        padding: 4px 12px;
-        border-radius: 999px;
-    }
-
-    .rule-state.active {
-        background: rgba(16, 185, 129, 0.14);
-        color: #047857;
-    }
-
-    .rule-state.paused {
-        background: rgba(100, 116, 139, 0.16);
-        color: #334155;
-    }
-
-    [data-theme="dark"] .rule-state.active {
-        color: #6ee7b7;
-    }
-
-    [data-theme="dark"] .rule-state.paused {
-        color: #cbd5e1;
-    }
-
-    .rule-desc {
-        font-size: 1.2rem;
-        font-weight: 800;
-        color: var(--text-main);
-        margin-bottom: 4px;
-    }
-
-    .rule-amount {
-        font-size: 1.55rem;
-        font-weight: 800;
-        letter-spacing: -0.01em;
-        margin-bottom: 0;
-    }
-
-    .rule-amount.expense {
-        color: var(--rule-expense);
-    }
-
-    .rule-amount.income {
-        color: var(--rule-income);
-    }
-
-    .rule-frequency {
-        color: var(--muted);
-        font-size: 0.9rem;
-        font-weight: 700;
-    }
-
-    .rule-info-box {
-        margin-top: 16px;
-        padding: 14px;
-        border-radius: 14px;
-        background: var(--bg);
-        border: 1px solid var(--border);
-    }
-
-    .rule-info-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        font-size: 0.86rem;
-    }
-
-    .rule-info-row + .rule-info-row {
-        margin-top: 8px;
-    }
-
-    .rule-info-row span:first-child {
-        color: var(--muted);
-        font-weight: 600;
-    }
-
-    .rule-info-row span:last-child {
-        color: var(--text-main);
-        font-weight: 700;
-        text-align: right;
-    }
-
-    .rule-delete-btn {
-        border: none;
-        background: rgba(239, 68, 68, 0.12);
-        color: #dc2626;
-        width: 42px;
-        height: 42px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        transition: all 0.2s ease;
-        box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.2);
-    }
-
-    .rule-delete-btn:hover {
-        background: rgba(239, 68, 68, 0.2);
-        color: #b91c1c;
-        transform: translateY(-1px);
-    }
-
-    [data-theme="dark"] .rule-delete-btn {
-        background: rgba(248, 113, 113, 0.16);
-        color: #fda4af;
-        box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.28);
-    }
-
-    [data-theme="dark"] .rule-delete-btn:hover {
-        background: rgba(248, 113, 113, 0.24);
-        color: #fecaca;
-    }
-
-    .empty-rules-state {
-        background: var(--card);
-        border: 1px dashed var(--border);
-        border-radius: 24px;
-        padding: 56px 26px;
-        text-align: center;
-    }
-
-    .empty-rules-state .empty-icon {
-        width: 68px;
-        height: 68px;
-        border-radius: 20px;
-        margin: 0 auto 16px;
-        background: rgba(99, 102, 241, 0.12);
-        color: #4f46e5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    @@media (max-width: 767.98px) {
-        .rules-hero-card {
-            padding: 24px;
-        }
-
-        .rules-title {
-            font-size: 1.55rem;
-        }
+    @@media (max-width:767.98px) {
+        .rec-hero { padding:22px 20px; border-radius:18px; flex-direction:column; align-items:stretch; }
+        .rec-hero h1 { font-size:1.25rem; }
+        .btn-add { justify-content:center; }
+        .rec-grid { grid-template-columns:1fr; gap:12px; }
+        .rec-card { padding:18px 16px; border-radius:16px; }
+        .rec-desc { font-size:1rem; }
+        .rec-amount { font-size:1.2rem; }
+        .empty-card { padding:40px 16px; }
     }
 </style>
 
-<div class="rules-page-wrapper">
-    <div class="rules-hero-card d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-4">
-        <div style="position:relative;z-index:2;">
-            <h2 class="rules-title">Recurring Rules</h2>
-            <p class="rules-subtitle">Set up daily, weekly, or monthly automations for incomes and expenses so your tracking stays current without manual entry.</p>
+<div class="rec-page">
+    <div class="rec-hero">
+        <div>
+            <h1>Recurring Rules</h1>
+            <p>Automate daily, weekly, or monthly incomes and expenses so your tracking stays current without manual entry.</p>
         </div>
-        <a asp-action="Create" class="rules-add-btn">
-            <i data-lucide="plus" style="width:18px;height:18px;"></i>
-            New Rule
-        </a>
+        <a asp-action="Create" class="btn-add"><i data-lucide="plus" style="width:18px;height:18px"></i> New Rule</a>
     </div>
 
-    @if (!Model.Any())
-    {
-        <div class="empty-rules-state">
-            <div class="empty-icon">
-                <i data-lucide="refresh-cw" style="width: 30px; height: 30px;"></i>
+    <div class="rec-grid">
+        @if (!Model.Any())
+        {
+            <div class="empty-card">
+                <div class="empty-icon"><i data-lucide="refresh-cw" style="width:28px;height:28px"></i></div>
+                <h5>No Automations Yet</h5>
+                <p>Create your first recurring rule to automate scheduled entries.</p>
+                <a asp-action="Create" class="btn-add"><i data-lucide="plus" style="width:18px;height:18px"></i> Create First Rule</a>
             </div>
-            <h4 class="fw-800 text-main-adaptive mb-2">No Automations Yet</h4>
-            <p class="text-muted mb-4">Create your first recurring rule to automate scheduled income or expense entries.</p>
-            <a asp-action="Create" class="rules-add-btn">
-                <i data-lucide="plus" style="width:18px;height:18px;"></i>
-                Create First Rule
-            </a>
-        </div>
-    }
-    else
-    {
-        <div class="rule-grid">
-            @foreach (var item in Model)
+        }
+        else
+        {
+            foreach (var item in Model)
             {
                 var isExpense = item.Type == ExpenseTracker.Models.Entities.TransactionType.Expense;
                 var iconClass = isExpense ? "expense" : "income";
                 var iconName = isExpense ? "arrow-down-right" : "arrow-up-right";
-                var amountClass = isExpense ? "expense" : "income";
                 var stateClass = item.IsActive ? "active" : "paused";
                 var stateText = item.IsActive ? "Active" : "Paused";
 
-                <div class="rule-card">
-                    <div class="rule-meta">
-                        <div class="rule-icon @iconClass">
-                            <i data-lucide="@iconName"></i>
+                <div class="rec-card">
+                    <div class="rec-card-top">
+                        <div class="rec-type-icon @iconClass">
+                            <i data-lucide="@iconName" style="width:22px;height:22px"></i>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="rule-state @stateClass">@stateText</span>
-                            <button type="button" class="rule-delete-btn btn-delete-rule-trigger" data-id="@item.Id" title="Delete Rule" aria-label="Delete Rule">
-                                <i data-lucide="trash-2" style="width:20px;height:20px;"></i>
+                        <div class="rec-card-actions">
+                            <span class="rec-status @stateClass">@stateText</span>
+                            <button type="button" class="rec-del-btn btn-delete-rule-trigger" data-id="@item.Id" title="Delete Rule">
+                                <i data-lucide="trash-2" style="width:16px;height:16px"></i>
                             </button>
                         </div>
                     </div>
 
-                    <h3 class="rule-desc">@item.Description</h3>
-                    <div class="d-flex align-items-baseline gap-2">
-                        <p class="rule-amount @amountClass mb-0">@item.Amount.ToString("C")</p>
-                        <span class="rule-frequency">/ @item.Frequency</span>
+                    <h3 class="rec-desc">@item.Description</h3>
+                    <div class="rec-amount-row">
+                        <span class="rec-amount @iconClass">₹@item.Amount.ToString("N2")</span>
+                        <span class="rec-freq">/ @item.Frequency</span>
                     </div>
 
-                    <div class="rule-info-box">
-                        <div class="rule-info-row">
+                    <div class="rec-info">
+                        <div class="rec-info-row">
                             <span>Account</span>
                             <span>@item.Account?.Name</span>
                         </div>
-                        <div class="rule-info-row">
+                        <div class="rec-info-row">
                             <span>Last Processed</span>
                             <span>@(item.LastProcessedDate?.ToString("dd MMM yyyy") ?? "Never")</span>
                         </div>
                     </div>
                 </div>
             }
-        </div>
-    }
+        }
+    </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteRuleModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content modal-custom-content">
-            <div class="modal-header modal-custom-header">
-                <div class="mb-3">
-                    <div class="icon-box bg-danger-subtle text-danger p-3 rounded-circle d-inline-flex">
-                        <i data-lucide="trash-2" size="32"></i>
-                    </div>
+<div class="modal fade del-modal" id="deleteRuleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
+        <div class="modal-content">
+            <div class="modal-body p-5 text-center">
+                <div class="del-modal-icon"><i data-lucide="trash-2" style="width:28px;height:28px"></i></div>
+                <h4 class="fw-800 text-main-adaptive mb-2" style="font-size:1.15rem">Delete Rule?</h4>
+                <p class="text-muted mb-4" style="font-size:0.88rem">This action cannot be undone.</p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <button type="button" class="modal-btn-cancel flex-grow-1" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmDeleteRuleBtn" href="#" class="modal-btn-del flex-grow-1 text-decoration-none text-center">Delete</a>
                 </div>
-                <h4 class="fw-800 text-main-adaptive mb-0">Delete Rule</h4>
-            </div>
-            <div class="modal-body modal-custom-body">
-                Are you sure you want to delete this recurring rule? This action cannot be undone.
-            </div>
-            <div class="modal-footer modal-custom-footer">
-                <button type="button" class="btn-modal-cancel flex-grow-1" data-bs-dismiss="modal">Cancel</button>
-                <a id="confirmDeleteRuleBtn" href="#" class="btn-modal-confirm flex-grow-1 text-decoration-none text-center">Delete</a>
             </div>
         </div>
     </div>
@@ -373,18 +168,13 @@
 
 @section Scripts {
     <script>
-        $(function () {
+        $(function() {
             lucide.createIcons();
-
-            $('.btn-delete-rule-trigger').on('click', function (e) {
+            $('.btn-delete-rule-trigger').on('click', function(e) {
                 e.preventDefault();
-                const ruleId = $(this).data('id');
-                const deleteUrl = `/RecurringTransaction/Delete/${ruleId}`;
-                $('#confirmDeleteRuleBtn').attr('href', deleteUrl);
-                const modal = new bootstrap.Modal(document.getElementById('deleteRuleModal'));
-                modal.show();
+                $('#confirmDeleteRuleBtn').attr('href', `/RecurringTransaction/Delete/${$(this).data('id')}`);
+                new bootstrap.Modal(document.getElementById('deleteRuleModal')).show();
             });
         });
     </script>
 }
-

@@ -5,242 +5,150 @@
 }
 
 <style>
-    :root {
-        --accent: #10b981;
-        --accent-soft: rgba(16, 185, 129, 0.08);
-        --card-radius: 24px;
+    :root { --accent:#10b981; --accent-hover:#059669; --accent-soft:rgba(16,185,129,0.08); --danger:#ef4444; --danger-soft:rgba(239,68,68,0.08); }
+    .inc-page { animation:pageIn 0.45s ease-out; }
+    @@keyframes pageIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @@keyframes cardIn { from{opacity:0;transform:translateY(10px) scale(0.98)} to{opacity:1;transform:translateY(0) scale(1)} }
+
+    .inc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; gap:16px; flex-wrap:wrap; }
+    .inc-header h1 { font-size:1.35rem; font-weight:800; color:var(--text-main); margin:0; }
+    .inc-header p { font-size:0.84rem; color:var(--muted); margin:4px 0 0; }
+    .btn-add { display:inline-flex; align-items:center; gap:8px; background:var(--accent); color:white; border:none; padding:11px 24px; border-radius:12px; font-weight:700; font-size:0.88rem; text-decoration:none; transition:all 0.22s; box-shadow:0 4px 16px rgba(16,185,129,0.2); }
+    .btn-add:hover { background:var(--accent-hover); transform:translateY(-1px); box-shadow:0 8px 24px rgba(16,185,129,0.3); color:white; }
+
+    .inc-stats { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+    .inc-stat-chip { display:inline-flex; align-items:center; gap:8px; padding:7px 14px; border-radius:10px; font-size:0.76rem; font-weight:700; background:var(--card); border:1px solid var(--border); }
+    .inc-stat-chip .dot { width:8px; height:8px; border-radius:50%; }
+    .dot.green { background:var(--accent); box-shadow:0 0 8px rgba(16,185,129,0.4); }
+
+    .inc-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:12px; }
+
+    .inc-card {
+        background:var(--card); border:1px solid var(--border); border-radius:16px; padding:16px 18px;
+        display:flex; align-items:center; gap:14px; transition:all 0.22s;
+        animation:cardIn 0.35s ease-out both; position:relative; overflow:hidden;
     }
+    .inc-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:3px 0 0 3px; background:var(--accent); opacity:0; transition:opacity 0.22s; }
+    .inc-card:hover { border-color:rgba(16,185,129,0.15); box-shadow:0 6px 20px rgba(0,0,0,0.05); transform:translateY(-2px); }
+    .inc-card:hover::before { opacity:1; }
+    .inc-card:nth-child(1){animation-delay:.02s} .inc-card:nth-child(2){animation-delay:.04s} .inc-card:nth-child(3){animation-delay:.06s}
+    .inc-card:nth-child(4){animation-delay:.08s} .inc-card:nth-child(5){animation-delay:.10s} .inc-card:nth-child(6){animation-delay:.12s}
+    .inc-card:nth-child(7){animation-delay:.14s} .inc-card:nth-child(8){animation-delay:.16s} .inc-card:nth-child(9){animation-delay:.18s} .inc-card:nth-child(10){animation-delay:.20s}
 
-    .income-page-wrapper {
-        animation: fadeIn 0.5s ease-out;
+    .inc-date-chip { width:48px; height:48px; border-radius:14px; flex-shrink:0; background:var(--accent-soft); color:var(--accent); display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:0.6rem; font-weight:800; line-height:1; gap:1px; }
+    .inc-date-chip .day { font-size:1rem; font-weight:800; margin-top:-1px; }
+    .inc-date-chip .yr { font-size:0.5rem; font-weight:700; opacity:0.9; letter-spacing:0.02em; }
+
+    .inc-card-body { flex:1; min-width:0; }
+    .inc-card-desc { font-size:0.9rem; font-weight:600; color:var(--text-main); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .inc-card-meta { font-size:0.72rem; color:var(--muted); margin-top:3px; display:flex; align-items:center; gap:6px; }
+    .inc-cat-pill { display:inline-flex; align-items:center; gap:4px; background:var(--bg); border:1px solid var(--border); padding:2px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:var(--text-main); }
+
+    .inc-amount { font-size:1rem; font-weight:800; color:var(--accent); flex-shrink:0; white-space:nowrap; }
+
+    .inc-actions { display:flex; gap:5px; flex-shrink:0; }
+    .act-btn { width:34px; height:34px; border-radius:10px; border:1px solid var(--border); background:var(--card); color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; text-decoration:none; }
+    .act-btn:hover { transform:translateY(-1px); }
+    .act-btn.edit:hover { background:var(--accent-soft); color:var(--accent); border-color:rgba(16,185,129,0.25); }
+    .act-btn.delete:hover { background:var(--danger-soft); color:var(--danger); border-color:rgba(239,68,68,0.2); }
+
+    .empty-card { grid-column:1/-1; text-align:center; padding:56px 24px; background:var(--card); border:1px dashed var(--border); border-radius:20px; }
+    .empty-icon { width:72px; height:72px; border-radius:20px; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+    .empty-card h5 { font-size:1.05rem; font-weight:800; color:var(--text-main); margin:0 0 6px; }
+    .empty-card p { font-size:0.84rem; color:var(--muted); margin:0 0 20px; }
+
+    .del-modal .modal-content { border-radius:24px; border:none; box-shadow:0 30px 80px rgba(0,0,0,0.18); background:var(--card); }
+    .del-modal-icon { width:68px; height:68px; border-radius:50%; background:var(--danger-soft); color:var(--danger); display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+    .modal-btn-del { background:var(--danger); color:white; border:none; padding:12px 28px; border-radius:12px; font-weight:700; transition:all 0.2s; text-decoration:none; }
+    .modal-btn-del:hover { background:#dc2626; transform:translateY(-1px); box-shadow:0 8px 20px rgba(239,68,68,0.25); color:white; }
+    .modal-btn-cancel { background:var(--bg); color:var(--muted); border:1px solid var(--border); padding:12px 28px; border-radius:12px; font-weight:700; transition:all 0.2s; }
+    .modal-btn-cancel:hover { background:var(--border); color:var(--text-main); }
+
+    @@media (max-width:767.98px) {
+        .inc-header { flex-direction:column; align-items:stretch; margin-bottom:18px; }
+        .inc-header h1 { font-size:1.2rem; }
+        .btn-add { justify-content:center; padding:13px 20px; }
+        .inc-grid { grid-template-columns:1fr; gap:10px; }
+        .inc-card { padding:14px 14px; gap:12px; border-radius:14px; }
+        .inc-date-chip { width:44px; height:44px; border-radius:12px; }
+        .inc-date-chip .day { font-size:0.9rem; }
+        .inc-amount { font-size:0.92rem; }
+        .act-btn { width:36px; height:36px; }
+        .empty-card { padding:40px 16px; }
     }
-
-    @@keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .premium-card {
-        background: var(--card);
-        border-radius: var(--card-radius);
-        border: 1px solid var(--border);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-        overflow: hidden;
-    }
-
-    .premium-card-header {
-        padding: 24px 32px;
-        background: var(--card);
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .modern-table {
-        margin-bottom: 0;
-    }
-
-    .modern-table thead th {
-        background: var(--bg);
-        padding: 18px 32px;
-        font-size: 0.7rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--muted);
-        border-bottom: 1px solid var(--border);
-    }
-
-    .modern-table tbody td {
-        padding: 20px 32px;
-        border-bottom: 1px solid var(--border);
-        vertical-align: middle;
-    }
-
-    .date-box {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .calendar-icon {
-        width: 40px;
-        height: 40px;
-        background: var(--accent-soft);
-        color: var(--accent);
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.6rem;
-        font-weight: 800;
-    }
-
-    .calendar-icon span { font-size: 0.9rem; margin-top: -2px; }
-
-    .category-pill {
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        background: var(--border);
-        color: var(--muted);
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .amount-text {
-        font-size: 1rem;
-        font-weight: 800;
-        color: var(--accent);
-    }
-
-    .action-btn-group {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-    }
-
-    .btn-action {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        border: 1px solid var(--border);
-        background: var(--card);
-        color: var(--muted);
-        text-decoration: none;
-    }
-
-    .btn-edit:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
-    .btn-delete:hover { background: var(--card); color: #ef4444; border-color: #fecaca; }
+    @@media (max-width:400px) { .inc-card { flex-wrap:wrap; } .inc-actions { width:100%; justify-content:flex-end; margin-top:4px; } }
 </style>
 
-<div class="income-page-wrapper" id="incomeHistoryReport">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+<div class="inc-page">
+    <div class="inc-header">
         <div>
-            <h1 class="h3 fw-800 text-main-adaptive m-0">Income History</h1>
-            <p class="text-muted small m-0">Track all your earnings and monitor your financial growth.</p>
+            <h1>Income History</h1>
+            <p>Track all your earnings and monitor your financial growth.</p>
         </div>
-        <div class="d-flex gap-2">        
-            <a asp-action="Create" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow-sm" style="background: var(--accent); border: none; color: white">
-                <i data-lucide="plus" class="me-2" style="width: 18px"></i> Add Income
-            </a>
-        </div>
+        <a asp-action="Create" class="btn-add"><i data-lucide="plus" style="width:18px;height:18px"></i> Add Income</a>
     </div>
 
-    <!-- Main Table Card -->
-    <div class="premium-card">
-        <div class="premium-card-header">
-            <h5 class="fw-700 m-0 d-flex align-items-center gap-2">
-                <i data-lucide="trending-up" style="width: 20px; color: var(--accent)"></i>
-                Recent Earnings
-            </h5>
-            <span class="badge bg-light text-main-adaptive rounded-pill px-3 py-2 border">
-                @Model.Count() Records Found
-            </span>
+    @if (Model.Any())
+    {
+        <div class="inc-stats">
+            <span class="inc-stat-chip"><span class="dot green"></span> @Model.Count() Records</span>
+            <span class="inc-stat-chip"><span class="dot green"></span> +₹@Model.Sum(x => x.Amount).ToString("N2") Total</span>
         </div>
+    }
 
-        <div class="table-responsive">
-            <table class="table modern-table align-middle">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Source</th>
-                        <th>Description</th>
-                        <th class="text-center">Amount</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (!Model.Any())
-                    {
-                        <tr>
-                            <td colspan="5">
-                                <div class="text-center py-5">
-                                    <i data-lucide="inbox" style="width: 48px; height: 48px; color: #cbd5e1" class="mb-3"></i>
-                                    <h6 class="fw-bold">No Income Recorded</h6>
-                                    <p class="text-muted small">You haven't added any income records yet.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        foreach (var item in Model.OrderByDescending(x => x.IncomeDate))
-                        {
-                            <tr>
-                                <td>
-                                    <div class="date-box">
-                                        <div class="calendar-icon">
-                                            @item.IncomeDate.ToString("MMM")
-                                            <span>@item.IncomeDate.ToString("dd")</span>
-                                        </div>
-                                        <div>
-                                            <span class="fw-700 text-main-adaptive d-block">@item.IncomeDate.ToString("yyyy")</span>
-                                            <span class="text-muted small">@item.IncomeDate.DayOfWeek</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="category-pill">
-                                        <i data-lucide="briefcase" style="width: 12px"></i>
-                                        @(item.IncomeCategory?.Name ?? "General")
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="text-main-adaptive fw-500 text-truncate d-inline-block" style="max-width: 200px;" title="@item.Description">
-                                        @(string.IsNullOrWhiteSpace(item.Description) ? "No description" : item.Description)
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="amount-text">+ ₹ @item.Amount.ToString("N2")</span>
-                                </td>
-                                <td>
-                                    <div class="action-btn-group">
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit" title="Edit Income">
-                                            <i data-lucide="pencil" style="width: 16px"></i>
-                                        </a>
-                                        <button type="button" 
-                                                class="btn-action btn-delete delete-trigger" 
-                                                data-id="@item.Id"
-                                                data-amount="@item.Amount.ToString("N2")"
-                                                data-date="@item.IncomeDate.ToString("dd MMM yyyy")"
-                                                title="Delete Income">
-                                            <i data-lucide="trash-2" style="width: 16px"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
+    <div class="inc-grid">
+        @if (!Model.Any())
+        {
+            <div class="empty-card">
+                <div class="empty-icon"><i data-lucide="trending-up" style="width:28px;height:28px"></i></div>
+                <h5>No Income Recorded</h5>
+                <p>You haven't added any income records yet.</p>
+                <a asp-action="Create" class="btn-add"><i data-lucide="plus" style="width:18px;height:18px"></i> Add First Income</a>
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model.OrderByDescending(x => x.IncomeDate))
+            {
+                <div class="inc-card">
+                    <div class="inc-date-chip">
+                        @item.IncomeDate.ToString("MMM")
+                        <span class="day">@item.IncomeDate.ToString("dd")</span>
+                        <span class="yr">@item.IncomeDate.ToString("yyyy")</span>
+                    </div>
+                    <div class="inc-card-body">
+                        <p class="inc-card-desc">@(string.IsNullOrWhiteSpace(item.Description) ? "No description" : item.Description)</p>
+                        <div class="inc-card-meta">
+                            <span class="inc-cat-pill"><i data-lucide="briefcase" style="width:10px;height:10px"></i> @(item.IncomeCategory?.Name ?? "General")</span>
+                        </div>
+                    </div>
+                    <span class="inc-amount">+₹@item.Amount.ToString("N2")</span>
+                    <div class="inc-actions">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="act-btn edit" title="Edit">
+                            <i data-lucide="pencil" style="width:14px;height:14px"></i>
+                        </a>
+                        <button type="button" class="act-btn delete delete-trigger"
+                                data-id="@item.Id" data-amount="@item.Amount.ToString("N2")"
+                                data-date="@item.IncomeDate.ToString("dd MMM yyyy")" title="Delete">
+                            <i data-lucide="trash-2" style="width:14px;height:14px"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        }
     </div>
 </div>
 
-<!-- Premium Delete Confirmation Modal -->
-<div class="modal fade premium-modal" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+<div class="modal fade del-modal" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
         <div class="modal-content">
             <div class="modal-body p-5 text-center">
-                <div class="modal-confirm-icon">
-                    <i data-lucide="alert-triangle" style="width: 40px; height: 40px"></i>
-                </div>
-                <h4 class="fw-800 text-main-adaptive mb-2">Delete Income?</h4>
-                <p class="text-muted mb-4">Are you sure you want to delete this income of <strong id="deleteTargetAmount" class="text-success"></strong>?</p>
-                
+                <div class="del-modal-icon"><i data-lucide="alert-triangle" style="width:28px;height:28px"></i></div>
+                <h4 class="fw-800 text-main-adaptive mb-2" style="font-size:1.15rem">Delete Income?</h4>
+                <p class="text-muted mb-4" style="font-size:0.88rem">Delete this income of <strong id="deleteTargetAmount" style="color:var(--accent)"></strong> from <span id="deleteTargetDate" class="fw-bold text-main-adaptive"></span>?</p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <button type="button" class="btn-modal-cancel flex-grow-1" data-bs-dismiss="modal">Cancel</button>
-                    <a id="confirmDeleteBtn" href="#" class="btn-modal-confirm flex-grow-1 text-decoration-none" style="background: #ef4444">Confirm</a>
+                    <button type="button" class="modal-btn-cancel flex-grow-1" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmDeleteBtn" href="#" class="modal-btn-del flex-grow-1 text-decoration-none text-center">Delete</a>
                 </div>
             </div>
         </div>
@@ -251,18 +159,13 @@
     <script>
         $(function() {
             lucide.createIcons();
-
             $('.delete-trigger').on('click', function() {
                 const id = $(this).data('id');
-                const amount = $(this).data('amount');
-                const deleteUrl = `/Income/Delete/${id}`;
-
-                $('#deleteTargetAmount').text('₹ ' + amount);
-                $('#confirmDeleteBtn').attr('href', deleteUrl);
-                
+                $('#deleteTargetAmount').text('₹' + $(this).data('amount'));
+                $('#deleteTargetDate').text($(this).data('date'));
+                $('#confirmDeleteBtn').attr('href', `/Income/Delete/${id}`);
                 new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
             });
         });
     </script>
 }
-

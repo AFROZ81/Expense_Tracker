@@ -5,192 +5,150 @@
 }
 
 <style>
-    :root {
-        --accent: #f59e0b; /* Amber/Gold */
-        --accent-soft: rgba(245, 158, 11, 0.1);
-        --card-radius: 24px;
-    }
+    :root { --accent:#f59e0b; --accent-hover:#d97706; --accent-soft:rgba(245,158,11,0.08); }
+    .wal-page { animation:pageIn 0.45s ease-out; }
+    @@keyframes pageIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @@keyframes cardIn { from{opacity:0;transform:translateY(10px) scale(0.98)} to{opacity:1;transform:translateY(0) scale(1)} }
 
-    .account-page-wrapper {
-        animation: fadeIn 0.5s ease-out;
-    }
+    /* Header */
+    .wal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; gap:16px; flex-wrap:wrap; }
+    .wal-header h1 { font-size:1.35rem; font-weight:800; color:var(--text-main); margin:0; letter-spacing:-0.02em; }
+    .wal-header p { font-size:0.84rem; color:var(--muted); margin:4px 0 0; }
+    .btn-add { display:inline-flex; align-items:center; gap:8px; background:var(--accent); color:white; border:none; padding:11px 24px; border-radius:12px; font-weight:700; font-size:0.88rem; text-decoration:none; transition:all 0.22s; box-shadow:0 4px 16px rgba(245,158,11,0.25); }
+    .btn-add:hover { background:var(--accent-hover); transform:translateY(-1px); box-shadow:0 8px 24px rgba(245,158,11,0.35); color:white; }
 
-    @@keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    /* Net Worth Hero */
+    .net-worth-card {
+        background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);
+        color:white; border-radius:20px; padding:32px 36px; margin-bottom:28px;
+        display:flex; justify-content:space-between; align-items:center;
+        box-shadow:0 16px 40px rgba(0,0,0,0.2); position:relative; overflow:hidden;
     }
+    .net-worth-card::after { content:''; position:absolute; width:200px; height:200px; background:rgba(245,158,11,0.08); border-radius:50%; top:-100px; right:-60px; }
+    .nw-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; opacity:0.6; margin-bottom:6px; }
+    .nw-amount { font-size:2.4rem; font-weight:800; letter-spacing:-0.03em; }
+    .nw-stats { display:flex; gap:24px; margin-top:14px; }
+    .nw-stat { font-size:0.78rem; font-weight:600; opacity:0.7; display:flex; align-items:center; gap:6px; }
+    .nw-stat .dot { width:6px; height:6px; border-radius:50%; }
 
-    .account-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 24px;
+    /* Account Grid */
+    .wal-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:16px; }
+
+    /* Account Card */
+    .wal-card {
+        background:var(--card); border:1px solid var(--border); border-radius:18px; padding:24px;
+        position:relative; overflow:hidden; transition:all 0.25s;
+        animation:cardIn 0.35s ease-out both;
     }
+    .wal-card::before { content:''; position:absolute; top:0; right:0; width:80px; height:80px; background:radial-gradient(circle at top right, var(--accent-soft), transparent); border-radius:0 0 0 80px; }
+    .wal-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(0,0,0,0.08); }
+    .wal-card:nth-child(1){animation-delay:.03s} .wal-card:nth-child(2){animation-delay:.06s} .wal-card:nth-child(3){animation-delay:.09s}
+    .wal-card:nth-child(4){animation-delay:.12s} .wal-card:nth-child(5){animation-delay:.15s} .wal-card:nth-child(6){animation-delay:.18s}
 
-    .account-card {
-        background: var(--card);
-        border-radius: 28px;
-        padding: 30px;
-        border: 1px solid rgba(0,0,0,0.03);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        position: relative;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
+    .wal-card-top { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+    .wal-icon { width:48px; height:48px; border-radius:14px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .wal-card-name { font-size:1rem; font-weight:700; color:var(--text-main); margin:0; }
+    .wal-card-type { font-size:0.74rem; font-weight:600; color:var(--muted); margin-top:2px; }
 
-    .account-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    }
+    .wal-balance-label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:4px; }
+    .wal-balance-amount { font-size:1.6rem; font-weight:800; color:var(--text-main); margin-bottom:18px; letter-spacing:-0.02em; }
 
-    .account-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 100px;
-        height: 100px;
-        background: radial-gradient(circle at top right, var(--accent-soft), transparent);
-        border-radius: 0 0 0 100%;
-    }
+    .wal-card-footer { display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:1px solid var(--border); }
+    .wal-health { display:inline-flex; align-items:center; gap:5px; font-size:0.76rem; font-weight:700; padding:4px 12px; border-radius:8px; }
+    .wal-health.good { background:rgba(16,185,129,0.08); color:#10b981; }
+    .wal-health.bad { background:rgba(239,68,68,0.08); color:#ef4444; }
+    [data-theme="dark"] .wal-health.good { background:rgba(34,197,94,0.15); color:#4ade80; }
+    [data-theme="dark"] .wal-health.bad { background:rgba(239,68,68,0.15); color:#f87171; }
 
-    .account-type-icon {
-        width: 50px;
-        height: 50px;
-        background: var(--accent-soft);
-        color: var(--accent);
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
+    .wal-settings-link { display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:0.8rem; font-weight:700; text-decoration:none; transition:color 0.2s; }
+    .wal-settings-link:hover { color:var(--accent); }
 
-    .account-balance-label {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: var(--muted);
-        letter-spacing: 0.1em;
-        margin-bottom: 4px;
-    }
+    /* Empty State */
+    .empty-card { text-align:center; padding:56px 24px; background:var(--card); border:1px dashed var(--border); border-radius:20px; }
+    .empty-icon { width:72px; height:72px; border-radius:20px; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
+    .empty-card h5 { font-size:1.05rem; font-weight:800; color:var(--text-main); margin:0 0 6px; }
+    .empty-card p { font-size:0.84rem; color:var(--muted); margin:0 0 20px; }
 
-    .account-balance-value {
-        font-size: 1.75rem;
-        font-weight: 800;
-        color: var(--text-main);
-        margin-bottom: 15px;
-    }
-
-    .account-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 15px;
-        border-top: 1px solid #f1f5f9;
-    }
-
-    .btn-account-edit {
-        color: var(--muted);
-        text-decoration: none;
-        font-size: 0.8rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        transition: color 0.2s;
-    }
-
-    .btn-account-edit:hover {
-        color: var(--accent);
-    }
-
-    .total-wealth-card {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        color: white;
-        padding: 40px;
-        border-radius: 32px;
-        margin-bottom: 40px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-    }
-
-    .wealth-value {
-        font-size: 2.5rem;
-        font-weight: 800;
-        letter-spacing: -0.02em;
+    @@media (max-width:767.98px) {
+        .wal-header { flex-direction:column; align-items:stretch; margin-bottom:18px; }
+        .wal-header h1 { font-size:1.2rem; }
+        .btn-add { justify-content:center; padding:13px 20px; }
+        .net-worth-card { padding:24px 20px; border-radius:16px; flex-direction:column; align-items:flex-start; gap:12px; }
+        .nw-amount { font-size:1.8rem; }
+        .nw-stats { gap:16px; }
+        .wal-grid { grid-template-columns:1fr; gap:12px; }
+        .wal-card { padding:20px; border-radius:16px; }
+        .wal-balance-amount { font-size:1.4rem; }
+        .wal-icon { width:44px; height:44px; border-radius:12px; }
+        .empty-card { padding:40px 16px; }
     }
 </style>
 
-<div class="account-page-wrapper">
-    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+<div class="wal-page">
+    <div class="wal-header">
         <div>
-            <h1 class="h3 fw-800 text-main-adaptive m-0">Wallets & Accounts</h1>
-            <p class="text-muted small m-0">Manage your cash, bank accounts, and investments in one place.</p>
+            <h1>Wallets & Accounts</h1>
+            <p>Manage your cash, bank accounts, and investments in one place.</p>
         </div>
-        <a asp-action="Create" class="btn btn-warning rounded-pill px-4 py-2 fw-bold shadow-sm" style="background: var(--accent); border: none; color: white">
-            <i data-lucide="plus" class="me-2" style="width: 18px"></i> New Account
-        </a>
+        <a asp-action="Create" class="btn-add"><i data-lucide="plus" style="width:18px;height:18px"></i> New Account</a>
     </div>
 
-    @{
-        var totalWealth = Model.Sum(a => a.CurrentBalance);
+    @{ var totalWealth = Model.Sum(a => a.CurrentBalance); var accountCount = Model.Count(); }
+
+    @if (Model.Any())
+    {
+        <div class="net-worth-card">
+            <div>
+                <div class="nw-label">Total Net Worth</div>
+                <div class="nw-amount">₹@totalWealth.ToString("N2")</div>
+                <div class="nw-stats">
+                    <span class="nw-stat"><span class="dot" style="background:#f59e0b"></span> @accountCount Account@(accountCount != 1 ? "s" : "")</span>
+                    <span class="nw-stat"><span class="dot" style="background:#22c55e"></span> @Model.Count(a => a.CurrentBalance >= 0) Healthy</span>
+                </div>
+            </div>
+            <div style="opacity:0.15"><i data-lucide="gem" style="width:64px;height:64px"></i></div>
+        </div>
     }
-
-    <div class="total-wealth-card">
-        <div>
-            <div class="text-white-50 small fw-bold text-uppercase mb-1" style="letter-spacing: 0.1em">Total Net Worth</div>
-            <div class="wealth-value">₹ @totalWealth.ToString("N0")</div>
-        </div>
-        <div style="opacity: 0.2">
-            <i data-lucide="gem" style="width: 80px; height: 80px"></i>
-        </div>
-    </div>
 
     @if (!Model.Any())
     {
-        <div class="text-center py-5">
-            <i data-lucide="wallet" style="width: 60px; height: 60px; color: #cbd5e1" class="mb-3"></i>
-            <h5 class="fw-bold">No Accounts Linked</h5>
-            <p class="text-muted">Start by adding your first bank account or cash wallet.</p>
+        <div class="empty-card">
+            <div class="empty-icon"><i data-lucide="wallet" style="width:28px;height:28px"></i></div>
+            <h5>No Accounts Linked</h5>
+            <p>Start by adding your first bank account or cash wallet.</p>
+            <a asp-action="Create" class="btn-add"><i data-lucide="plus" style="width:18px;height:18px"></i> Add Account</a>
         </div>
     }
     else
     {
-        <div class="account-grid">
+        <div class="wal-grid">
             @foreach (var item in Model)
             {
-                <div class="account-card">
-                    @{
-                        string icon = "banknote";
-                        switch(item.Type) {
-                            case ExpenseTracker.Models.Entities.AccountType.Bank: icon = "landmark"; break;
-                            case ExpenseTracker.Models.Entities.AccountType.CreditCard: icon = "credit-card"; break;
-                            case ExpenseTracker.Models.Entities.AccountType.Savings: icon = "piggy-bank"; break;
-                            case ExpenseTracker.Models.Entities.AccountType.Investment: icon = "trending-up"; break;
-                        }
-                    }
-                    <div class="account-type-icon">
-                        <i data-lucide="@icon"></i>
+                string icon = "banknote"; string iconColor = "#f59e0b";
+                switch(item.Type) {
+                    case ExpenseTracker.Models.Entities.AccountType.Bank: icon = "landmark"; iconColor = "#3b82f6"; break;
+                    case ExpenseTracker.Models.Entities.AccountType.CreditCard: icon = "credit-card"; iconColor = "#ec4899"; break;
+                    case ExpenseTracker.Models.Entities.AccountType.Savings: icon = "piggy-bank"; iconColor = "#10b981"; break;
+                    case ExpenseTracker.Models.Entities.AccountType.Investment: icon = "trending-up"; iconColor = "#8b5cf6"; break;
+                }
+                <div class="wal-card">
+                    <div class="wal-card-top">
+                        <div class="wal-icon" style="color:@iconColor"><i data-lucide="@icon" style="width:22px;height:22px"></i></div>
+                        <div style="min-width:0">
+                            <h5 class="wal-card-name">@item.Name</h5>
+                            <div class="wal-card-type">@item.Type Account</div>
+                        </div>
                     </div>
-                    
-                    <h5 class="fw-800 text-main-adaptive mb-1">@item.Name</h5>
-                    <div class="text-muted small mb-4">@item.Type Account</div>
-
-                    <div class="account-balance-label">Available Balance</div>
-                    <div class="account-balance-value">₹ @item.CurrentBalance.ToString("N2")</div>
-
-                    <div class="account-footer">
-                        <div class="small fw-600 @(item.CurrentBalance < 0 ? "text-danger" : "text-success")">
-                            <i data-lucide="@(item.CurrentBalance < 0 ? "alert-circle" : "shield-check")" style="width: 14px"></i>
+                    <div class="wal-balance-label">Available Balance</div>
+                    <div class="wal-balance-amount">₹@item.CurrentBalance.ToString("N2")</div>
+                    <div class="wal-card-footer">
+                        <span class="wal-health @(item.CurrentBalance < 0 ? "bad" : "good")">
+                            <i data-lucide="@(item.CurrentBalance < 0 ? "alert-circle" : "shield-check")" style="width:13px;height:13px"></i>
                             @(item.CurrentBalance < 0 ? "Overdrawn" : "Healthy")
-                        </div>
-                        <div class="d-flex gap-3">
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn-account-edit">
-                                <i data-lucide="settings" style="width: 14px"></i> Settings
-                            </a>
-                        </div>
+                        </span>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="wal-settings-link">
+                            <i data-lucide="settings" style="width:14px;height:14px"></i> Settings
+                        </a>
                     </div>
                 </div>
             }
@@ -199,10 +157,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        $(function() {
-            lucide.createIcons();
-        });
-    </script>
+    <script>$(function(){ lucide.createIcons(); });</script>
 }
-

@@ -26,7 +26,7 @@
             --card-bg: rgba(255, 255, 255, 0.85);
             --brand-a: #0ea5e9;
             --brand-b: #10b981;
-            --brand-c: #6366f1;
+            --brand-c: #059669;
             --brand-gradient: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
             --brand-gradient-hover: linear-gradient(135deg, #0284c7 0%, #059669 100%);
             --money-grid: rgba(15, 23, 42, 0.04);
@@ -72,6 +72,7 @@
             padding: 0;
             overflow-x: hidden;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -529,6 +530,30 @@
             background: var(--bg-soft);
         }
 
+        .back-float-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 120;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--line);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .back-float-btn:hover {
+            transform: scale(1.05);
+            background: var(--bg-soft);
+            color: var(--brand-a);
+        }
+
         /* Password Strength Meter */
         .strength-meter {
             height: 4px;
@@ -595,6 +620,27 @@
                 max-width: 100%;
             }
         }
+
+        /* ── Auth Footer ── */
+        .auth-footer {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+            font-size: .72rem;
+            color: var(--text-muted);
+        }
+
+        .auth-footer a {
+            color: var(--brand-a);
+            font-weight: 700;
+            text-decoration: none;
+            transition: color .2s;
+        }
+
+        .auth-footer a:hover {
+            color: var(--brand-b);
+        }
     </style>
 </head>
 <body>
@@ -606,10 +652,13 @@
         <div class="bg-glow-b"></div>
     </div>
 
-    <!-- Floating Theme Swapper -->
+    <!-- Floating Theme Swapper & Back Nav -->
     <button class="theme-float-btn" id="themeToggle" type="button" aria-label="Toggle theme">
         <span id="themeGlyph"><i data-lucide="moon" style="width: 16px; height: 16px;"></i></span>
     </button>
+    <a href="@Url.Action("Index", "Home")" class="back-float-btn" title="Back to Home" aria-label="Back to Home">
+        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+    </a>
 
     <!-- Master Switchable Card -->
     <div class="auth-wrapper" id="authWrapper">
@@ -755,6 +804,10 @@
         </div>
 
     </div>
+
+    <footer class="auth-footer">
+        &copy; 2026 ExpenseTracker &mdash; Built by <strong>Afroz</strong>
+    </footer>
 
     <!-- Controls & Animation script -->
     <script>

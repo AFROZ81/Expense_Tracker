@@ -735,3 +735,222 @@ h1, h2, h3, h4, h5, h6 {
         transform: scaleX(0);
     }
 }
+
+/* =====================================================
+   14. MOBILE RESPONSIVENESS OVERRIDES
+===================================================== */
+@media (max-width: 991.98px) {
+    .content-area,
+    .content-container {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    .dashboard-wrapper,
+    .expense-page-wrapper,
+    .form-page-wrapper {
+        padding-bottom: 8px;
+    }
+
+    .welcome-banner,
+    .breakdown-header,
+    .premium-card-header,
+    .card-gradient-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+
+    .welcome-banner {
+        padding: 20px !important;
+        border-radius: 20px !important;
+    }
+
+    .welcome-banner h1 {
+        font-size: 1.5rem !important;
+        line-height: 1.15;
+    }
+
+    .stat-card,
+    .breakdown-card,
+    .premium-card,
+    .premium-form-card {
+        border-radius: 20px !important;
+    }
+
+    .stat-card {
+        padding: 18px !important;
+    }
+
+    .stat-value {
+        font-size: 1.45rem !important;
+    }
+
+    .stat-icon-wrapper {
+        width: 44px !important;
+        height: 44px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .premium-card-header,
+    .breakdown-header,
+    .card-gradient-header,
+    .form-body {
+        padding: 18px !important;
+    }
+
+    .premium-card-header .badge,
+    .breakdown-header .badge {
+        align-self: flex-start;
+    }
+
+    .premium-form-card,
+    .premium-card {
+        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.06) !important;
+    }
+
+    .modern-input,
+    .modern-select,
+    .form-control,
+    .form-select {
+        min-height: 48px;
+        padding: 12px 14px !important;
+        border-radius: 14px !important;
+    }
+
+    .amount-field {
+        font-size: 1.2rem !important;
+    }
+
+    .modern-input-group {
+        margin-bottom: 18px !important;
+    }
+
+    .modern-table thead th,
+    .table thead th {
+        padding: 12px 14px !important;
+        font-size: 0.68rem !important;
+    }
+
+    .modern-table tbody td,
+    .table tbody td {
+        padding: 14px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .action-btn-group {
+        justify-content: flex-start !important;
+    }
+
+    .date-box {
+        gap: 10px !important;
+    }
+
+    .btn-action {
+        width: 34px !important;
+        height: 34px !important;
+    }
+
+    .quick-action-card {
+        padding: 18px !important;
+    }
+
+    .quick-action-card h6 {
+        font-size: 0.95rem !important;
+    }
+
+    .quick-action-card p {
+        font-size: 0.8rem !important;
+    }
+
+    .breakdown-card .row.align-items-center {
+        gap: 12px;
+    }
+
+    .breakdown-card .col-md-5,
+    .breakdown-card .col-md-7,
+    .premium-form-card .col-md-6,
+    .premium-form-card .col-md-12 {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .premium-form-card .row {
+        --bs-gutter-x: 0;
+    }
+
+    .modal-custom-header {
+        padding: 28px 20px 8px !important;
+    }
+
+    .modal-custom-body {
+        padding: 8px 20px 18px !important;
+    }
+
+    .modal-custom-footer {
+        padding: 8px 20px 24px !important;
+        flex-direction: column !important;
+    }
+
+    .mobile-nav-sheet-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .topbar-title {
+        font-size: 0.98rem !important;
+        max-width: 13ch;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .welcome-banner h1 {
+        font-size: 1.35rem !important;
+    }
+
+    .welcome-banner,
+    .breakdown-card,
+    .premium-card,
+    .premium-form-card {
+        border-radius: 18px !important;
+    }
+
+    .premium-card-header,
+    .breakdown-header,
+    .card-gradient-header,
+    .form-body {
+        padding: 16px !important;
+    }
+
+    .premium-card-header,
+    .breakdown-header {
+        gap: 10px !important;
+    }
+
+    .welcome-banner .current-date,
+    .profile-role-text {
+        font-size: 0.78rem !important;
+    }
+
+    .category-list-item {
+        padding: 12px 0 !important;
+    }
+
+    .mobile-nav-sheet .offcanvas-header,
+    .mobile-nav-sheet .offcanvas-body {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    .mobile-sheet-link {
+        min-height: 88px !important;
+    }
+
+    .mobile-bottom-nav {
+        left: 10px !important;
+        right: 10px !important;
+        bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+    }
+}

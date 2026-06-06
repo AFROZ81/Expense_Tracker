@@ -7,135 +7,143 @@
 }
 
 <style>
-    :root {
-        --accent: #6366f1;
-        --card-radius: 24px;
-    }
+    :root { --accent:#0ea5e9; --accent-hover:#0284c7; --accent-soft:rgba(14,165,233,0.08); }
+    .form-page { animation:slideIn 0.45s ease-out; }
+    @@keyframes slideIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 
-    .form-container {
-        animation: fadeIn 0.5s ease-out;
-        max-width: 650px;
-        margin: 0 auto;
-    }
+    .form-card { background:var(--card); border:1px solid var(--border); border-radius:20px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.06); }
+    .form-card-header { padding:28px 32px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:16px; }
+    .form-header-icon { width:50px; height:50px; border-radius:16px; flex-shrink:0; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; }
+    .form-card-header h2 { font-size:1.15rem; font-weight:800; color:var(--text-main); margin:0; }
+    .form-card-header p { font-size:0.8rem; color:var(--muted); margin:3px 0 0; }
+    .form-card-body { padding:28px 32px 32px; }
 
-    @@keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+    .field-group { margin-bottom:20px; }
+    .field-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:7px; display:block; }
 
-    .premium-card {
-        background: var(--card);
-        border-radius: var(--card-radius);
-        border: 1px solid rgba(0,0,0,0.03);
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
-        padding: 40px;
-    }
+    .input-wrap { display:flex; align-items:stretch; border:1.5px solid var(--border); border-radius:14px; background:var(--bg); transition:all 0.22s; overflow:hidden; }
+    .input-wrap:focus-within { border-color:var(--accent); background:var(--card); box-shadow:0 0 0 4px rgba(14,165,233,0.1); }
+    .input-wrap-icon { width:46px; min-width:46px; display:flex; align-items:center; justify-content:center; color:var(--muted); flex-shrink:0; border-right:1.5px solid var(--border); transition:all 0.22s; }
+    .input-wrap:focus-within .input-wrap-icon { color:var(--accent); border-right-color:var(--accent); }
+    .input-wrap input, .input-wrap select { flex:1; border:none; background:transparent; outline:none; padding:12px 14px; font-size:0.9rem; font-weight:500; color:var(--text-main); min-width:0; appearance:none; font-family:inherit; }
+    .input-wrap select { cursor:pointer; }
 
-    .form-label {
-        font-weight: 700;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--muted);
-        margin-bottom: 10px;
-    }
+    .amount-wrap { display:flex; align-items:stretch; border:1.5px solid var(--border); border-radius:14px; background:var(--bg); transition:all 0.22s; overflow:hidden; }
+    .amount-wrap:focus-within { border-color:var(--accent); background:var(--card); box-shadow:0 0 0 4px rgba(14,165,233,0.1); }
+    .currency-prefix { width:46px; min-width:46px; display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--muted); font-size:1.1rem; border-right:1.5px solid var(--border); flex-shrink:0; transition:all 0.22s; }
+    .amount-wrap:focus-within .currency-prefix { color:var(--accent); border-right-color:var(--accent); }
+    .amount-wrap input { flex:1; border:none; background:transparent; outline:none; padding:14px 16px; font-size:1.3rem; font-weight:800; color:var(--text-main); min-width:0; font-family:inherit; }
+    .amount-wrap input::placeholder { color:var(--muted); opacity:0.4; }
 
-    .form-control, .form-select {
-        border-radius: 14px;
-        padding: 12px 20px;
-        border: 1px solid var(--border);
-        transition: all 0.2s ease;
-    }
+    .btn-submit { display:inline-flex; align-items:center; justify-content:center; gap:8px; background:var(--accent); color:white; border:none; padding:14px 28px; border-radius:12px; font-weight:700; font-size:0.9rem; width:100%; transition:all 0.22s; box-shadow:0 4px 16px rgba(14,165,233,0.2); cursor:pointer; margin-top:8px; font-family:inherit; }
+    .btn-submit:hover { background:var(--accent-hover); transform:translateY(-1px); box-shadow:0 8px 24px rgba(14,165,233,0.3); }
 
-    .form-control:focus, .form-select:focus {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-    }
+    .btn-back-link { display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-weight:600; font-size:0.88rem; text-decoration:none; transition:all 0.2s; margin-bottom:18px; }
+    .btn-back-link:hover { color:var(--text-main); }
 
-    .btn-submit {
-        background: var(--accent);
-        color: white;
-        border: none;
-        padding: 16px;
-        border-radius: 16px;
-        font-weight: 800;
-        transition: all 0.3s ease;
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    .btn-submit:hover {
-        background: #4f46e5;
-        transform: translateY(-2px);
-        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.25);
-        color: white;
+    @@media (max-width:767.98px) {
+        .form-card { border-radius:18px; }
+        .form-card-header { padding:20px 18px; gap:12px; }
+        .form-header-icon { width:44px; height:44px; border-radius:12px; }
+        .form-header-icon svg { width:22px; height:22px; }
+        .form-card-header h2 { font-size:1.05rem; }
+        .form-card-body { padding:20px 18px 26px; }
+        .field-row { grid-template-columns:1fr; gap:0; }
+        .field-group { margin-bottom:16px; }
+        .field-label { font-size:0.66rem; margin-bottom:5px; }
+        .input-wrap { border-radius:12px; }
+        .input-wrap-icon { width:42px; min-width:42px; }
+        .input-wrap-icon svg { width:16px; height:16px; }
+        .input-wrap input, .input-wrap select { padding:11px 12px; font-size:0.86rem; }
+        .amount-wrap { border-radius:12px; }
+        .currency-prefix { width:42px; min-width:42px; font-size:1rem; }
+        .amount-wrap input { padding:12px 14px; font-size:1.15rem; }
+        .btn-submit { padding:14px 20px; }
     }
 </style>
 
-<div class="form-container">
-    <div class="d-flex align-items-center gap-3 mb-4">
-        <a asp-action="Index" class="btn btn-light rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px">
-            <i data-lucide="arrow-left" style="width: 20px; color: var(--muted);"></i>
-        </a>
-        <h1 class="h3 fw-800 text-main-adaptive m-0">Set New Budget</h1>
-    </div>
+<div class="form-page">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <a asp-action="Index" class="btn-back-link">
+                <i data-lucide="arrow-left" style="width:16px;height:16px"></i> Back to budgets
+            </a>
 
-    <div class="premium-card">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small fw-bold"></div>
-
-            <div class="mb-4">
-                <label asp-for="CategoryId" class="form-label">Expense Category</label>
-                <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryList">
-                    <option value="">-- Choose Category --</option>
-                </select>
-                <span asp-validation-for="CategoryId" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-4">
-                <label asp-for="Amount" class="form-label">Monthly Limit (Budget)</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0" style="border-radius: 14px 0 0 14px;">₹</span>
-                    <input asp-for="Amount" class="form-control border-start-0" type="number" step="0.01" placeholder="0.00" style="border-radius: 0 14px 14px 0;" />
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="form-header-icon">
+                        <i data-lucide="target" style="width:24px;height:24px"></i>
+                    </div>
+                    <div>
+                        <h2>Set New Budget</h2>
+                        <p>Define a spending limit for a category.</p>
+                    </div>
                 </div>
-                <span asp-validation-for="Amount" class="text-danger small"></span>
-            </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <label asp-for="Month" class="form-label">Month</label>
-                    <select asp-for="Month" class="form-select">
-                        @for (int i = 1; i <= 12; i++)
-                        {
-                            <option value="@i" selected="@(i == currentMonth)">@System.Globalization.DateTimeFormatInfo.InvariantInfo.GetMonthName(i)</option>
-                        }
-                    </select>
-                    <span asp-validation-for="Month" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <label asp-for="Year" class="form-label">Year</label>
-                    <select asp-for="Year" class="form-select">
-                        <option value="@(currentYear - 1)">@(currentYear - 1)</option>
-                        <option value="@currentYear" selected>@currentYear</option>
-                        <option value="@(currentYear + 1)">@(currentYear + 1)</option>
-                    </select>
-                    <span asp-validation-for="Year" class="text-danger small"></span>
+                <div class="form-card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small fw-bold"></div>
+
+                        <div class="field-group">
+                            <label asp-for="CategoryId" class="field-label">Expense Category</label>
+                            <div class="input-wrap">
+                                <div class="input-wrap-icon"><i data-lucide="tag" style="width:17px;height:17px"></i></div>
+                                <select asp-for="CategoryId" asp-items="ViewBag.CategoryList">
+                                    <option value="">-- Choose Category --</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="CategoryId" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="field-group">
+                            <label asp-for="Amount" class="field-label">Monthly Limit (Budget)</label>
+                            <div class="amount-wrap">
+                                <span class="currency-prefix">₹</span>
+                                <input asp-for="Amount" type="number" step="0.01" placeholder="0.00" />
+                            </div>
+                            <span asp-validation-for="Amount" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="field-row">
+                            <div>
+                                <label asp-for="Month" class="field-label">Month</label>
+                                <div class="input-wrap">
+                                    <div class="input-wrap-icon"><i data-lucide="calendar" style="width:17px;height:17px"></i></div>
+                                    <select asp-for="Month">
+                                        @for (int i = 1; i <= 12; i++)
+                                        {
+                                            <option value="@i" selected="@(i == currentMonth)">@System.Globalization.DateTimeFormatInfo.InvariantInfo.GetMonthName(i)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Month" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                            <div>
+                                <label asp-for="Year" class="field-label">Year</label>
+                                <div class="input-wrap">
+                                    <div class="input-wrap-icon"><i data-lucide="hash" style="width:17px;height:17px"></i></div>
+                                    <select asp-for="Year">
+                                        <option value="@(currentYear - 1)">@(currentYear - 1)</option>
+                                        <option value="@currentYear" selected>@currentYear</option>
+                                        <option value="@(currentYear + 1)">@(currentYear + 1)</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Year" class="text-danger small mt-1 d-block"></span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <i data-lucide="check" style="width:16px;height:16px"></i> Initialize Budget
+                        </button>
+                    </form>
                 </div>
             </div>
-
-            <button type="submit" class="btn-submit">
-                Initialize Budget
-            </button>
-        </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>
-        $(function() {
-            lucide.createIcons();
-        });
-    </script>
+    <script>$(function(){ lucide.createIcons(); });</script>
 }
-

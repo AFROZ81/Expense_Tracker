@@ -5,557 +5,315 @@
 }
 
 <style>
-    :root {
-        --accent: #6366f1;
-        --accent-dark: #4f46e5;
-        --success: #0cda3fff;
-        --warning: #f59e0b;
-        --danger: #ef4444;
-        --glass: rgba(255, 255, 255, 0.7);
-        --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    :root { --accent:#0ea5e9; --accent-soft:rgba(14,165,233,0.08); --success:#10b981; --success-soft:rgba(16,185,129,0.08); --danger:#ef4444; --danger-soft:rgba(239,68,68,0.08); --warning:#f59e0b; --warning-soft:rgba(245,158,11,0.08); }
+
+    .dash-page { animation:pageIn 0.45s ease-out; }
+    @@keyframes pageIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { opacity:0; animation:fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+    /* Welcome */
+    .welcome-card { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:28px 30px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 16px rgba(0,0,0,0.04); }
+    .welcome-card h1 { font-size:1.5rem; font-weight:800; color:var(--text-main); margin:0 0 4px; letter-spacing:-0.02em; }
+    .welcome-card .date-line { font-size:0.84rem; color:var(--muted); display:flex; align-items:center; gap:8px; }
+
+    /* Stats Grid */
+    .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:22px 24px; position:relative; overflow:hidden; transition:all 0.25s; box-shadow:0 4px 16px rgba(0,0,0,0.04); }
+    .stat-card:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(0,0,0,0.08); }
+    .stat-card.hero { background:linear-gradient(135deg,#0ea5e9 0%,#10b981 100%); color:white; border:none; }
+    .stat-card .stat-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+    .stat-card.hero .stat-icon { background:rgba(255,255,255,0.2); color:white; }
+    .stat-card .stat-label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:6px; }
+    .stat-card.hero .stat-label { color:rgba(255,255,255,0.75); }
+    .stat-card .stat-value { font-size:1.5rem; font-weight:800; color:var(--text-main); letter-spacing:-0.02em; margin-bottom:4px; }
+    .stat-card.hero .stat-value { color:white; }
+    .stat-card .stat-sub { font-size:0.78rem; color:var(--muted); }
+    .stat-card.hero .stat-sub { color:rgba(255,255,255,0.7); }
+    .trend-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:0.7rem; font-weight:700; margin-top:10px; }
+    .trend-up { background:#dcfce7; color:#15803d; }
+    .trend-down { background:#fee2e2; color:#b91c1c; }
+    [data-theme="dark"] .trend-up { background:rgba(34,197,94,0.15); color:#4ade80; }
+    [data-theme="dark"] .trend-down { background:rgba(239,68,68,0.15); color:#f87171; }
+
+    /* Section Card */
+    .section-card { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:24px 28px; box-shadow:0 4px 16px rgba(0,0,0,0.04); margin-bottom:20px; }
+    .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+    .section-header h5 { font-size:1rem; font-weight:800; color:var(--text-main); margin:0; }
+    .section-header p { font-size:0.78rem; color:var(--muted); margin:2px 0 0; }
+    .section-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:10px; font-size:0.74rem; font-weight:700; background:var(--accent-soft); color:var(--accent); }
+
+    /* Category List */
+    .cat-list-item { padding:14px 0; border-bottom:1px solid var(--border); }
+    .cat-list-item:last-child { border-bottom:none; }
+    .cat-list-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .cat-list-name { font-weight:600; font-size:0.88rem; color:var(--text-main); display:flex; align-items:center; gap:8px; }
+    .cat-list-amount { font-weight:700; font-size:0.88rem; color:var(--text-main); }
+    .progress-track { height:7px; background:var(--bg); border-radius:8px; overflow:hidden; }
+    .progress-fill { height:100%; background:var(--accent); border-radius:8px; transition:width 1s ease-in-out; }
+
+    /* Sleek custom scrollbar for category list */
+    .cat-scroll { scrollbar-width:thin; scrollbar-color:#0ea5e9 transparent; }
+    .cat-scroll::-webkit-scrollbar { width:2px; }
+    .cat-scroll::-webkit-scrollbar-track { background:transparent; }
+    .cat-scroll::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #67e8f9 0%, #22d3ee 35%, #14b8a6 70%, #10b981 100%);
+        border-radius:999px;
+        box-shadow:0 0 6px rgba(34,211,238,0.22);
+    }
+    .cat-scroll::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #a5f3fc 0%, #67e8f9 35%, #2dd4bf 70%, #34d399 100%);
+        box-shadow:0 0 8px rgba(34,211,238,0.3);
+    }
+    [data-theme="dark"] .cat-scroll { scrollbar-color:rgba(34,211,238,0.42) transparent; }
+    [data-theme="dark"] .cat-scroll::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, rgba(103,232,249,0.55) 0%, rgba(34,211,238,0.55) 35%, rgba(20,184,166,0.55) 70%, rgba(16,185,129,0.55) 100%);
     }
 
-    .dashboard-wrapper {
-        padding-bottom: 40px;
+    /* Quick Actions */
+    .quick-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
+    .quick-card { display:flex; align-items:center; gap:14px; padding:18px 20px; border-radius:16px; border:1px solid var(--border); background:var(--card); text-decoration:none; transition:all 0.22s; box-shadow:0 2px 8px rgba(0,0,0,0.03); }
+    .quick-card:hover { border-color:rgba(14,165,233,0.2); transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,0.06); }
+    .quick-icon { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .quick-card h6 { font-size:0.88rem; font-weight:700; color:var(--text-main); margin:0; }
+    .quick-card p { font-size:0.74rem; color:var(--muted); margin:2px 0 0; }
+
+    /* Wallet cards */
+    .wallet-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:12px; }
+    .wallet-card { display:flex; align-items:center; gap:14px; padding:16px 20px; border-radius:14px; border:1px solid var(--border); background:var(--bg); transition:all 0.22s; }
+    .wallet-card:hover { border-color:rgba(14,165,233,0.15); transform:translateY(-1px); }
+    .wallet-icon-box { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:var(--card); box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+    .wallet-card .wallet-name { font-weight:700; font-size:0.88rem; color:var(--text-main); }
+    .wallet-card .wallet-type { font-size:0.7rem; font-weight:600; color:var(--muted); }
+    .wallet-card .wallet-bal { font-weight:800; font-size:1rem; color:var(--text-main); margin-left:auto; text-align:right; white-space:nowrap; }
+
+    /* Budget cards */
+    .budget-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:12px; }
+    .budget-card { padding:18px 20px; border-radius:14px; border:1px solid var(--border); background:var(--bg); }
+    .budget-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .budget-card-header .name { font-weight:700; font-size:0.88rem; color:var(--text-main); }
+    .budget-pct { padding:3px 10px; border-radius:8px; font-size:0.7rem; font-weight:700; }
+    .budget-card .budget-nums { display:flex; justify-content:space-between; margin-top:10px; }
+    .budget-card .budget-nums span { font-size:0.78rem; font-weight:700; }
+    .budget-card .budget-nums .spent { color:var(--text-main); }
+    .budget-card .budget-nums .limit { color:var(--accent); }
+
+    /* Chart canvas */
+    .chart-wrap { position:relative; height:200px; width:200px; margin:0 auto; }
+
+    .btn-link-sm { display:inline-flex; align-items:center; gap:6px; font-size:0.78rem; font-weight:700; color:var(--accent); text-decoration:none; transition:all 0.2s; }
+    .btn-link-sm:hover { color:var(--accent-hover); }
+
+    .empty-note { text-align:center; padding:32px 16px; color:var(--muted); font-size:0.85rem; }
+
+    @@media (max-width:991.98px) {
+        .stats-grid { grid-template-columns:1fr; }
     }
-
-    .animate-item {
-        opacity: 0;
-        transform: translateY(20px);
-        animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    @@keyframes fadeUp {
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Welcome Banner */
-    .welcome-banner {
-        background: var(--card);
-        border-radius: 24px;
-        padding: 30px;
-        margin-bottom: 32px;
-        box-shadow: var(--card-shadow);
-        border: 1px solid var(--border);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .welcome-text h1 {
-        font-size: 2rem;
-        font-weight: 800;
-        color: var(--text-main);
-        margin-bottom: 8px;
-        letter-spacing: -0.02em;
-    }
-
-    .current-date {
-        color: var(--muted);
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    /* Stat Cards */
-    .stat-card {
-        background: var(--card);
-        border-radius: 24px;
-        padding: 24px;
-        height: 100%;
-        position: relative;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        border: 1px solid var(--border);
-        box-shadow: var(--card-shadow);
-    }
-
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    }
-
-    .stat-card.hero-stat {
-        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-        color: white;
-    }
-
-    .stat-icon-wrapper {
-        width: 50px;
-        height: 50px;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-        font-size: 1.25rem;
-    }
-
-    .hero-stat .stat-icon-wrapper {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-    }
-
-    .stat-value {
-        font-size: 1.75rem;
-        font-weight: 800;
-        margin-bottom: 4px;
-        color: var(--text-main);
-        letter-spacing: -0.02em;
-    }
-
-    .stat-label {
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    .hero-stat .stat-label {
-        color: rgba(255, 255, 255, 0.8);
-    }
-
-    .trend-indicator {
-        font-size: 0.75rem;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 4px 10px;
-        border-radius: 20px;
-        margin-top: 12px;
-    }
-
-    .trend-up { background: #dcfce7; color: #15803d; }
-    .trend-down { background: #fee2e2; color: #b91c1c; }
-
-    /* Category Breakdown List */
-    .breakdown-card {
-        background: var(--card);
-        border-radius: 24px;
-        padding: 30px;
-        box-shadow: var(--card-shadow);
-        border: 1px solid var(--border);
-    }
-
-    .breakdown-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-    }
-
-    .category-list-item {
-        padding: 16px 0;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .category-list-item:last-child {
-        border-bottom: none;
-    }
-
-    .category-info {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
-    }
-
-    .category-name {
-        font-weight: 600;
-        color: var(--text-main);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .category-amount {
-        font-weight: 700;
-        color: var(--text-main);
-    }
-
-    .progress-track {
-        height: 8px;
-        background: var(--bg);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .progress-bar-fill {
-        height: 100%;
-        background: var(--accent);
-        border-radius: 10px;
-        transition: width 1s ease-in-out;
-    }
-
-    /* Floating Quick Actions */
-    .quick-action-card {
-        background: var(--bg);
-        border: 2px dashed var(--border);
-        border-radius: 24px;
-        padding: 30px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-    }
-
-    .quick-action-card:hover {
-        background: var(--card);
-        border-color: var(--accent);
-        transform: scale(1.02);
-    }
-
-    .action-icon {
-        width: 44px;
-        height: 44px;
-        background: var(--card);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        color: var(--accent);
-    }
-
-    @@media (max-width: 768px) {
-        .welcome-banner {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 16px;
-        }
+    @@media (max-width:767.98px) {
+        .welcome-card { padding:20px; flex-direction:column; align-items:flex-start; gap:12px; border-radius:16px; }
+        .welcome-card h1 { font-size:1.2rem; }
+        .stats-grid { grid-template-columns:1fr; gap:10px; }
+        .stat-card { padding:18px 20px; border-radius:14px; }
+        .stat-card .stat-value { font-size:1.3rem; }
+        .section-card { padding:18px 16px; border-radius:16px; }
+        .quick-grid { grid-template-columns:1fr; gap:10px; }
+        .wallet-grid { grid-template-columns:1fr; }
+        .budget-grid { grid-template-columns:1fr; }
+        .chart-wrap { height:160px; width:160px; }
     }
 </style>
 
-<div class="dashboard-wrapper" id="dashboardReport">
-    <!-- Welcome Header -->
-    <div class="welcome-banner animate-item" style="animation-delay: 0.05s;">
-        <div class="welcome-text">
+<div class="dash-page">
+    <!-- Welcome -->
+    <div class="welcome-card fade-up" style="animation-delay:0.05s">
+        <div>
             <h1 id="greetingText">Good Day, @(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</h1>
-            <div class="current-date">
-                <i data-lucide="calendar"></i>
-                <span id="dateDisplay"></span>
-            </div>
-        </div>      
+            <div class="date-line"><i data-lucide="calendar" style="width:16px;height:16px"></i> <span id="dateDisplay"></span></div>
+        </div>
     </div>
 
-    <!-- Key Metrics Grid -->
-    <div class="row g-4 mb-5">
-        <div class="col-lg-4 col-md-12 animate-item" style="animation-delay: 0.1s;">
-            <div class="stat-card hero-stat">
-                <div class="stat-icon-wrapper">
-                    <i data-lucide="wallet"></i>
-                </div>
-                <div class="stat-label">Net Balance</div>
-                <div class="stat-value">₹ @Model.NetBalance.ToString("N0")</div>
-                <div class="trend-indicator @(Model.NetBalance >= 0 ? "trend-up" : "trend-down")">
-                    <i data-lucide="@(Model.NetBalance >= 0 ? "shield-check" : "alert-circle")" style="width: 12px"></i> 
-                    @(Model.NetBalance >= 0 ? "Surplus" : "Deficit") available
-                </div>
+    <!-- Key Metrics -->
+    <div class="stats-grid">
+        <div class="stat-card hero fade-up" style="animation-delay:0.1s">
+            <div class="stat-icon"><i data-lucide="wallet" style="width:22px;height:22px"></i></div>
+            <div class="stat-label">Net Balance</div>
+            <div class="stat-value">₹@Model.NetBalance.ToString("N2")</div>
+            <div class="trend-chip @(Model.NetBalance >= 0 ? "trend-up" : "trend-down")" style="@(Model.NetBalance >= 0 ? "" : "background:rgba(255,255,255,0.2);color:white")">
+                <i data-lucide="@(Model.NetBalance >= 0 ? "shield-check" : "alert-circle")" style="width:11px;height:11px"></i>
+                @(Model.NetBalance >= 0 ? "Surplus" : "Deficit") available
             </div>
         </div>
-
-        <div class="col-lg-4 col-md-6 animate-item" style="animation-delay: 0.2s;">
-            <div class="stat-card">
-                <div class="stat-icon-wrapper" style="background: var(--card); color: #10b981;">
-                    <i data-lucide="trending-up"></i>
-                </div>
-                <div class="stat-label">Income (This Month)</div>
-                <div class="stat-value">₹ @Model.ThisMonthIncome.ToString("N0")</div>
-                <div class="text-muted small mt-2">
-                    Total: ₹ @Model.TotalIncome.ToString("N0")
-                </div>
-            </div>
+        <div class="stat-card fade-up" style="animation-delay:0.15s">
+            <div class="stat-icon" style="background:var(--success-soft);color:var(--success)"><i data-lucide="trending-up" style="width:20px;height:20px"></i></div>
+            <div class="stat-label">Income (This Month)</div>
+            <div class="stat-value">₹@Model.ThisMonthIncome.ToString("N2")</div>
+            <div class="stat-sub">Total: ₹@Model.TotalIncome.ToString("N2")</div>
         </div>
+        <div class="stat-card fade-up" style="animation-delay:0.2s">
+            <div class="stat-icon" style="background:var(--danger-soft);color:var(--danger)"><i data-lucide="trending-down" style="width:20px;height:20px"></i></div>
+            <div class="stat-label">Expenses (This Month)</div>
+            <div class="stat-value">₹@Model.ThisMonthExpense.ToString("N2")</div>
+            @{ var diff = Model.ThisMonthExpense - Model.LastMonthExpense;
+               var trendClass = diff > 0 ? "trend-down" : "trend-up";
+               var trendIcon = diff > 0 ? "arrow-up" : "arrow-down";
+               var trendText = diff > 0 ? "Increased" : "Decreased"; }
+            <div class="trend-chip @trendClass"><i data-lucide="@trendIcon" style="width:11px;height:11px"></i> @trendText vs last month</div>
+        </div>
+    </div>
 
-        <div class="col-lg-4 col-md-6 animate-item" style="animation-delay: 0.3s;">
-            <div class="stat-card">
-                <div class="stat-icon-wrapper" style="background: var(--card); color: #ef4444;">
-                    <i data-lucide="trending-down"></i>
+    <!-- Spending Breakdown + Quick Actions -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8 fade-up" style="animation-delay:0.25s">
+            <div class="section-card h-100">
+                <div class="section-header">
+                    <div><h5>Spending Breakdown</h5></div>
+                    <span class="section-badge">@Model.CategorySummary.Count Active Categories</span>
                 </div>
-                <div class="stat-label">Expenses (This Month)</div>
-                <div class="stat-value">₹ @Model.ThisMonthExpense.ToString("N0")</div>
-                @{
-                    var diff = Model.ThisMonthExpense - Model.LastMonthExpense;
-                    var trendClass = diff > 0 ? "trend-down" : "trend-up";
-                    var trendIcon = diff > 0 ? "arrow-up" : "arrow-down";
-                    var trendText = diff > 0 ? "Increased" : "Decreased";
+                @if (!Model.CategorySummary.Any())
+                {
+                    <div class="empty-note"><i data-lucide="layout-list" style="width:36px;height:36px;color:var(--border)" class="mb-2"></i><br>No expenses found for this period.</div>
                 }
-                <div class="trend-indicator @trendClass">
-                    <i data-lucide="@trendIcon" style="width: 12px"></i> @trendText vs last month
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4">
-        <!-- Category Breakdown -->
-        <div class="col-lg-8 animate-item" style="animation-delay: 0.4s;">
-            <div class="breakdown-card h-100">
-                <div class="breakdown-header">
-                    <h5 class="fw-800 m-0 text-main-adaptive">Spending Breakdown</h5>
-                    <div class="badge rounded-pill px-3 py-2" style="background: rgba(99, 102, 241, 0.1); color: var(--accent)">
-                        @Model.CategorySummary.Count Active Categories
-                    </div>
-                </div>
-
-                <div class="row align-items-center mt-3">
-                    @if (!Model.CategorySummary.Any())
-                    {
-                        <div class="col-12 text-center py-5">
-                            <i data-lucide="layout-list" style="width: 48px; height: 48px; color: #cbd5e1" class="mb-3"></i>
-                            <p class="text-muted">No expenses found for this period.</p>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="col-md-5 mb-4 mb-md-0 d-flex justify-content-center">
-                            <div style="position: relative; height: 220px; width: 220px;">
+                else
+                {
+                    <div class="row align-items-center">
+                        <div class="col-md-5 mb-3 mb-md-0 d-flex justify-content-center">
+                            <div class="chart-wrap">
                                 <canvas id="categoryChart"></canvas>
-                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                                    <span style="font-size: 0.8rem; color: var(--muted); text-transform: uppercase; font-weight: 700;">Total</span><br/>
-                                    <span style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">₹ @Model.CategorySummary.Sum(x => x.TotalAmount).ToString("N0")</span>
+                                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+                                    <span style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;font-weight:700">Total</span><br/>
+                                    <span style="font-size:1.1rem;font-weight:800;color:var(--text-main)">₹@Model.CategorySummary.Sum(x=>x.TotalAmount).ToString("N2")</span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-7">
-                            <div class="category-list" style="max-height: 250px; overflow-y: auto; padding-right: 10px;">
-                                @{
-                                    var maxVal = Model.CategorySummary.Max(x => x.TotalAmount);
-                                    foreach (var item in Model.CategorySummary.OrderByDescending(x => x.TotalAmount))
-                                    {
-                                        var percentage = maxVal > 0 ? (item.TotalAmount / maxVal * 100) : 0;
-                                        <div class="category-list-item">
-                                            <div class="category-info">
-                                                <span class="category-name">
-                                                    <i data-lucide="hash" style="width: 16px; color: var(--accent)"></i>
-                                                    @item.CategoryName
-                                                </span>
-                                                <span class="category-amount">₹ @item.TotalAmount.ToString("N0")</span>
-                                            </div>
-                                            <div class="progress-track">
-                                                <div class="progress-bar-fill" style="width: 0%" data-width="@percentage%"></div>
-                                            </div>
+                            <div class="cat-scroll" style="max-height:240px;overflow-y:auto;padding-right:10px;">
+                                @{ var maxVal = Model.CategorySummary.Max(x=>x.TotalAmount);
+                                   foreach (var item in Model.CategorySummary.OrderByDescending(x=>x.TotalAmount)) {
+                                       var pct = maxVal > 0 ? (item.TotalAmount/maxVal*100) : 0;
+                                    <div class="cat-list-item">
+                                        <div class="cat-list-row">
+                                            <span class="cat-list-name"><i data-lucide="shopping-bag" style="width:14px;height:14px;color:var(--accent)"></i> @item.CategoryName</span>
+                                            <span class="cat-list-amount">₹@item.TotalAmount.ToString("N2")</span>
                                         </div>
-                                    }
-                                }
+                                        <div class="progress-track"><div class="progress-fill" style="width:0%" data-width="@pct%"></div></div>
+                                    </div>
+                                }}
                             </div>
                         </div>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions (Equally Heighted) -->
-        <div class="col-lg-4 animate-item" style="animation-delay: 0.5s;">
-            <div class="row g-4 h-70">
-                <div class="col-12 h-50">
-                    <a asp-controller="Income" asp-action="Create" class="text-decoration-none h-100 d-block">
-                        <div class="quick-action-card border-success border-opacity-25" style="border-style: solid; border-width: 1px; padding: 24px;">
-                            <div class="action-icon text-success bg-success bg-opacity-10">
-                                <i data-lucide="plus-circle"></i>
-                            </div>
-                            <h6 class="fw-bold text-main-adaptive m-0">Add New Income</h6>
-                            <p class="small text-muted mb-0">Record a new earning quickly</p>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-12 h-50">
-                    <a asp-controller="Expense" asp-action="Create" class="text-decoration-none h-100 d-block">
-                        <div class="quick-action-card border-danger border-opacity-25" style="border-style: solid; border-width: 1px; padding: 24px;">
-                            <div class="action-icon text-danger bg-danger bg-opacity-10">
-                                <i data-lucide="minus-circle"></i>
-                            </div>
-                            <h6 class="fw-bold text-main-adaptive m-0">Add New Expense</h6>
-                            <p class="small text-muted mb-0">Record a new spending quickly</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- My Wallets (Full Width Below) -->
-        <div class="col-lg-12 animate-item" style="animation-delay: 0.6s;">
-            <div class="breakdown-card">
-                <div class="breakdown-header mb-4">
-                    <div>
-                        <h5 class="fw-800 m-0">My Wallets</h5>
-                        <p class="text-muted small mb-0">Manage your connected bank accounts and cash balances</p>
                     </div>
-                    <a asp-controller="Wallet" asp-action="Index" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">Manage All</a>
-                </div>
-                <div class="row g-4">
-                    @if (!Model.Accounts.Any())
-                    {
-                        <div class="col-12 text-center py-4">
-                            <p class="text-muted small">No accounts setup. <a asp-controller="Wallet" asp-action="Create" class="fw-bold">Add one now</a> to track your balances!</p>
-                        </div>
-                    }
-                    else
-                    {
-                        foreach (var acc in Model.Accounts)
-                        {
-                            <div class="col-md-4 col-sm-6">
-                                <div class="d-flex justify-content-between align-items-center p-4 rounded-4 bg-bg-adaptive hover-lift h-100 shadow-sm" style="transition: all 0.2s; border: 1px solid var(--border);">
-                                    <div class="d-flex align-items-center gap-3">
-                                        @{
-                                            var icon = "wallet";
-                                            var iconColor = "#f59e0b";
-                                            if (acc.Type == ExpenseTracker.Models.Entities.AccountType.Bank) { icon = "building-2"; iconColor = "#3b82f6"; }
-                                            else if (acc.Type == ExpenseTracker.Models.Entities.AccountType.CreditCard) { icon = "credit-card"; iconColor = "#ec4899"; }
-                                            else if (acc.Type == ExpenseTracker.Models.Entities.AccountType.Savings) { icon = "piggy-bank"; iconColor = "#10b981"; }
-                                        }
-                                        <div style="width: 48px; height: 48px; background: var(--card); color: @iconColor; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 15px rgba(0,0,0,0.05);">
-                                            <i data-lucide="@icon" style="width: 24px"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-800 text-main-adaptive">@acc.Name</div>
-                                            <div class="text-muted" style="font-size: 0.75rem; font-weight: 600;">@acc.Type | Since @acc.CreatedOn.ToString("MMM yyyy")</div>
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <div class="fw-800 text-main-adaptive" style="font-size: 1.1rem">₹ @acc.CurrentBalance.ToString("N0")</div>
-                                        <div class="text-muted small">Current Balance</div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    }
-                </div>
+                }
             </div>
         </div>
+        <div class="col-lg-4 fade-up" style="animation-delay:0.3s">
+            <div class="quick-grid h-100" style="grid-template-rows:1fr 1fr">
+                <a asp-controller="Income" asp-action="Create" class="quick-card">
+                    <div class="quick-icon" style="background:var(--success-soft);color:var(--success)"><i data-lucide="plus-circle" style="width:20px;height:20px"></i></div>
+                    <div><h6>Add Income</h6><p>Record a new earning</p></div>
+                </a>
+                <a asp-controller="Expense" asp-action="Create" class="quick-card">
+                    <div class="quick-icon" style="background:var(--danger-soft);color:var(--danger)"><i data-lucide="minus-circle" style="width:20px;height:20px"></i></div>
+                    <div><h6>Add Expense</h6><p>Record new spending</p></div>
+                </a>
+            </div>
+        </div>
+    </div>
 
-        <!-- Budget Health Tracking -->
-        <div class="col-lg-12 mb-2 animate-item" style="animation-delay: 0.7s;">
-            <div class="breakdown-card">
-                <div class="breakdown-header">
-                    <div>
-                        <h5 class="fw-800 m-0">Budget Health</h5>
-                        <p class="text-muted small mb-0">How you're tracking against your monthly goals</p>
+    <!-- Wallets -->
+    <div class="section-card fade-up" style="animation-delay:0.35s">
+        <div class="section-header">
+            <div><h5>My Wallets</h5><p>Manage your connected accounts and balances</p></div>
+            <a asp-controller="Wallet" asp-action="Index" class="btn-link-sm">Manage All <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+        </div>
+        @if (!Model.Accounts.Any())
+        {
+            <div class="empty-note">No accounts setup. <a asp-controller="Wallet" asp-action="Create" style="color:var(--accent);font-weight:700">Add one now</a></div>
+        }
+        else
+        {
+            <div class="wallet-grid">
+                @foreach (var acc in Model.Accounts)
+                {
+                    var icon = "wallet"; var iconColor = "#f59e0b";
+                    if (acc.Type == ExpenseTracker.Models.Entities.AccountType.Bank) { icon = "building-2"; iconColor = "#3b82f6"; }
+                    else if (acc.Type == ExpenseTracker.Models.Entities.AccountType.CreditCard) { icon = "credit-card"; iconColor = "#ec4899"; }
+                    else if (acc.Type == ExpenseTracker.Models.Entities.AccountType.Savings) { icon = "piggy-bank"; iconColor = "#10b981"; }
+                    <div class="wallet-card">
+                        <div class="wallet-icon-box" style="color:@iconColor"><i data-lucide="@icon" style="width:22px;height:22px"></i></div>
+                        <div style="min-width:0">
+                            <div class="wallet-name">@acc.Name</div>
+                            <div class="wallet-type">@acc.Type · Since @acc.CreatedOn.ToString("MMM yyyy")</div>
+                        </div>
+                        <div class="wallet-bal">₹@acc.CurrentBalance.ToString("N2")</div>
                     </div>
-                    <a asp-controller="Budget" asp-action="Index" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">View All</a>
-                </div>
-
-                <div class="row g-4 mt-1">
-                    @if (!Model.BudgetSummary.Any())
-                    {
-                        <div class="col-12 text-center py-4">
-                            <div class="icon-box bg-light text-muted p-3 rounded-circle d-inline-flex mb-3">
-                                <i data-lucide="target" size="24"></i>
-                            </div>
-                            <p class="text-muted small">No budgets set for this month. <a asp-controller="Budget" asp-action="Create" class="fw-bold">Set one now</a> to track your goals!</p>
-                        </div>
-                    }
-                    else
-                    {
-                        foreach (var budget in Model.BudgetSummary)
-                        {
-                            var barColor = "#10b981";
-                            if (budget.PercentageUsed >= 100) barColor = "#ef4444";
-                            else if (budget.PercentageUsed >= 80) barColor = "#f59e0b";
-
-                            <div class="col-xl-3 col-lg-4 col-md-6">
-                                <div class="p-4 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-between" style="background: var(--bg); border: 1px solid var(--border);">
-                                    <div>
-                                        <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <span class="fw-800 text-main-adaptive">@budget.CategoryName</span>
-                                            <span class="badge @(budget.IsOverBudget ? "bg-danger" : "bg-secondary bg-opacity-25 text-main-adaptive") rounded-pill">@budget.PercentageUsed.ToString("N0")%</span>
-                                        </div>
-                                        <div class="progress-track mb-3" style="height: 10px;">
-                                            <div class="progress-bar-fill" style="width: 0%; background: @barColor;" data-width="@(Math.Min(budget.PercentageUsed, 100))%"></div>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <div class="d-flex flex-column">
-                                            <span class="text-muted" style="font-size: 0.7rem; text-transform: uppercase; font-weight: 700;">Spent</span>
-                                            <span class="fw-800" style="font-size: 0.9rem">₹ @budget.ActualSpent.ToString("N0")</span>
-                                        </div>
-                                        <div class="d-flex flex-column text-end">
-                                            <span class="text-muted" style="font-size: 0.7rem; text-transform: uppercase; font-weight: 700;">Budget</span>
-                                            <span class="fw-800" style="font-size: 0.9rem; color: var(--accent)">₹ @budget.BudgetAmount.ToString("N0")</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    }
-                </div>
+                }
             </div>
+        }
+    </div>
+
+    <!-- Budget Health -->
+    <div class="section-card fade-up" style="animation-delay:0.4s">
+        <div class="section-header">
+            <div><h5>Budget Health</h5><p>Track your monthly budget goals</p></div>
+            <a asp-controller="Budget" asp-action="Index" class="btn-link-sm">View All <i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
         </div>
+        @if (!Model.BudgetSummary.Any())
+        {
+            <div class="empty-note"><i data-lucide="target" style="width:28px;height:28px;color:var(--border)" class="mb-2"></i><br>No budgets set. <a asp-controller="Budget" asp-action="Create" style="color:var(--accent);font-weight:700">Set one now</a></div>
+        }
+        else
+        {
+            <div class="budget-grid">
+                @foreach (var b in Model.BudgetSummary)
+                {
+                    var barColor = "#10b981";
+                    if (b.PercentageUsed >= 100) barColor = "#ef4444";
+                    else if (b.PercentageUsed >= 80) barColor = "#f59e0b";
+                    var pctBg = b.PercentageUsed >= 100 ? "var(--danger-soft)" : (b.PercentageUsed >= 80 ? "var(--warning-soft)" : "var(--success-soft)");
+                    var pctColor = b.PercentageUsed >= 100 ? "var(--danger)" : (b.PercentageUsed >= 80 ? "var(--warning)" : "var(--success)");
+                    <div class="budget-card">
+                        <div class="budget-card-header">
+                            <span class="name">@b.CategoryName</span>
+                            <span class="budget-pct" style="background:@pctBg;color:@pctColor">@b.PercentageUsed.ToString("N0")%</span>
+                        </div>
+                        <div class="progress-track" style="height:8px"><div class="progress-fill" style="width:0%;background:@barColor" data-width="@(Math.Min(b.PercentageUsed,100))%"></div></div>
+                        <div class="budget-nums">
+                            <div><span style="font-size:0.65rem;text-transform:uppercase;color:var(--muted);font-weight:700;display:block">Spent</span><span class="spent">₹@b.ActualSpent.ToString("N2")</span></div>
+                            <div style="text-align:right"><span style="font-size:0.65rem;text-transform:uppercase;color:var(--muted);font-weight:700;display:block">Budget</span><span class="limit">₹@b.BudgetAmount.ToString("N2")</span></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
     </div>
 </div>
 
 @section Scripts {
     <script>
         $(function() {
-            // Dynamic Greeting
             const hour = new Date().getHours();
             const fullName = "@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)";
             let greeting = "Good Evening";
             if (hour < 12) greeting = "Good Morning";
             else if (hour < 18) greeting = "Good Afternoon";
             $('#greetingText').text(`${greeting}, ${fullName}`);
-
-            // Set current date
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            $('#dateDisplay').text(new Date().toLocaleDateString('en-US', options));
-
-            // Animate progress bars
-            setTimeout(() => {
-                $('.progress-bar-fill').each(function() {
-                    $(this).css('width', $(this).data('width'));
-                });
-            }, 300);
-
-            // Re-initialize Lucide icons for dynamic content
+            const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+            $('#dateDisplay').text(new Date().toLocaleDateString('en-US', opts));
+            setTimeout(() => { $('.progress-fill').each(function(){ $(this).css('width', $(this).data('width')); }); }, 300);
             lucide.createIcons();
 
             @if(Model.CategorySummary.Any())
             {
                 <text>
-                const ctx = document.getElementById('categoryChart').getContext('2d');
-                const categories = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategorySummary.Select(c => c.CategoryName)));
-                const amounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategorySummary.Select(c => c.TotalAmount)));
-                
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: categories,
-                        datasets: [{
-                            data: amounts,
-                            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#0ea5e9'],
-                            borderWidth: 0,
-                            hoverOffset: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '75%',
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                                titleFont: { family: 'Inter', size: 13 },
-                                bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
-                                padding: 12,
-                                cornerRadius: 8,
-                                displayColors: true
-                            }
-                        }
-                    }
+                new Chart(document.getElementById('categoryChart').getContext('2d'), {
+                    type:'doughnut',
+                    data:{ labels:@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategorySummary.Select(c=>c.CategoryName))),
+                           datasets:[{ data:@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategorySummary.Select(c=>c.TotalAmount))),
+                                       backgroundColor:['#0ea5e9','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4'], borderWidth:0, hoverOffset:6 }] },
+                    options:{ responsive:true, maintainAspectRatio:false, cutout:'75%',
+                              plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'rgba(15,23,42,0.9)', titleFont:{family:'Inter',size:13}, bodyFont:{family:'Inter',size:14,weight:'bold'}, padding:12, cornerRadius:8 } } }
                 });
                 </text>
             }
         });
     </script>
 }
-
-    </script>
-

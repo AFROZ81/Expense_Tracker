@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ExpenseTracker</title>
     <link rel="icon" type="image/x-icon" href="~/favicon1.ico" asp-append-version="true" />
     <script>
-        (function () {
-            var savedTheme = localStorage.getItem('theme') || 'light';
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                document.documentElement.setAttribute('data-bs-theme', 'dark');
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-                document.documentElement.setAttribute('data-bs-theme', 'light');
-            }
-        })();
+            (function () {
+                var savedTheme = localStorage.getItem('theme') || 'light';
+                if (savedTheme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    document.documentElement.setAttribute('data-bs-theme', 'light');
+                }
+            })();
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,574 +36,972 @@
 
     <style>
         :root {
-            --sidebar-bg: #0b0f19;
-            --sidebar-hover: rgba(255, 255, 255, 0.03);
-            --sidebar-active: #818cf8;
-            --sidebar-active-bg: rgba(129, 140, 248, 0.08);
-            --sidebar-text: #64748b;
-            --sidebar-text-bright: #f1f5f9;
-            --sidebar-accent: #6366f1;
-            --body-bg: #f8fafc;
-            --topbar-bg: rgba(255, 255, 255, 0.85);
-            --topbar-border: #f1f5f9;
-            --text-main: #1e293b;
-            --sidebar-w: 260px;
-            --sidebar-collapsed-w: 76px;
-            --topbar-h: 95px;
-            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        --sidebar-bg: #0b0f19;
+        --sidebar-hover: rgba(255, 255, 255, 0.03);
+        --sidebar-active: #0ea5e9;
+        --sidebar-active-bg: rgba(14, 165, 233, 0.08);
+        --sidebar-text: #64748b;
+        --sidebar-text-bright: #f1f5f9;
+        --sidebar-accent: #0ea5e9;
+        --body-bg: #f8fafc;
+        --topbar-bg: rgba(255, 255, 255, 0.85);
+        --topbar-border: #f1f5f9;
+        --text-main: #1e293b;
+        --sidebar-w: 260px;
+        --sidebar-collapsed-w: 76px;
+        --topbar-h: 95px;
+        --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
         }
 
         [data-theme="dark"] {
-            --body-bg: #0f172a;
-            --topbar-bg: rgba(30, 41, 59, 0.85);
-            --topbar-border: #334155;
-            --text-main: #f8fafc;
+        --body-bg: #0f172a;
+        --topbar-bg: rgba(30, 41, 59, 0.85);
+        --topbar-border: #334155;
+        --text-main: #f8fafc;
         }
 
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
         }
 
+        /* --- Custom App-Themed Scrollbar --- */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+            border-radius: 10px;
+        }
+
+        /* Slimmer scrollbar on mobile */
+        @@media (max-width: 991.98px) {
+            ::-webkit-scrollbar {
+                width: 3px;
+                height: 3px;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: rgba(14,165,233,0.35);
+            }
+        }
         body {
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: stretch;
             min-height: 100vh;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--body-bg);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         .app-container {
-            display: flex;
-            min-height: 100vh;
-            width: 100%;
-            overflow-x: hidden;
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+        overflow-x: hidden;
         }
 
         #sidebar {
-            width: var(--sidebar-collapsed-w);
-            min-width: var(--sidebar-collapsed-w);
-            background: var(--sidebar-bg);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            transition: var(--transition);
-            position: relative;
-            z-index: 1000;
-            border-right: 1px solid rgba(255, 255, 255, 0.03);
-            box-shadow: 20px 0 50px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            flex-shrink: 0;
+        width: 72px;
+        min-width: 72px;
+        background: var(--sidebar-bg);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+        position: relative;
+        z-index: 1000;
+        border-right: 1px solid rgba(255,255,255,0.04);
+        overflow: hidden;
+        flex-shrink: 0;
         }
 
         #sidebar:hover {
-            width: var(--sidebar-w);
-            min-width: var(--sidebar-w);
+        width: 264px;
+        min-width: 264px;
         }
 
         /* Logo Area */
         .sidebar-logo-area {
-            height: 90px;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            transition: var(--transition);
-            position: relative;
-            flex-shrink: 0;
+        height: var(--topbar-h);
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        gap: 12px;
+        flex-shrink: 0;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
         }
 
         .brand-logo-container {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
-            transition: var(--transition);
-            flex-shrink: 0;
-            position: relative;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 4px 14px rgba(14,165,233,0.3);
+        flex-shrink: 0;
+        transition: transform 0.3s ease;
         }
 
-        .brand-logo-container::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border: 2px solid rgba(99, 102, 241, 0.2);
-            border-radius: 18px;
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        #sidebar:hover .brand-logo-container::after {
-            opacity: 1;
+        #sidebar:hover .brand-logo-container {
+        transform: scale(1.05);
         }
 
         .brand-name-text {
-            margin-left: 14px;
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: white;
-            letter-spacing: -0.03em;
-            opacity: 0;
-            transform: translateX(-10px);
-            white-space: nowrap;
-            transition: var(--transition);
-            pointer-events: none;
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: white;
+        letter-spacing: -0.03em;
+        opacity: 0;
+        white-space: nowrap;
+        transition: opacity 0.25s ease;
+        pointer-events: none;
         }
 
         #sidebar:hover .brand-name-text {
-            opacity: 1;
-            transform: translateX(0);
+        opacity: 1;
         }
 
         /* Sidebar Scrollable Content */
         .sidebar-main-content {
-            flex: 1;
-            padding: 10px 14px;
-            overflow-y: auto;
-            overflow-x: hidden;
+        flex: 1;
+        padding: 16px 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
         }
 
         .sidebar-main-content::-webkit-scrollbar {
-            width: 3px;
+        width: 3px;
         }
 
         .sidebar-main-content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 10px;
         }
 
         .nav-section {
-            margin-bottom: 28px;
+        margin-bottom: 20px;
         }
 
         .section-heading {
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--muted);
-            margin-bottom: 14px;
-            padding-left: 12px;
-            transition: var(--transition);
-            white-space: nowrap;
-            opacity: 0;
+        font-size: 0.62rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: rgba(148,163,184,0.5);
+        margin-bottom: 8px;
+        padding: 0 12px;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.25s ease;
         }
 
         #sidebar:hover .section-heading {
-            opacity: 1;
+        opacity: 1;
         }
 
         /* Nav Items */
         .nav-item-new {
-            display: flex;
-            align-items: center;
-            height: 48px;
-            border-radius: 12px;
-            color: var(--sidebar-text);
-            text-decoration: none;
-            transition: var(--transition);
-            margin-bottom: 6px;
-            position: relative;
-            overflow: hidden;
+        display: flex;
+        align-items: center;
+        height: 44px;
+        border-radius: 10px;
+        color: var(--sidebar-text);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        margin-bottom: 3px;
+        position: relative;
+        overflow: hidden;
         }
 
         .nav-item-new:hover {
-            color: var(--sidebar-text-bright);
-            background: var(--sidebar-hover);
-            transform: translateX(4px);
+        color: var(--sidebar-text-bright);
+        background: rgba(255,255,255,0.04);
         }
 
         .nav-item-new.active {
-            color: var(--sidebar-active);
-            background: var(--sidebar-active-bg);
+        color: white;
+        background: linear-gradient(135deg, rgba(14,165,233,0.15) 0%, rgba(16,185,129,0.1) 100%);
         }
 
         .nav-item-new.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 15%;
-            height: 70%;
-            width: 3px;
-            background: var(--sidebar-active);
-            border-radius: 0 4px 4px 0;
-            box-shadow: 4px 0 15px var(--sidebar-active);
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 20%;
+        height: 60%;
+        width: 3px;
+        background: linear-gradient(180deg, #0ea5e9, #10b981);
+        border-radius: 0 3px 3px 0;
         }
 
         .nav-icon-box {
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: var(--transition);
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
         }
 
         .nav-icon-box i {
-            width: 20px;
-            height: 20px;
+        width: 19px;
+        height: 19px;
+        }
+
+        .nav-item-new.active .nav-icon-box {
+        color: #0ea5e9;
         }
 
         .nav-label-text {
-            font-size: 0.9rem;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: var(--transition);
-            white-space: nowrap;
+        font-size: 0.85rem;
+        font-weight: 600;
+        opacity: 0;
+        white-space: nowrap;
+        transition: opacity 0.25s ease;
         }
 
         #sidebar:hover .nav-label-text {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        /* Pulse effect for active icon */
-        .nav-item-new.active .nav-icon-box {
-            color: var(--sidebar-active);
+        opacity: 1;
         }
 
         /* Sidebar Footer (Profile) */
         .sidebar-user-profile {
-            padding: 20px 17px;
-            border-top: 1px solid rgba(255, 255, 255, 0.03);
-            background: rgba(0, 0, 0, 0.1);
+        padding: 12px 10px;
+        border-top: 1px solid rgba(255,255,255,0.04);
+        flex-shrink: 0;
         }
 
         .profile-container {
-            display: flex;
-            align-items: center;
-            height: 50px;
-            border-radius: 12px;
-            transition: var(--transition);
-            text-decoration: none;
-            overflow: hidden;
+        display: flex;
+        align-items: center;
+        height: 44px;
+        border-radius: 10px;
+        padding: 0 6px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        overflow: hidden;
+        }
+
+        .profile-container:hover {
+        background: rgba(255,255,255,0.04);
         }
 
         .avatar-glow {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: #1e293b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #94a3b8;
-            flex-shrink: 0;
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: var(--transition);
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
         }
 
         .profile-container:hover .avatar-glow {
-            border-color: var(--sidebar-active);
-            box-shadow: 0 0 15px rgba(129, 140, 248, 0.2);
+        transform: scale(1.05);
+        box-shadow: 0 0 12px rgba(14,165,233,0.3);
         }
 
         .user-details-box {
-            margin-left: 12px;
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: var(--transition);
-            overflow: hidden;
+        margin-left: 10px;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+        overflow: hidden;
         }
 
         #sidebar:hover .user-details-box {
-            opacity: 1;
-            transform: translateX(0);
+        opacity: 1;
         }
 
         .profile-name {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: white;
-            white-space: nowrap;
+        display: block;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: white;
+        white-space: nowrap;
         }
 
         .profile-role {
-            display: block;
-            font-size: 0.7rem;
-            color: var(--sidebar-text);
-            white-space: nowrap;
+        display: block;
+        font-size: 0.66rem;
+        color: var(--sidebar-text);
+        white-space: nowrap;
         }
 
         /* --- MAIN CONTENT & TOPBAR --- */
         .main-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-y: auto;
-            background: var(--body-bg);
-            position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        overflow-y: visible; /* body is the single scroll container */
+        overflow-x: hidden;
+        background: var(--body-bg);
+        position: relative;
         }
 
         .modern-topbar {
-            height: var(--topbar-h);
-            min-height: var(--topbar-h);
-            background: var(--topbar-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 0 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 99;
-            border-bottom: 1px solid var(--topbar-border);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        height: var(--topbar-h);
+        min-height: var(--topbar-h);
+        background: var(--topbar-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 0 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 99;
+        border-bottom: 1px solid var(--topbar-border);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
         }
 
         .topbar-title {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--text-main);
-            letter-spacing: -0.02em;
-            margin: 0;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--text-main);
+        letter-spacing: -0.02em;
+        margin: 0;
         }
 
         .topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
         }
 
         .topbar-profile-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 8px 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-            text-decoration: none;
-            height: 52px; /* Fixed height for sleek look */
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 8px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+        text-decoration: none;
+        height: 52px;
+        /* Fixed height for sleek look */
         }
 
         .topbar-profile-card:hover {
-            background: var(--card);
-            border-color: var(--sidebar-accent);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.08);
-            transform: translateY(-1px);
+        background: var(--card);
+        border-color: var(--sidebar-accent);
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.08);
+        transform: translateY(-1px);
         }
 
         .profile-avatar-small {
-            width: 34px;
-            height: 34px;
-            background: linear-gradient(135deg, var(--sidebar-accent) 0%, #818cf8 100%);
-            color: white;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+        width: 34px;
+        height: 34px;
+        background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+        color: white;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
         }
 
         .profile-info-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
         }
 
         .profile-name-text {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text-main);
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--text-main);
         }
 
         .profile-role-text {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
         }
 
         .dropdown-menu-profile {
-            border: none;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-            border-radius: 16px;
-            padding: 8px;
-            margin-top: 12px !important;
-            min-width: 180px;
-            background: var(--card);
-            border: 1px solid var(--border);
+        border: none;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        border-radius: 16px;
+        padding: 8px;
+        margin-top: 12px !important;
+        min-width: 180px;
+        background: var(--card);
+        border: 1px solid var(--border);
         }
 
         .dropdown-item-custom {
-            border-radius: 12px;
-            padding: 12px 16px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--muted);
-            transition: all 0.2s;
-            cursor: pointer;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--muted);
+        transition: all 0.2s;
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
         }
 
         .dropdown-item-custom:hover {
-            background: var(--bg);
-            color: var(--sidebar-accent);
+        background: var(--bg);
+        color: var(--sidebar-accent);
         }
 
         .dropdown-item-custom.text-danger:hover {
-            background: #fff1f2;
-            color: #e11d48;
+        background: #fff1f2;
+        color: #e11d48;
         }
 
-        /* Modal Styles */
-        .modal-custom-content {
-            border-radius: 28px;
+        /* --- Modern Modal Redesign --- */
+        .glass-modal {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: rgba(15, 23, 42, 0.4) !important;
+        }
+
+        .modern-modal-content {
             border: 1px solid var(--border);
+            border-radius: 24px;
             background: var(--card);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
         }
 
-        .modal-custom-header {
-            border: none;
-            padding: 40px 40px 10px;
-            text-align: center;
-            display: block;
-        }
-
-        .modal-custom-body {
-            padding: 10px 40px 20px;
-            text-align: center;
-            color: var(--muted);
-        }
-
-        .modal-custom-footer {
-            border: none;
-            padding: 10px 40px 40px;
+        .logout-icon-wrapper {
             display: flex;
-            gap: 16px;
+            justify-content: center;
+            align-items: center;
         }
 
-        .modal-custom-footer form {
-            flex: 1;
+        .logout-icon-bg {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(225, 29, 72, 0.1);
             display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
         }
 
-        .btn-modal-confirm {
-            background: #e11d48;
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 16px;
-            font-weight: 700;
+        .pulse-danger::before {
+            content: '';
+            position: absolute;
             width: 100%;
-            transition: all 0.2s;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(225, 29, 72, 0.2);
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
         }
 
-        .btn-modal-confirm:hover {
-            background: #be123c;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(225, 29, 72, 0.3);
+        @@keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
         }
 
-        .btn-modal-cancel {
+        .fs-14 { font-size: 0.875rem; }
+
+        .btn-modern-cancel {
             background: var(--bg);
             color: var(--text-main);
             border: 1px solid var(--border);
-            padding: 14px;
-            border-radius: 16px;
-            font-weight: 700;
-            flex: 1;
-            transition: all 0.2s;
+            border-radius: 14px;
+            padding: 12px 20px;
+            font-weight: 600;
+            transition: all 0.2s ease;
         }
 
-        .btn-modal-cancel:hover {
+        .btn-modern-cancel:hover {
             background: var(--border);
+            color: var(--text-main);
+            transform: translateY(-1px);
+        }
+
+        .btn-modern-danger {
+            background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 12px 20px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 16px rgba(225, 29, 72, 0.25);
+        }
+
+        .btn-modern-danger:hover {
+            background: linear-gradient(135deg, #be123c 0%, #9f1239 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(225, 29, 72, 0.35);
+            color: white;
         }
 
         .content-container {
-            padding: 40px;
-            max-width: 1600px;
-            width: 100%;
-            margin: 0 auto;
+        padding: 40px;
+        max-width: 1600px;
+        width: 100%;
+        margin: 0 auto;
+        flex: 1;
+        }
+
+        /* ── App Footer ── */
+        .app-footer {
+        padding: 10px 40px;
+        border-top: 2px solid var(--border);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        font-size: .82rem;
+        color: var(--muted);
+        flex-shrink: 0;       
+        z-index: 10;
+        }
+
+        .app-footer a {
+        color: var(--sidebar-accent);
+        font-weight: 700;
+        text-decoration: none;
+        transition: color .2s;
+        }
+
+        .app-footer a:hover {
+        color: var(--brand-b, #10b981);
         }
 
         /* Mobile Adjustments */
         @@media (max-width: 991.98px) {
-            #sidebar {
-                position: fixed;
-                left: -100%;
-                top: 0;
-                bottom: 0;
-                width: 280px;
-            }
+        #sidebar {
+        position: fixed;
+        left: -100%;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        }
 
-            body.sidebar-open #sidebar {
-                left: 0;
-            }
+        body.sidebar-open #sidebar {
+        left: 0;
+        }
 
-            .sidebar-overlay {
-                display: block;
-                position: fixed;
-                inset: 0;
-                background: rgba(15, 23, 42, 0.5);
-                backdrop-filter: blur(4px);
-                z-index: 999;
-                opacity: 0;
-                pointer-events: none;
-                transition: var(--transition);
-            }
+        .sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: var(--transition);
+        }
 
-            body.sidebar-open .sidebar-overlay {
-                opacity: 1;
-                pointer-events: all;
-            }
-
-            .mobile-only-toggle {
-                display: flex !important;
-            }
+        body.sidebar-open .sidebar-overlay {
+        opacity: 1;
+        pointer-events: all;
         }
 
         .mobile-only-toggle {
-            display: none;
+        display: flex !important;
+        }
+        }
+
+        .mobile-only-toggle {
+        display: none;
+        }
+
+        .mobile-only.app-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;        /* grow with content, body handles full height */
+        width: 100%;
+        overflow-x: hidden;
+        overflow-y: visible;  /* body is the single scroll container */
+        }
+
+
+
+        .main-wrapper {
+        min-width: 0;
+        }
+
+        .content-container {
+        width: 100%;
+        padding: clamp(18px, 2.4vw, 40px);
+        }
+
+        .modern-topbar {
+        gap: 16px;
+        }
+
+        .mobile-bottom-nav {
+        display: none;
+        }
+
+        @@media (max-width: 991.98px) {
+        body {
+        justify-content: flex-start;
+        min-height: 100dvh;
+        }
+        .app-container {
+        flex-direction: column;
+        }
+        #sidebar {
+        display: none !important;
+        }
+
+        .main-wrapper {
+        width: 100%;
+        /* On mobile, let body be the single scroll container to prevent double scrollbars */
+        overflow-y: visible;
+        min-height: unset;
+        padding-bottom: calc(36px + env(safe-area-inset-bottom));
+        }
+
+        .modern-topbar {
+        height: auto;
+        min-height: 72px;
+        padding: 16px 18px 14px;
+        }
+
+        .topbar-title {
+        font-size: 1.05rem;
+        line-height: 1.1;
+        }
+
+        .topbar-actions {
+        gap: 10px;
+        }
+
+        .topbar-profile-card {
+        padding: 6px 10px;
+        height: 46px;
+        }
+
+        .profile-info-text {
+        display: none;
+        }
+
+        .content-container {
+        padding: 18px 16px 24px;
+        }
+
+        .app-footer {
+        padding: 8px 16px;
+        font-size: .76rem;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        }
+
+        .mobile-bottom-nav {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: calc(12px + env(safe-area-inset-bottom));
+        z-index: 1050;
+        display: flex;
+        align-items: stretch;
+        justify-content: space-between;
+        gap: 6px;
+        padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 26px;
+        box-shadow: 0 22px 50px rgba(15, 23, 42, 0.16);
+        }
+
+        [data-theme="dark"] .mobile-bottom-nav {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(148, 163, 184, 0.18);
+        box-shadow: 0 22px 50px rgba(0, 0, 0, 0.35);
+        }
+
+        .mobile-nav-link {
+        flex: 1 1 0;
+        min-width: 0;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        padding: 8px 4px;
+        border-radius: 18px;
+        transition: transform 0.18s ease, color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+        appearance: none;
+        }
+
+        .mobile-nav-link i {
+        width: 20px;
+        height: 20px;
+        }
+
+        .mobile-nav-link span {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        }
+
+        .mobile-nav-link.active,
+        .mobile-nav-link:hover,
+        .mobile-nav-link:focus-visible {
+        color: var(--sidebar-accent);
+        background: rgba(99, 102, 241, 0.08);
+        box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.12);
+        transform: translateY(-1px);
+        }
+
+        .mobile-nav-action {
+        position: relative;
+        transform: translateY(-16px);
+        }
+
+        .mobile-nav-action.active,
+        .mobile-nav-action:hover,
+        .mobile-nav-action:focus-visible {
+        background: transparent;
+        box-shadow: none;
+        }
+
+        .mobile-fab {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+        box-shadow: 0 12px 28px rgba(14, 165, 233, 0.3);
+        margin-bottom: 4px;
+        }
+
+        .mobile-fab i {
+        width: 24px;
+        height: 24px;
+        }
+
+        .mobile-nav-button {
+        cursor: pointer;
+        }
+
+        .mobile-floating-btn {
+        display: inline-flex;
+        position: fixed;
+        right: 12px;
+        bottom: calc(12px + env(safe-area-inset-bottom));
+        z-index: 1060;
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+        box-shadow: 0 12px 28px rgba(14, 165, 233, 0.3);
+        border: none;
+        }
+
+        [data-theme="dark"] .mobile-floating-btn {
+        background: linear-gradient(135deg, #0284c7 0%, #059669 100%);
+        }
+
+        .mobile-nav-sheet {
+        border-radius: 28px 28px 0 0;
+        border: 1px solid var(--border);
+        background: var(--card);
+        /* make the sheet occupy 60% of the viewport height by default */
+        height: 60vh;
+        max-height: 95vh;
+        padding-bottom: env(safe-area-inset-bottom);
+        overflow: hidden;
+        display: flex !important;
+        flex-direction: column !important;
+        }
+
+        .offcanvas-backdrop {
+        background-color: rgba(15, 23, 42, 0.55) !important;
+        backdrop-filter: blur(18px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        padding-left: 20px;
+        padding-right: 20px;
+        }
+
+        .mobile-nav-sheet .offcanvas-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        flex: 1;
+        }
+
+        /* Rules to ensure the Bootstrap offcanvas-bottom respects dynamic height */
+        .offcanvas.mobile-nav-sheet {
+        height: 60vh;
+        max-height: 95vh;
+        }
+
+        .sheet-drag-handle-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 12px 0 6px;
+        cursor: ns-resize;
+        user-select: none;
+        touch-action: none;
+        }
+
+        .sheet-drag-handle {
+        width: 42px;
+        height: 5px;
+        background: var(--border);
+        border-radius: 99px;
+        opacity: 0.8;
+        transition: opacity 0.2s, background-color 0.2s;
+        }
+
+        .sheet-drag-handle-wrapper:hover .sheet-drag-handle {
+        background: var(--sidebar-accent);
+        opacity: 1;
+        }
+
+        .mobile-nav-sheet-header {
+        border-bottom: 1px solid var(--border);
+        align-items: flex-start;
+        padding-top: 18px;
+        padding-bottom: 14px;
+        }
+
+        .mobile-nav-sheet-kicker {
+        color: var(--muted);
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        }
+
+        .mobile-nav-sheet-title {
+        color: var(--text-main);
+        font-size: 1.15rem;
+        font-weight: 800;
+        }
+
+        .mobile-nav-sheet-body {
+        padding-top: 18px;
+        padding-bottom: 18px;
+        }
+
+        .mobile-nav-sheet-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        }
+
+        .mobile-sheet-link {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text-main);
+        border-radius: 20px;
+        padding: 16px 14px;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 10px;
+        min-height: 98px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+        transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+        }
+
+        .mobile-sheet-link i {
+        width: 20px;
+        height: 20px;
+        color: var(--sidebar-accent);
+        }
+        .mobile-sheet-link span {
+        font-size: 0.9rem;
+        font-weight: 700;
+        line-height: 1.2;
+        }
+
+        .mobile-sheet-link.active,
+        .mobile-sheet-link:hover,
+        .mobile-sheet-link:focus-visible {
+        border-color: rgba(14, 165, 233, 0.35);
+        background: rgba(14, 165, 233, 0.08);
+        box-shadow: 0 8px 20px rgba(14, 165, 233, 0.08);
+        transform: translateY(-1px);
+        }
         }
     </style>
 </head>
-<body>
-    <div class="app-container">
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+<body>
+    @{
+        var currentController = (ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty).ToLowerInvariant();
+        var currentAction = (ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty).ToLowerInvariant();
+
+        bool IsActive(string controller, params string[] actions)
+        {
+            if (!string.Equals(currentController, controller.ToLowerInvariant(), StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            return actions.Length == 0 || actions.Any(action => string.Equals(currentAction, action.ToLowerInvariant(),
+    StringComparison.OrdinalIgnoreCase));
+        }
+    }
+
+    <div class="app-container">
         <aside id="sidebar">
-            <!-- Brand Logo Section -->
             <div class="sidebar-logo-area">
                 <div class="brand-logo-container">
-                    <i data-lucide="wallet-2"></i>
+                    <i data-lucide="wallet" style="width:20px;height:20px"></i>
                 </div>
-                <span class="brand-name-text">ExpensePro</span>
+                <span class="brand-name-text">ExpenseTracker</span>
             </div>
 
-            <!-- Navigation Items -->
             <div class="sidebar-main-content">
                 <div class="nav-section">
                     <div class="section-heading">Overview</div>
-                    <a asp-controller="Expense" asp-action="Dashboard" class="nav-item-new">
+                    <a asp-controller="Expense" asp-action="Dashboard" class="nav-item-new @(IsActive("Expense", "Dashboard") ? "active" : "")">
                         <div class="nav-icon-box"><i data-lucide="grid"></i></div>
                         <span class="nav-label-text">Dashboard</span>
                     </a>
@@ -610,15 +1009,15 @@
 
                 <div class="nav-section">
                     <div class="section-heading">Manage</div>
-                    <a asp-controller="Category" asp-action="Index" class="nav-item-new">
+                    <a asp-controller="Category" asp-action="Index" class="nav-item-new @(IsActive("Category") ? "active" : "")">
                         <div class="nav-icon-box"><i data-lucide="tag"></i></div>
                         <span class="nav-label-text">Expense Categories</span>
                     </a>
-                    <a asp-controller="Expense" asp-action="Index" class="nav-item-new">
+                    <a asp-controller="Expense" asp-action="Index" class="nav-item-new @(IsActive("Expense", "Index", "Create", "Edit") ? "active" : "")">
                         <div class="nav-icon-box"><i data-lucide="receipt"></i></div>
                         <span class="nav-label-text">Expenses</span>
                     </a>
-                    <a asp-controller="Wallet" asp-action="Index" class="nav-item-new">
+                    <a asp-controller="Wallet" asp-action="Index" class="nav-item-new @(IsActive("Wallet") ? "active" : "")">
                         <div class="nav-icon-box"><i data-lucide="wallet"></i></div>
                         <span class="nav-label-text">Accounts</span>
                     </a>
@@ -626,11 +1025,11 @@
 
                 <div class="nav-section">
                     <div class="section-heading">Income</div>
-                    <a asp-controller="IncomeCategory" asp-action="Index" class="nav-item-new">
+                    <a asp-controller="IncomeCategory" asp-action="Index" class="nav-item-new @(IsActive("IncomeCategory") ? "active" : "")">
                         <div class="nav-icon-box"><i data-lucide="briefcase"></i></div>
                         <span class="nav-label-text">Income Sources</span>
                     </a>
-                    <a asp-controller="Income" asp-action="Index" class="nav-item-new">
+                    <a asp-controller="Income" asp-action="Index" class="nav-item-new @(IsActive("Income") ? "active" : "")">
                         <div class="nav-icon-box"><i data-lucide="trending-up"></i></div>
                         <span class="nav-label-text">Income Log</span>
                     </a>
@@ -638,19 +1037,19 @@
 
                 <div class="nav-section">
                     <div class="section-heading">Analysis</div>
-                    <a asp-controller="Expense" asp-action="MonthlySummary" class="nav-item-new">
+                    <a asp-controller="Expense" asp-action="MonthlySummary" class="nav-item-new @(IsActive("Expense", "MonthlySummary") ? "active" : "")">
                         <div class="nav-icon-box"><i data-lucide="calendar"></i></div>
                         <span class="nav-label-text">Monthly Summary</span>
                     </a>
-                    <a asp-controller="Budget" asp-action="Index" class="nav-item-new">
+                    <a asp-controller="Budget" asp-action="Index" class="nav-item-new @(IsActive("Budget") ? "active" : "")">
                         <div class="nav-icon-box"><i data-lucide="target"></i></div>
                         <span class="nav-label-text">Budget Planning</span>
                     </a>
-                    <a asp-controller="Expense" asp-action="Charts" class="nav-item-new">
+                    <a asp-controller="Expense" asp-action="Charts" class="nav-item-new @(IsActive("Expense", "Charts") ? "active" : "")">
                         <div class="nav-icon-box"><i data-lucide="line-chart"></i></div>
                         <span class="nav-label-text">Insights</span>
                     </a>
-                    <a asp-controller="RecurringTransaction" asp-action="Index" class="nav-item-new">
+                    <a asp-controller="RecurringTransaction" asp-action="Index" class="nav-item-new @(IsActive("RecurringTransaction") ? "active" : "")">
                         <div class="nav-icon-box"><i data-lucide="refresh-cw"></i></div>
                         <span class="nav-label-text">Automations</span>
                     </a>
@@ -661,14 +1060,12 @@
         <div class="main-wrapper">
             <header class="modern-topbar">
                 <div class="d-flex align-items-center gap-3">
-                    <button class="icon-btn-top mobile-only-toggle" id="mobileToggle">
-                        <i data-lucide="menu"></i>
-                    </button>
                     <h2 class="topbar-title">@ViewData["Title"]</h2>
                 </div>
 
                 <div class="topbar-actions">
-                    <button class="btn btn-link text-muted p-2 me-2 rounded-circle" id="themeToggle" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--border);">
+                    <button class="btn btn-link text-muted p-2 me-2 rounded-circle" id="themeToggle"
+                            style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--border);">
                         <i data-lucide="moon" id="themeIcon" size="20"></i>
                     </button>
                     @if (User.Identity?.IsAuthenticated ?? false)
@@ -679,91 +1076,159 @@
                                     <i data-lucide="user" size="18"></i>
                                 </div>
                                 <div class="profile-info-text">
-                                    <span class="profile-name-text">@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</span>
+                                    <span class="profile-name-text">@(User.FindFirst("FullName")?.Value ??
+                                                                                                                                                            User.Identity.Name)</span>
+                                    </div>
+                                    <i data-lucide="chevron-down" size="14" class="text-muted ms-1"></i>
                                 </div>
-                                <i data-lucide="chevron-down" size="14" class="text-muted ms-1"></i>
+                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-profile">
+                                    <li>
+                                        <button type="button" class="dropdown-item-custom text-danger" data-bs-toggle="modal"
+                                                data-bs-target="#logoutModal">
+                                            <i data-lucide="log-out" size="18"></i>
+                                            Sign Out
+                                        </button>
+                                    </li>
+                                </ul>
                             </div>
-                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-profile">
-                                <li>
-                                    <button type="button" class="dropdown-item-custom text-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">
-                                        <i data-lucide="log-out" size="18"></i>
-                                        Sign Out
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-                    }
+                        }
                     else
-                    {
-                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary rounded-pill px-4 fw-700">Login</a>
-                    }
-                </div>
-            </header>
+                        {
+                            <a asp-controller="Account" asp-action="Login"
+                               class="btn btn-primary rounded-pill px-4 fw-700">Login</a>
+                        }
+                    </div>
+                </header>
 
-            <!-- Logout Confirmation Modal -->
-            <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content modal-custom-content">
-                        <div class="modal-header modal-custom-header">
-                            <div class="mb-3">
-                                <div class="icon-box bg-danger-subtle text-danger p-3 rounded-circle d-inline-flex">
-                                    <i data-lucide="log-out" size="32"></i>
+                <!-- Modern Logout Confirmation Modal -->
+                <div class="modal fade glass-modal" id="logoutModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content modern-modal-content">
+                            <div class="modal-body p-4 p-md-5 text-center">
+                                <div class="logout-icon-wrapper mb-4">
+                                    <div class="logout-icon-bg pulse-danger">
+                                        <i data-lucide="log-out" class="text-danger" style="width: 28px; height: 28px;"></i>
+                                    </div>
+                                </div>
+                                <h4 class="fw-800 text-main mb-2">Sign Out?</h4>
+                                <p class="text-muted mb-4 fs-14">
+                                    You are about to sign out of your account. Any unsaved progress may be lost. Are you sure you want to proceed?
+                                </p>
+                                <div class="d-flex flex-column flex-sm-row gap-3">
+                                    <button type="button" class="btn btn-modern-cancel flex-grow-1" data-bs-dismiss="modal">Cancel</button>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="flex-grow-1 d-flex m-0">
+                                        <button type="submit" class="btn btn-modern-danger flex-grow-1">Sign Out</button>
+                                    </form>
                                 </div>
                             </div>
-                            <h4 class="fw-800 text-main-adaptive mb-0">Confirm Logout</h4>
-                        </div>
-                        <div class="modal-body modal-custom-body">
-                            Are you sure you want to sign out of your account? Any unsaved changes may be lost.
-                        </div>
-                        <div class="modal-footer modal-custom-footer">
-                            <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Cancel</button>
-                            <form asp-controller="Account" asp-action="Logout" method="post" id="logoutFormMain">
-                                <button type="submit" class="btn-modal-confirm">Sign Out</button>
-                            </form>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <main class="content-container">
-                @RenderBody()
-            </main>
-            
-            <!-- Mobile Bottom Navigation -->
-            <div class="mobile-bottom-nav d-lg-none">
-                <a asp-controller="Expense" asp-action="Dashboard" class="mobile-nav-item">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span>Home</span>
-                </a>
-                <a asp-controller="Expense" asp-action="Index" class="mobile-nav-item">
-                    <i data-lucide="receipt"></i>
-                    <span>Log</span>
-                </a>
-                <div class="mobile-nav-item fab-container">
-                    <a asp-controller="Expense" asp-action="Create" class="mobile-fab shadow-lg">
-                        <i data-lucide="plus"></i>
-                    </a>
-                </div>
-                <a asp-controller="Budget" asp-action="Index" class="mobile-nav-item">
-                    <i data-lucide="target"></i>
-                    <span>Budget</span>
-                </a>
-                <a asp-controller="Profile" asp-action="Index" class="mobile-nav-item">
-                    <i data-lucide="user"></i>
-                    <span>Profile</span>
-                </a>
+                <main class="content-container">
+                    @RenderBody()
+                </main>
+
+                <footer class="app-footer">
+                    <span>&copy; 2026 ExpenseTracker &mdash; Built by <strong>Afroz</strong></span>
+                    <span style="opacity:.4">&middot;</span>
+                    <a href="@Url.Action("Privacy", "Home")">Privacy Policy</a>
+                </footer>
             </div>
         </div>
-    </div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="~/js/site.js"></script>
-    
-    <!-- Global Toast System -->
-    <script>
-        $(function () {
+        <!-- Mobile Floating Action Button (opens the same offcanvas as the previous bottom dock) -->
+        <button type="button" class="mobile-floating-btn d-lg-none" id="mobileFloatingBtn" aria-label="Open navigation">
+            <i data-lucide="grid-2x2" style="width:22px;height:22px;"></i>
+        </button>
+
+        <div class="offcanvas offcanvas-bottom mobile-nav-sheet" tabindex="-1" id="mobileNavSheet"
+             aria-labelledby="mobileNavSheetLabel">
+            <div class="sheet-drag-handle-wrapper" id="sheetDragHandle">
+                <div class="sheet-drag-handle"></div>
+            </div>
+            <div class="offcanvas-header mobile-nav-sheet-header" style="padding-top: 6px;">
+                <div>
+                    <p class="mobile-nav-sheet-kicker mb-1">Quick access</p>
+                    <h5 class="mobile-nav-sheet-title mb-0" id="mobileNavSheetLabel">Navigate faster</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+            </div>
+
+            <div class="offcanvas-body mobile-nav-sheet-body">
+                <div class="mobile-nav-sheet-grid">
+                    <a href="@Url.Action("Dashboard", "Expense")"
+                       class="mobile-sheet-link @(IsActive("Expense", "Dashboard") ? "active" : "")">
+                        <i data-lucide="grid"></i>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <a href="@Url.Action("Index", "Category")"
+                       class="mobile-sheet-link @(IsActive("Category", "Index") ? "active" : "")">
+                        <i data-lucide="tag"></i>
+                        <span>Expense Categories</span>
+                    </a>
+
+                    <a href="@Url.Action("Index", "Expense")"
+                       class="mobile-sheet-link @(IsActive("Expense", "Index") ? "active" : "")">
+                        <i data-lucide="receipt"></i>
+                        <span>Expenses</span>
+                    </a>
+
+                    <a href="@Url.Action("Index", "Wallet")"
+                       class="mobile-sheet-link @(IsActive("Wallet", "Index") ? "active" : "")">
+                        <i data-lucide="wallet"></i>
+                        <span>Accounts</span>
+                    </a>
+
+                    <a href="@Url.Action("Index", "IncomeCategory")"
+                       class="mobile-sheet-link @(IsActive("IncomeCategory", "Index") ? "active" : "")">
+                        <i data-lucide="briefcase"></i>
+                        <span>Income Sources</span>
+                    </a>
+
+                    <a href="@Url.Action("Index", "Income")"
+                       class="mobile-sheet-link @(IsActive("Income", "Index") ? "active" : "")">
+                        <i data-lucide="trending-up"></i>
+                        <span>Income Log</span>
+                    </a>
+
+                    <a href="@Url.Action("MonthlySummary", "Expense")"
+                       class="mobile-sheet-link @(IsActive("Expense", "MonthlySummary") ? "active" : "")">
+                        <i data-lucide="calendar"></i>
+                        <span>Monthly Summary</span>
+                    </a>
+
+                    <a href="@Url.Action("Index", "Budget")"
+                       class="mobile-sheet-link @(IsActive("Budget", "Index") ? "active" : "")">
+                        <i data-lucide="target"></i>
+                        <span>Budget Planning</span>
+                    </a>
+
+                    <a href="@Url.Action("Charts", "Expense")"
+                       class="mobile-sheet-link @(IsActive("Expense", "Charts") ? "active" : "")">
+                        <i data-lucide="line-chart"></i>
+                        <span>Insights</span>
+                    </a>
+
+                    <a href="@Url.Action("Index", "RecurringTransaction")"
+                       class="mobile-sheet-link @(IsActive("RecurringTransaction", "Index") ? "active" : "")">
+                        <i data-lucide="refresh-cw"></i>
+                        <span>Automations</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="~/js/site.js"></script>
+
+        <!-- Global Toast System -->
+        <script>
+            $(function () {
             @if (TempData.Peek("SuccessMessage") != null)
             {
                 <text>showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["SuccessMessage"]?.ToString())), "success");</text>
@@ -792,70 +1257,215 @@
             {
                 <text>showToast(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Delete"]?.ToString())), "delete");</text>
             }
-        });
-    </script>
-    
-    @RenderSection("Scripts", required: false)
+            });
+        </script>
 
-    <script>
-        $(function () {
+        @RenderSection("Scripts", required: false)
+
+        <script>
+            $(function () {
             // Initialize Lucide icons
             lucide.createIcons();
 
             const body = $('body');
-            const sidebar = $('#sidebar');
-            const isMobile = () => window.matchMedia('(max-width: 991.98px)').matches;
-
-            // Active link highlighting
-            const currentPath = window.location.pathname.toLowerCase();
-            $('.nav-item-new').each(function () {
-                const linkPath = $(this).attr('href')?.toLowerCase();
-                if (currentPath === linkPath) {
-                    $(this).addClass('active');
-                }
-            });
-
-            const toggleMobileSidebar = () => {
-                body.toggleClass('sidebar-open');
-            };
-
-            $('#mobileToggle, #sidebarOverlay').on('click', toggleMobileSidebar);
-
-            // Handle window resize
-            $(window).on('resize', function () {
-                if (!isMobile()) {
-                    body.removeClass('sidebar-open');
-                }
-            });
 
             // Theme Toggle Logic
             const themeToggleBtn = $('#themeToggle');
             const setTheme = (theme) => {
-                const html = $('html');
-                if (theme === 'dark') {
-                    html.attr('data-theme', 'dark');
-                    html.attr('data-bs-theme', 'dark');
-                    $('#themeIcon').replaceWith('<i data-lucide="sun" id="themeIcon" size="20"></i>');
-                } else {
-                    html.removeAttr('data-theme');
-                    html.attr('data-bs-theme', 'light');
-                    $('#themeIcon').replaceWith('<i data-lucide="moon" id="themeIcon" size="20"></i>');
-                }
-                localStorage.setItem('theme', theme);
-                lucide.createIcons();
+            const html = $('html');
+            if (theme === 'dark') {
+            html.attr('data-theme', 'dark');
+            html.attr('data-bs-theme', 'dark');
+            $('#themeIcon').replaceWith('<i data-lucide="sun" id="themeIcon" size="20"></i>');
+            } else {
+            html.removeAttr('data-theme');
+            html.attr('data-bs-theme', 'light');
+            $('#themeIcon').replaceWith('<i data-lucide="moon" id="themeIcon" size="20"></i>');
+            }
+            localStorage.setItem('theme', theme);
+            lucide.createIcons();
             };
 
             const savedTheme = localStorage.getItem('theme') || 'light';
             setTheme(savedTheme);
 
             themeToggleBtn.on('click', function () {
-                const html = $('html');
-                const isDark = html.attr('data-theme') === 'dark';
-                setTheme(isDark ? 'light' : 'dark');
+            const html = $('html');
+            const isDark = html.attr('data-theme') === 'dark';
+            setTheme(isDark ? 'light' : 'dark');
             });
-        });
 
-    </script>
-</body>
+            // --- Draggable Floating Action Button ---
+            const $btn = $('#mobileFloatingBtn');
+            const offcanvasEl = document.getElementById('mobileNavSheet');
+
+            if ($btn.length && offcanvasEl) {
+                let isDragging = false;
+                let startX, startY;
+                let initialLeft, initialTop;
+                let hasDragged = false;
+
+                // Disable touch scrolling/actions on the button itself while dragging
+                $btn.css('touch-action', 'none');
+
+                const dragStart = (e) => {
+                    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                    
+                    if (clientX === undefined || clientY === undefined) return;
+
+                    isDragging = true;
+                    hasDragged = false;
+                    startX = clientX;
+                    startY = clientY;
+
+                    // Get exact current position bounding rect
+                    const rect = $btn[0].getBoundingClientRect();
+                    initialLeft = rect.left;
+                    initialTop = rect.top;
+
+                    // Switch button to use absolute left/top instead of right/bottom constraints
+                    $btn.css({
+                        left: initialLeft + 'px',
+                        top: initialTop + 'px',
+                        right: 'auto',
+                        bottom: 'auto',
+                        transition: 'none' // Disable transition during drag
+                    });
+
+                    $(document).on('mousemove touchmove', dragMove);
+                    $(document).on('mouseup touchend', dragEnd);
+                };
+
+                const dragMove = (e) => {
+                    if (!isDragging) return;
+                    
+                    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                    
+                    if (clientX === undefined || clientY === undefined) return;
+
+                    const dx = clientX - startX;
+                    const dy = clientY - startY;
+
+                    if (Math.hypot(dx, dy) > 5) {
+                        hasDragged = true;
+                    }
+
+                    let newLeft = initialLeft + dx;
+                    let newTop = initialTop + dy;
+
+                    // Boundaries constraint (keep inside window)
+                    const margin = 10;
+                    const btnWidth = $btn.outerWidth();
+                    const btnHeight = $btn.outerHeight();
+                    const maxLeft = window.innerWidth - btnWidth - margin;
+                    const maxTop = window.innerHeight - btnHeight - margin;
+
+                    newLeft = Math.max(margin, Math.min(newLeft, maxLeft));
+                    newTop = Math.max(margin, Math.min(newTop, maxTop));
+
+                    $btn.css({
+                        left: newLeft + 'px',
+                        top: newTop + 'px'
+                    });
+                };
+
+                const dragEnd = (e) => {
+                    isDragging = false;
+                    $(document).off('mousemove touchmove', dragMove);
+                    $(document).off('mouseup touchend', dragEnd);
+                };
+
+                // Attach start events
+                $btn.on('mousedown touchstart', dragStart);
+
+                // Open offcanvas on click ONLY if we didn't drag
+                $btn.on('click', function(e) {
+                    if (hasDragged) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return;
+                    }
+                    if (window.bootstrap && window.bootstrap.Offcanvas) {
+                        const bsOffcanvas = window.bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl);
+                        if (bsOffcanvas) {
+                            bsOffcanvas.toggle();
+                        }
+                    }
+                });
+            }
+
+            // --- Dynamic/Resizable Offcanvas Sheet ---
+            const $sheet = $('#mobileNavSheet');
+            const $handle = $('#sheetDragHandle');
+            if ($sheet.length && $handle.length) {
+                let isResizing = false;
+                let startY, startHeight;
+
+                const resizeStart = (e) => {
+                    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                    if (clientY === undefined) return;
+
+                    isResizing = true;
+                    startY = clientY;
+                    startHeight = $sheet.outerHeight();
+
+                    // Temporarily remove transition during drag for smoothness
+                    $sheet.css({
+                        transition: 'none',
+                        height: startHeight + 'px',
+                        'max-height': '95vh'
+                    });
+
+                    $(document).on('mousemove touchmove', resizeMove);
+                    $(document).on('mouseup touchend', resizeEnd);
+                };
+
+                const resizeMove = (e) => {
+                    if (!isResizing) return;
+                    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                    if (clientY === undefined) return;
+
+                    const dy = startY - clientY; // Dragging UP increases height (y decreases)
+                    const newHeight = startHeight + dy;
+
+                    // Constraint boundaries
+                    const minHeight = 180;
+                    const maxHeight = window.innerHeight * 0.95;
+                    const finalHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
+
+                    $sheet.css({
+                        height: finalHeight + 'px',
+                        'max-height': finalHeight + 'px'
+                    });
+                };
+
+                const resizeEnd = () => {
+                    isResizing = false;
+                    $sheet.css({
+                        transition: '' // Restore CSS transition
+                    });
+                    $(document).off('mousemove touchmove', resizeMove);
+                    $(document).off('mouseup touchend', resizeEnd);
+                };
+
+                $handle.on('mousedown touchstart', resizeStart);
+
+                // Reset height to default when closed
+                if (offcanvasEl) {
+                    offcanvasEl.addEventListener('hidden.bs.offcanvas', function () {
+                        $sheet.css({
+                            height: '',
+                            'max-height': ''
+                        });
+                    });
+                }
+            }
+            });
+
+        </script>
+    </body>
+
 </html>
 

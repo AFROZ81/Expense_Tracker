@@ -1,6 +1,196 @@
 ﻿@{
+    Layout = null;
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>@ViewData["Title"] — ExpenseTracker</title>
+    <link rel="icon" type="image/x-icon" href="~/favicon1.ico" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <script>
+        (function(){var t=localStorage.getItem('theme')||'light';if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.documentElement.setAttribute('data-bs-theme','dark');}else{document.documentElement.removeAttribute('data-theme');document.documentElement.setAttribute('data-bs-theme','light');}})();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-main:#f4f8fa;--bg-soft:#eaf1f5;--text-primary:#0f172a;--text-muted:#475569;
+            --line:rgba(15,23,42,0.08);--card-bg:rgba(255,255,255,0.85);
+            --brand-a:#0ea5e9;--brand-b:#10b981;--brand-c:#059669;
+            --brand-gradient:linear-gradient(135deg,#0ea5e9 0%,#10b981 100%);
+            --brand-gradient-hover:linear-gradient(135deg,#0284c7 0%,#059669 100%);
+            --money-grid:rgba(15,23,42,0.04);--money-wave:rgba(14,165,233,0.08);--money-wave-2:rgba(16,185,129,0.06);
+            --glow-a:rgba(14,165,233,0.15);--glow-b:rgba(16,185,129,0.12);--glow-c:rgba(5,150,105,0.1);
+            --topbar-bg:rgba(244,248,250,0.75);
+            --success:#10b981;--danger:#ef4444;--warning:#f59e0b;--info:#0ea5e9;
+        }
+        [data-theme="dark"] {
+            --bg-main:#070d19;--bg-soft:#0e1726;--text-primary:#f1f5f9;--text-muted:#94a3b8;
+            --line:rgba(255,255,255,0.08);--card-bg:rgba(13,23,42,0.7);
+            --money-grid:rgba(255,255,255,0.03);--money-wave:rgba(14,165,233,0.12);--money-wave-2:rgba(16,185,129,0.1);
+            --glow-a:rgba(14,165,233,0.2);--glow-b:rgba(16,185,129,0.16);--glow-c:rgba(5,150,105,0.15);
+            --topbar-bg:rgba(7,13,25,0.7);
+            --success:#34d399;--danger:#f87171;--warning:#fbbf24;--info:#38bdf8;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{font-family:'Manrope',system-ui,sans-serif;color:var(--text-primary);background:var(--bg-main);overflow-x:hidden;line-height:1.6;transition:background-color .3s,color .3s}
+        h1,h2,h3,h4,h5{font-family:'Outfit','Manrope',sans-serif}
+        a{text-decoration:none;color:inherit}
+        .wrap{width:min(1160px,92vw);margin:0 auto;padding:0 20px}
 
-<p>Use this page to detail your site's privacy policy.</p>
+        /* ── Ambient ── */
+        .ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+        .bg-noise{position:absolute;inset:0;background-image:radial-gradient(circle at 15% 15%,var(--money-wave),transparent 45%),radial-gradient(circle at 85% 85%,var(--money-wave-2),transparent 45%)}
+        .bg-grid{position:absolute;inset:0;background-image:linear-gradient(to right,var(--money-grid) 1px,transparent 1px),linear-gradient(to bottom,var(--money-grid) 1px,transparent 1px);background-size:60px 60px}
+        .bg-glow{position:absolute;border-radius:999px;filter:blur(130px);opacity:.7;animation:fl 22s infinite alternate ease-in-out}
+        .bg-glow-a{width:500px;height:500px;top:-100px;left:-120px;background:var(--glow-a)}
+        .bg-glow-b{width:450px;height:450px;right:-90px;top:35%;background:var(--glow-b);animation-delay:-7s}
+        .bg-glow-c{width:380px;height:380px;bottom:-60px;left:25%;background:var(--glow-c);animation-delay:-13s}
+        @@keyframes fl{0%{transform:translateY(0) scale(1)}100%{transform:translateY(25px) scale(1.1)}}
+
+        /* ── Topbar ── */
+        .topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;transition:all .35s;padding:16px 0}
+        .topbar.scrolled{padding:10px 0;background:var(--topbar-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line);box-shadow:0 4px 30px rgba(0,0,0,0.03)}
+        .topbar-inner{display:flex;justify-content:space-between;align-items:center;width:100%;padding:0 16px}
+        .brand{display:inline-flex;align-items:center;gap:9px;font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-0.03em;color:var(--text-primary)}
+        .brand-mark{width:34px;height:34px;border-radius:9px;background:var(--brand-gradient);box-shadow:0 5px 14px rgba(14,165,233,0.25);display:inline-flex;align-items:center;justify-content:center;color:white;transition:transform .3s}
+        .brand:hover .brand-mark{transform:scale(1.06) rotate(4deg)}
+        .top-actions{display:flex;align-items:center;gap:8px}
+        .theme-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card-bg);color:var(--text-primary);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s}
+        .theme-btn:hover{transform:rotate(15deg) scale(1.05);background:var(--bg-soft)}
+        .back-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card-bg);color:var(--text-primary);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s}
+        .back-btn:hover{transform:scale(1.05);background:var(--bg-soft);color:var(--brand-a)}
+
+        /* ── Privacy Content ── */
+        .priv-page{position:relative;z-index:10;max-width:720px;margin:0 auto;padding:120px 20px 60px;animation:fadeI .45s ease-out}
+        @@keyframes fadeI{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        .priv-header{margin-bottom:28px}
+        .priv-header h1{font-size:1.6rem;font-weight:900;color:var(--text-primary);margin:0 0 8px;letter-spacing:-0.03em}
+        .priv-header p{font-size:.9rem;color:var(--text-muted);margin:0;line-height:1.6}
+        .priv-card{background:var(--card-bg);border:1px solid var(--line);border-radius:20px;padding:28px 32px;box-shadow:0 10px 40px -10px rgba(0,0,0,0.06);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+        [data-theme="dark"] .priv-card{box-shadow:0 10px 40px -10px rgba(0,0,0,0.3)}
+        .priv-card h3{font-size:1rem;font-weight:800;color:var(--text-primary);margin:0 0 10px;display:flex;align-items:center;gap:10px}
+        .priv-card p{font-size:.88rem;color:var(--text-muted);line-height:1.7;margin:0 0 20px}
+        .priv-card p:last-child{margin-bottom:0}
+        .priv-divider{border:none;border-top:1px solid var(--line);margin:22px 0}
+        .priv-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .priv-icon.sky{background:rgba(14,165,233,0.1);color:var(--brand-a)}
+        .priv-icon.grn{background:rgba(16,185,129,0.1);color:var(--brand-b)}
+        .priv-icon.amb{background:rgba(245,158,11,0.1);color:var(--warning)}
+        .priv-icon.vio{background:rgba(5,150,105,0.1);color:var(--brand-c)}
+        .priv-icon.red{background:rgba(239,68,68,0.1);color:var(--danger)}
+
+        /* ── Footer ── */
+        .footer{border-top:1px solid var(--line);padding:28px 0 20px;position:relative;z-index:10}
+        .foot-bottom{display:flex;justify-content:space-between;align-items:center;font-size:.72rem;color:var(--text-muted)}
+        .foot-back{display:inline-flex;align-items:center;gap:6px;color:var(--brand-a);font-weight:700;font-size:.78rem;transition:color .2s}
+        .foot-back:hover{color:var(--brand-b)}
+
+        /* ── Responsive ── */
+        @@media(max-width:768px){
+            .topbar-inner{padding:0 12px}
+            .top-actions{gap:6px}
+            .brand{font-size:1rem;gap:7px}
+            .brand-mark{width:30px;height:30px;border-radius:8px}
+            .theme-btn,.back-btn{width:34px;height:34px}
+            .priv-page{padding:100px 16px 40px}
+            .priv-header h1{font-size:1.3rem}
+            .priv-card{padding:20px 18px;border-radius:16px}
+            .priv-card h3{font-size:.92rem}
+            .priv-card p{font-size:.84rem}
+            .foot-bottom{flex-direction:column;gap:10px;text-align:center}
+        }
+        @@media(max-width:400px){
+            .priv-page{padding:90px 14px 32px}
+            .priv-header h1{font-size:1.15rem}
+            .priv-card{padding:16px 14px;border-radius:14px}
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient" aria-hidden="true">
+        <div class="bg-noise"></div>
+        <div class="bg-grid"></div>
+        <div class="bg-glow bg-glow-a"></div>
+        <div class="bg-glow bg-glow-b"></div>
+        <div class="bg-glow bg-glow-c"></div>
+    </div>
+
+    <header id="mainHeader" class="topbar">
+        <div class="wrap topbar-inner">
+            <a class="brand" href="@Url.Action("Index","Home")">
+                <span class="brand-mark"><i data-lucide="wallet" style="width:17px;height:17px"></i></span>
+                ExpenseTracker
+            </a>
+            <div class="top-actions">
+                <a href="@Url.Action("Index","Home")" class="back-btn" title="Back to Home" aria-label="Back to Home">
+                    <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
+                </a>
+                <button id="themeToggle" class="theme-btn" type="button" aria-label="Toggle theme">
+                    <span id="themeGlyph"><i data-lucide="moon" style="width:16px;height:16px"></i></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="priv-page">
+            <div class="priv-header">
+                <h1>Privacy Policy</h1>
+                <p>Your privacy is important to us. This policy explains how ExpenseTracker collects, uses, and protects your personal and financial data.</p>
+            </div>
+
+            <div class="priv-card">
+                <h3><span class="priv-icon sky"><i data-lucide="shield-check" style="width:18px;height:18px"></i></span> Data Protection</h3>
+                <p>All your financial data is stored securely in user-scoped databases. Your records are completely isolated from other users, ensuring absolute privacy. We use industry-standard encryption for data at rest and in transit.</p>
+
+                <hr class="priv-divider"/>
+
+                <h3><span class="priv-icon grn"><i data-lucide="lock" style="width:18px;height:18px"></i></span> Authentication & Security</h3>
+                <p>ExpenseTracker uses ASP.NET Core Identity for secure authentication. Passwords are hashed using PBKDF2 and never stored in plain text. Session tokens are managed securely with automatic expiration.</p>
+
+                <hr class="priv-divider"/>
+
+                <h3><span class="priv-icon amb"><i data-lucide="eye-off" style="width:18px;height:18px"></i></span> Third-Party Sharing</h3>
+                <p>We do not sell, trade, or share your personal financial data with any third parties. Your transaction records, account balances, and budget information remain strictly confidential within the application.</p>
+
+                <hr class="priv-divider"/>
+
+                <h3><span class="priv-icon vio"><i data-lucide="cookie" style="width:18px;height:18px"></i></span> Cookies & Local Storage</h3>
+                <p>We use essential cookies for authentication and session management. Theme preferences are stored in your browser's local storage for a personalized experience. No tracking or advertising cookies are used.</p>
+
+                <hr class="priv-divider"/>
+
+                <h3><span class="priv-icon red"><i data-lucide="user-x" style="width:18px;height:18px"></i></span> Account Deletion</h3>
+                <p>You may request deletion of your account at any time. Upon deletion, all associated financial records, categories, and personal data will be permanently removed from our servers.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="wrap">
+            <div class="foot-bottom">
+                <span>&copy; 2026 ExpenseTracker &mdash; Built by <strong>Afroz</strong></span>
+                <a href="@Url.Action("Index","Home")" class="foot-back"><i data-lucide="arrow-left" style="width:13px;height:13px"></i> Back to Home</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        window.addEventListener('scroll',function(){document.getElementById('mainHeader').classList.toggle('scrolled',window.scrollY>20);});
+        (function(){
+            const h=document.documentElement,b=document.getElementById('themeToggle'),g=document.getElementById('themeGlyph');
+            const apply=(t)=>{if(t==='dark'){h.setAttribute('data-theme','dark');h.setAttribute('data-bs-theme','dark');g.innerHTML='<i data-lucide="sun" style="width:16px;height:16px"></i>';}else{h.removeAttribute('data-theme');h.setAttribute('data-bs-theme','light');g.innerHTML='<i data-lucide="moon" style="width:16px;height:16px"></i>';}localStorage.setItem('theme',t);lucide.createIcons();};
+            apply(localStorage.getItem('theme')||'light');
+            b.addEventListener('click',function(){apply(h.getAttribute('data-theme')==='dark'?'light':'dark');});
+        })();
+    </script>
+</body>
+</html>

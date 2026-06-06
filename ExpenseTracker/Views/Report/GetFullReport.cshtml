@@ -30,7 +30,7 @@
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                         <span class="text-muted small fw-700 text-uppercase tracking-wider">Total Income</span>
-                        <h2 class="fw-900 text-success mt-2 mb-0">@Model.TotalIncome.ToString("C")</h2>
+                        <h2 class="fw-900 text-success mt-2 mb-0">₹@Model.TotalIncome.ToString("N2")</h2>
                     </div>
                     <div class="widget-icon bg-success-subtle text-success rounded-3 p-2">
                         <i data-lucide="trending-up" size="24"></i>
@@ -49,7 +49,7 @@
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
                         <span class="text-muted small fw-700 text-uppercase tracking-wider">Total Expenses</span>
-                        <h2 class="fw-900 text-danger mt-2 mb-0">@Model.TotalExpense.ToString("C")</h2>
+                        <h2 class="fw-900 text-danger mt-2 mb-0">₹@Model.TotalExpense.ToString("N2")</h2>
                     </div>
                     <div class="widget-icon bg-danger-subtle text-danger rounded-3 p-2">
                         <i data-lucide="trending-down" size="24"></i>
@@ -194,7 +194,7 @@
 <style>
     /* Styling variables and aesthetics */
     :root {
-        --indigo-color: #6366f1;
+        --indigo-color: #0ea5e9;
         --indigo-light: #e0e7ff;
     }
     
@@ -220,7 +220,7 @@
     }
 
     .header-report-gradient {
-        background: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%) !important;
+        background: linear-gradient(135deg, #0284c7 0%, #10b981 100%) !important;
         color: white !important;
     }
     
@@ -247,7 +247,7 @@
     /* Primary Bright Button override */
     .btn-primary-bright {
         background: white !important;
-        color: #4f46e5 !important;
+        color: #0284c7 !important;
         border: 1px solid transparent !important;
     }
     .btn-primary-bright:hover {
@@ -271,14 +271,14 @@
     }
     
     .text-indigo {
-        color: #4f46e5 !important;
+        color: #0284c7 !important;
     }
     .border-indigo {
-        border-color: #4f46e5 !important;
+        border-color: #0284c7 !important;
     }
     .bg-indigo-subtle {
         background-color: #e0e7ff !important;
-        color: #4f46e5 !important;
+        color: #0284c7 !important;
     }
 
     /* Table styling additions */
@@ -335,7 +335,7 @@
         .glass-card { box-shadow: none !important; border: 1px solid #ddd !important; }
         body { background: white !important; color: black !important; }
         .header-report-gradient {
-            background: #4f46e5 !important;
+            background: #0284c7 !important;
             color: white !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
