@@ -1,5 +1,5 @@
-<div align="center">
-
+<div align="center"> 
+    
 # ExpenseTracker
 
 A premium personal finance web app built with ASP.NET Core MVC.
