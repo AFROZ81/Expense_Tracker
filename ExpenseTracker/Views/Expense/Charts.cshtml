@@ -22,8 +22,26 @@
     .insight-card p { font-size:0.82rem; color:var(--muted); margin:2px 0 0; }
 
     /* Chart cards */
-    .chart-grid { display:grid; grid-template-columns:5fr 7fr; gap:16px; }
-    .chart-card { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:24px 28px; box-shadow:0 4px 16px rgba(0,0,0,0.04); transition:transform 0.25s; }
+    .chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .chart-card {
+        display:flex;
+        flex-direction:column;
+        background: rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 20px;
+        padding: 24px 28px;
+        box-shadow: 0 8px 32px rgba(15, 23, 42, 0.04);
+        transition: transform 0.25s, box-shadow 0.25s;
+        min-width: 0;
+        overflow: hidden;
+    }
+    [data-theme="dark"] .chart-card {
+        background: rgba(15, 23, 42, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
     .chart-card:hover { transform:translateY(-3px); }
     .chart-card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
     .chart-card-head h6 { font-size:0.92rem; font-weight:800; color:var(--text-main); margin:0; }
@@ -32,14 +50,14 @@
     .chart-canvas { position:relative; height:320px; width:100%; }
 
     @@media (max-width:991.98px) {
-        .chart-grid { grid-template-columns:1fr; }
+        .chart-grid { grid-template-columns:1fr; gap:16px; }
     }
     @@media (max-width:767.98px) {
         .charts-header { flex-direction:column; align-items:stretch; margin-bottom:18px; }
-        .charts-header h1 { font-size:1.2rem; }
-        .chart-card { padding:18px 16px; border-radius:16px; }
-        .chart-canvas { height:260px; }
-        .insight-card { flex-direction:column; text-align:center; padding:16px 18px; gap:10px; }
+        .charts-header h1 { font-size:1.20rem; }
+        .chart-card { padding:16px 14px; border-radius:16px; }
+        .chart-canvas { height:250px; }
+        .insight-card { flex-direction:column; text-align:center; padding:16px 14px; gap:10px; }
     }
 </style>
 
@@ -87,29 +105,58 @@
         $(function() {
             lucide.createIcons();
 
+            let c1, c2;
+
+            function getThemeColors() {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.body.getAttribute('data-theme') === 'dark';
+                return {
+                    textColor: isDark ? '#94a3b8' : '#475569',
+                    gridColor: isDark ? 'rgba(255, 255, 255, 0.07)' : '#f1f5f9',
+                    borderColor: isDark ? '#1e293b' : '#ffffff'
+                };
+            }
+
             const pLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(pie.Labels));
             const pValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(pie.Values));
-            new Chart(document.getElementById('categoryDoughnut').getContext('2d'), {
+            const isMobile = window.innerWidth < 768;
+            const colors = getThemeColors();
+
+            c1 = new Chart(document.getElementById('categoryDoughnut').getContext('2d'), {
                 type:'doughnut',
-                data:{ labels:pLabels, datasets:[{ data:pValues, backgroundColor:['#0ea5e9','#10b981','#059669','#06b6d4','#14b8a6','#22d3ee','#67e8f9'], borderWidth:5, borderColor:'#ffffff', hoverOffset:15 }] },
+                data:{ labels:pLabels, datasets:[{ data:pValues, backgroundColor:['#3cb44b','#ffe119','#0082c8','#f58231','#911eb4','#46f0f0','#f032e6','#d2f53c','#fabebe','#008080','#e6beff','#aa6e28','#fffac8'], borderWidth:2, borderColor:colors.borderColor, hoverOffset:15 }] },
                 options:{ responsive:true, maintainAspectRatio:false, cutout:'75%',
-                    plugins:{ legend:{ position:'bottom', labels:{ usePointStyle:true, padding:20, font:{family:'Inter',size:11,weight:'600'} } },
+                    plugins:{ legend:{ position:'bottom', labels:{ usePointStyle:true, padding:isMobile ? 10 : 20, color:colors.textColor, font:{family:'Inter',size:isMobile ? 10 : 11,weight:'600'} } },
                               tooltip:{ backgroundColor:'#0f172a', padding:14, usePointStyle:true, callbacks:{ label:function(c){return ' ₹'+Number(c.raw).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} } } } }
             });
 
             const bLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(bar.Labels));
             const bValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(bar.Values));
             const barCtx = document.getElementById('trendBarChart').getContext('2d');
-            const grad = barCtx.createLinearGradient(0,0,0,400);
-            grad.addColorStop(0,'#0ea5e9'); grad.addColorStop(1,'rgba(14,165,233,0.1)');
-            new Chart(barCtx, {
+            c2 = new Chart(barCtx, {
                 type:'bar',
-                data:{ labels:bLabels, datasets:[{ label:'Total Spent', data:bValues, backgroundColor:grad, borderRadius:12, borderSkipped:false, barPercentage:0.5 }] },
+                data:{ labels:bLabels, datasets:[{ label:'Total Spent', data:bValues, backgroundColor:['#3cb44b','#ffe119','#0082c8','#f58231','#911eb4','#46f0f0','#f032e6','#d2f53c','#fabebe','#008080','#e6beff','#aa6e28','#fffac8'], borderRadius:12, borderSkipped:false, barPercentage:0.5, maxBarThickness:50 }] },
                 options:{ responsive:true, maintainAspectRatio:false,
                     plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#0f172a', padding:14, callbacks:{ label:function(c){return ' ₹'+Number(c.raw).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} } } },
-                    scales:{ y:{ beginAtZero:true, grid:{color:'#f1f5f9',borderDash:[5,5]}, ticks:{font:{family:'Inter',size:11},color:'#94a3b8'} },
-                             x:{ grid:{display:false}, ticks:{font:{family:'Inter',size:11,weight:'600'},color:'#475569'} } } }
+                    scales:{ y:{ beginAtZero:true, grid:{color:colors.gridColor,borderDash:[5,5]}, ticks:{font:{family:'Inter',size:11},color:colors.textColor} },
+                             x:{ grid:{display:false}, ticks:{font:{family:'Inter',size:11,weight:'600'},color:colors.textColor} } } }
             });
+
+            const observer = new MutationObserver(() => {
+                const newColors = getThemeColors();
+                if (c1) {
+                    c1.data.datasets[0].borderColor = newColors.borderColor;
+                    c1.options.plugins.legend.labels.color = newColors.textColor;
+                    c1.update();
+                }
+                if (c2) {
+                    c2.options.scales.y.grid.color = newColors.gridColor;
+                    c2.options.scales.y.ticks.color = newColors.textColor;
+                    c2.options.scales.x.ticks.color = newColors.textColor;
+                    c2.update();
+                }
+            });
+            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
         });
     </script>
 }
