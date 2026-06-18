@@ -22,6 +22,17 @@ namespace ExpenseTracker.Controllers
             _recurringService = recurringService;
         }
 
+        private ExpenseSetupViewModel GetExpensePrerequisites(string userId)
+        {
+            var hasAccounts = _context.Accounts.Any(a => a.IsActive && a.UserId == userId);
+            var hasCategories = _context.Categories.Any(c => c.IsActive && c.UserId == userId);
+            return new ExpenseSetupViewModel
+            {
+                HasAccounts = hasAccounts,
+                HasCategories = hasCategories
+            };
+        }
+
         // GET: Expense
         public IActionResult Index()
         {
@@ -40,6 +51,12 @@ namespace ExpenseTracker.Controllers
         public IActionResult Create()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var prerequisites = GetExpensePrerequisites(userId);
+            if (!prerequisites.HasAccounts || !prerequisites.HasCategories)
+            {
+                return View("SetupRequired", prerequisites);
+            }
+
             ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.IsActive && c.UserId == userId), "Id", "Name");
             ViewBag.AccountList = new SelectList(_context.Accounts.Where(a => a.IsActive && a.UserId == userId), "Id", "Name");
             return View();
@@ -51,6 +68,13 @@ namespace ExpenseTracker.Controllers
         public IActionResult Create(Expense expense)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var prerequisites = GetExpensePrerequisites(userId);
+            if (!prerequisites.HasAccounts || !prerequisites.HasCategories)
+            {
+                TempData["ErrorMessage"] = "Please add both an account and an expense category before recording expenses.";
+                return View("SetupRequired", prerequisites);
+            }
+
             if (ModelState.IsValid)
             {
                 using var transaction = _context.Database.BeginTransaction();
@@ -80,8 +104,8 @@ namespace ExpenseTracker.Controllers
                 }
             }
 
-            ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.IsActive), "Id", "Name", expense.CategoryId);
-            ViewBag.AccountList = new SelectList(_context.Accounts.Where(a => a.IsActive), "Id", "Name", expense.AccountId);
+            ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.IsActive && c.UserId == userId), "Id", "Name", expense.CategoryId);
+            ViewBag.AccountList = new SelectList(_context.Accounts.Where(a => a.IsActive && a.UserId == userId), "Id", "Name", expense.AccountId);
             return View(expense);
         }
 

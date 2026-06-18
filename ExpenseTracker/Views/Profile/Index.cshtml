@@ -1,0 +1,231 @@
+@model ExpenseTracker.Models.ViewModels.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["HideMobileQuickAction"] = true;
+    ViewData["HideSidebar"] = true;
+}
+
+<style>
+    :root { --accent:#0ea5e9; --accent2:#10b981; --accent-soft:rgba(14,165,233,.10); --accent2-soft:rgba(16,185,129,.10); }
+    .profile-page { animation:pageIn .42s ease-out; }
+    @@keyframes pageIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    .profile-shell { max-width: 980px; margin: 0 auto; }
+    .profile-topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; }
+    .back-link {
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        color:#0ea5e9;
+        font-weight:800;
+        text-decoration:none;
+    }
+    .back-link:hover { color:#10b981; }
+    .profile-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        padding: 26px;
+        color: #fff;
+        background: linear-gradient(135deg, rgba(14,165,233,.92) 0%, rgba(16,185,129,.92) 100%);
+        box-shadow: 0 18px 40px rgba(14,165,233,.12);
+    }
+    .profile-hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(255,255,255,.18), transparent 40%);
+        pointer-events: none;
+    }
+    .profile-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .profile-identity { display:flex; gap:18px; align-items:center; }
+    .profile-avatar {
+        width: 84px;
+        height: 84px;
+        border-radius: 24px;
+        background: rgba(255,255,255,.16);
+        border: 1px solid rgba(255,255,255,.22);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
+        flex-shrink:0;
+    }
+    .profile-kicker {
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:6px 12px;
+        border-radius:999px;
+        background: rgba(255,255,255,.14);
+        font-size:.72rem;
+        font-weight:800;
+        letter-spacing:.08em;
+        text-transform:uppercase;
+        margin-bottom:12px;
+    }
+    .profile-name { margin:0 0 8px; font-size:1.7rem; font-weight:800; letter-spacing:-.02em; }
+    .profile-meta { margin:0; color:rgba(255,255,255,.82); line-height:1.6; max-width: 640px; }
+    .profile-details {
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:12px;
+        margin-top:6px;
+    }
+    .detail-chip {
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:13px 15px;
+        border-radius:18px;
+        background: rgba(255,255,255,.10);
+        border:1px solid rgba(255,255,255,.14);
+        backdrop-filter: blur(10px);
+    }
+    .detail-chip span { display:block; }
+    .detail-label { font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; opacity:.74; }
+    .detail-value { font-size:.92rem; font-weight:700; word-break:break-word; }
+
+    .info-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+    .panel {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.05);
+    }
+    .panel h3 { margin:0 0 8px; font-size:1.05rem; font-weight:800; color:var(--text-main); }
+    .panel p.sub { margin:0 0 18px; color:var(--muted); font-size:.9rem; }
+    .info-row { display:flex; justify-content:space-between; gap:12px; padding:14px 0; border-bottom:1px solid var(--border); }
+    .info-row:last-child { border-bottom:none; }
+    .info-row .label { color:var(--muted); font-weight:700; font-size:.86rem; }
+    .info-row .value { color:var(--text-main); font-weight:800; text-align:right; }
+
+    .account-list { display:grid; gap:12px; }
+    .account-item {
+        display:flex; align-items:center; gap:14px;
+        padding:14px 16px;
+        border-radius:18px;
+        border:1px solid var(--border);
+        background: var(--bg);
+    }
+    .account-badge {
+        width:42px; height:42px; border-radius:14px;
+        background: var(--accent2-soft);
+        color: var(--accent2);
+        display:flex; align-items:center; justify-content:center;
+        flex-shrink:0;
+    }
+    .account-name { font-weight:800; color:var(--text-main); margin:0; }
+    .account-sub { font-size:.78rem; color:var(--muted); margin:3px 0 0; }
+    .account-bal { margin-left:auto; font-weight:800; color:var(--text-main); white-space:nowrap; }
+
+    @@media (max-width: 991.98px) {
+        .info-grid { grid-template-columns: 1fr; }
+        .profile-details { grid-template-columns: 1fr; }
+    }
+    @@media (max-width: 767.98px) {
+        .profile-topbar { margin-bottom:14px; }
+        .profile-hero { padding: 20px 16px; border-radius: 20px; }
+        .profile-identity { align-items:flex-start; }
+        .profile-avatar { width: 66px; height: 66px; border-radius: 18px; }
+        .profile-name { font-size: 1.25rem; }
+        .panel { padding: 18px; border-radius: 18px; }
+        .account-item { padding: 12px 14px; }
+        .account-bal { font-size: .92rem; }
+    }
+</style>
+
+<div class="profile-page">
+    <div class="profile-shell">
+        <div class="profile-topbar">
+            <a asp-controller="Expense" asp-action="Dashboard" class="back-link">
+                <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
+                Back to Dashboard
+            </a>
+        </div>
+
+        <div class="profile-hero">
+            <div class="profile-hero-grid">
+                <div class="profile-identity">
+                    <div class="profile-avatar">
+                        <i data-lucide="user" style="width:34px;height:34px"></i>
+                    </div>
+                    <div style="width:100%">
+                        <div class="profile-kicker">
+                            <i data-lucide="sparkles" style="width:13px;height:13px"></i>
+                            Client Profile
+                        </div>
+                        <h1 class="profile-name">@Model.FullName</h1>
+                        <p class="profile-meta">Professional account profile with identity and usage details pulled directly from your application data.</p>
+
+                        <div class="profile-details">
+                            <div class="detail-chip">
+                                <i data-lucide="mail" style="width:18px;height:18px"></i>
+                                <div>
+                                    <span class="detail-label">Email</span>
+                                    <span class="detail-value">@Model.Email</span>
+                                </div>
+                            </div>
+                            <div class="detail-chip">
+                                <i data-lucide="calendar-days" style="width:18px;height:18px"></i>
+                                <div>
+                                    <span class="detail-label">Member Since</span>
+                                    <span class="detail-value">@Model.CreatedOn.ToString("dd MMM yyyy")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="panel">
+                <h3>Profile Details</h3>
+                <p class="sub">These are the identity details available for this account.</p>
+                <div class="info-row">
+                    <div class="label">Full Name</div>
+                    <div class="value">@Model.FullName</div>
+                </div>
+                <div class="info-row">
+                    <div class="label">Email Address</div>
+                    <div class="value">@Model.Email</div>
+                </div>
+                <div class="info-row">
+                    <div class="label">Member Since</div>
+                    <div class="value">@Model.CreatedOn.ToString("dd MMM yyyy")</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Account Activity</h3>
+                <p class="sub">A compact summary of your app usage.</p>
+                <div class="info-row">
+                    <div class="label">Accounts</div>
+                    <div class="value">@Model.AccountCount</div>
+                </div>
+                <div class="info-row">
+                    <div class="label">Expense Categories</div>
+                    <div class="value">@Model.CategoryCount</div>
+                </div>
+                <div class="info-row">
+                    <div class="label">Expenses</div>
+                    <div class="value">@Model.ExpenseCount</div>
+                </div>
+                <div class="info-row">
+                    <div class="label">Income Entries</div>
+                    <div class="value">@Model.IncomeCount</div>
+                </div>
+                <div class="info-row">
+                    <div class="label">Budgets</div>
+                    <div class="value">@Model.BudgetCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>$(function(){ lucide.createIcons(); });</script>
+}

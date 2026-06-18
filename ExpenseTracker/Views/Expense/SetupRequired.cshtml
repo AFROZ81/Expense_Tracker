@@ -1,0 +1,102 @@
+@model ExpenseTracker.Models.ViewModels.ExpenseSetupViewModel
+
+@{
+    ViewData["Title"] = "Setup Required";
+    var missingAccount = !Model.HasAccounts;
+    var missingCategory = !Model.HasCategories;
+}
+
+<style>
+    .setup-page { animation:fadeUp .45s ease-out; }
+    @@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    .setup-shell { max-width:900px; margin:0 auto; }
+    .setup-card { background:var(--card); border:1px solid var(--border); border-radius:22px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.08); }
+    .setup-hero { padding:32px; border-bottom:1px solid var(--border); background:linear-gradient(135deg, rgba(14, 165, 233, 1), rgba(16, 185, 129, 1)); display:flex; gap:18px; align-items:flex-start; }
+    .setup-icon { width:56px; height:56px; border-radius:18px; display:flex; align-items:center; justify-content:center; background:var(--card); color:#0ea5e9; border:1px solid var(--border); flex-shrink:0; }
+    .setup-hero { color:#ffffff; }
+    .setup-hero h1 { font-size:1.35rem; font-weight:800; color:#ffffff; margin:0 0 8px; }
+    .setup-hero p { margin:0; color:rgba(255,255,255,.82); line-height:1.6; }
+    .setup-body { padding:28px 32px 32px; }
+    .missing-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:16px; margin-bottom:26px; }
+    .missing-item { border:1px solid var(--border); background:var(--bg); border-radius:18px; padding:18px; min-height:160px; display:flex; flex-direction:column; }
+    .missing-item h3 { margin:0 0 8px; font-size:1rem; font-weight:800; color:var(--text-main); }
+    .missing-item p { margin:0; color:var(--muted); font-size:.92rem; line-height:1.55; }
+    .missing-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; margin-bottom:12px; width:fit-content; flex:0 0 auto; }
+    .badge-warn { background:rgba(14,165,233,.12); color:#0ea5e9; }
+    .badge-info { background:rgba(16,185,129,.12); color:#10b981; }
+    .card-action { display:inline-flex; align-items:center; gap:7px; margin-top:auto; padding-top:14px; border:none; background:transparent; color:#0ea5e9; font-size:.88rem; font-weight:700; text-decoration:none; width:fit-content; }
+    .card-action:hover { color:#10b981; }
+    .setup-actions { display:flex; gap:12px; flex-wrap:wrap; }
+    .setup-note { margin-top:16px; color:var(--muted); font-size:.88rem; }
+    .back-expense { display:inline-flex; align-items:center; gap:7px; color:var(--muted); font-weight:700; text-decoration:none; margin-top:14px; }
+    .back-expense:hover { color:var(--text-main); }
+
+    @@media (max-width:767.98px) {
+        .setup-hero { padding:22px 18px; gap:14px; }
+        .setup-icon { width:48px; height:48px; border-radius:14px; }
+        .setup-hero h1 { font-size:1.12rem; }
+        .setup-body { padding:20px 18px 22px; }
+        .missing-grid { grid-template-columns:1fr; gap:12px; margin-bottom:20px; }
+    }
+</style>
+
+<div class="setup-page">
+    <div class="setup-shell">
+        <div class="setup-card">
+            <div class="setup-hero">
+                <div class="setup-icon">
+                    <i data-lucide="shield-alert" style="width:26px;height:26px"></i>
+                </div>
+                <div>
+                    <h1>Set up your spending essentials first</h1>
+                    <p>You need both an active account and an expense category before you can record a new expense. This keeps your expense entries clean and client-ready.</p>
+                </div>
+            </div>
+
+            <div class="setup-body">
+                <div class="missing-grid">
+                    <div class="missing-item">
+                        <span class="missing-badge @(missingAccount ? "badge-warn" : "badge-info")">
+                            <i data-lucide="wallet" style="width:12px;height:12px"></i>
+                            @(missingAccount ? "Required" : "Ready")
+                        </span>
+                        <h3>Account</h3>
+                        <p>@(missingAccount ? "Create at least one active account so expenses have a wallet to come from." : "You already have an active account available.")</p>
+                        @if (missingAccount)
+                        {
+                            <a asp-controller="Wallet" asp-action="Create" class="card-action">
+                                <i data-lucide="plus" style="width:14px;height:14px"></i>
+                                Add Account
+                            </a>
+                        }
+                    </div>
+                    <div class="missing-item">
+                        <span class="missing-badge @(missingCategory ? "badge-warn" : "badge-info")">
+                            <i data-lucide="tags" style="width:12px;height:12px"></i>
+                            @(missingCategory ? "Required" : "Ready")
+                        </span>
+                        <h3>Expense Category</h3>
+                        <p>@(missingCategory ? "Create at least one expense category so the transaction can be classified properly." : "You already have an expense category available.")</p>
+                        @if (missingCategory)
+                        {
+                            <a asp-controller="Category" asp-action="Create" class="card-action">
+                                <i data-lucide="tag" style="width:14px;height:14px"></i>
+                                Add Expense Category
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <a asp-action="Index" class="back-expense">
+                    <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
+                    Back to Expenses
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>$(function(){ lucide.createIcons(); });</script>
+}
