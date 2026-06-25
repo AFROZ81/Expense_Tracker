@@ -77,7 +77,8 @@
                             @(missingCategory ? "Required" : "Ready")
                         </span>
                         <h3>Expense Category</h3>
-                        <p>@(missingCategory ? "Create at least one expense category so the transaction can be classified properly." : "You already have an expense category available.")</p>
+                        <p>@(missingCategory ? "Create at least one expense category (excluding the default \"To Cash\") so the transaction can be classified properly." : "You already have an expense category available.")</p>
+<p class="setup-note">A default "To Cash" category is always present, but you must create at least one additional expense category.</p>
                         @if (missingCategory)
                         {
                             <a asp-controller="Category" asp-action="Create" class="card-action">

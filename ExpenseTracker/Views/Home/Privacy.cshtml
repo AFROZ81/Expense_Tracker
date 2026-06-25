@@ -1,6 +1,9 @@
-﻿@{
+@{
     Layout = null;
     ViewData["Title"] = "Privacy Policy";
+    var source = ViewData["Source"] as string;
+    var backUrl = source == "profile" ? Url.Action("Index", "Profile") : Url.Action("Index", "Home");
+    var backText = source == "profile" ? "Back to Profile" : "Back to Home";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -129,7 +132,7 @@
                 ExpenseTracker
             </a>
             <div class="top-actions">
-                <a href="@Url.Action("Index","Home")" class="back-btn" title="Back to Home" aria-label="Back to Home">
+                <a href="@backUrl" class="back-btn" title="@backText" aria-label="@backText">
                     <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
                 </a>
                 <button id="themeToggle" class="theme-btn" type="button" aria-label="Toggle theme">
@@ -177,7 +180,7 @@
         <div class="wrap">
             <div class="foot-bottom">
                 <span>&copy; 2026 ExpenseTracker &mdash; Built by <strong>Afroz</strong></span>
-                <a href="@Url.Action("Index","Home")" class="foot-back"><i data-lucide="arrow-left" style="width:13px;height:13px"></i> Back to Home</a>
+                <a href="@backUrl" class="foot-back"><i data-lucide="arrow-left" style="width:13px;height:13px"></i> @backText</a>
             </div>
         </div>
     </footer>

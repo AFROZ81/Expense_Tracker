@@ -98,7 +98,7 @@
                                 <label asp-for="ExpenseDate" class="field-label">Transaction Date</label>
                                 <div class="input-wrap">
                                     <div class="input-wrap-icon"><i data-lucide="calendar" style="width:17px;height:17px"></i></div>
-                                    <input asp-for="ExpenseDate" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                    <input asp-for="ExpenseDate" type="date" />
                                 </div>
                                 <span asp-validation-for="ExpenseDate" class="text-danger small mt-1 d-block"></span>
                             </div>
@@ -123,6 +123,8 @@
                                 </select>
                             </div>
                             <span asp-validation-for="AccountId" class="text-danger small mt-1 d-block"></span>
+                            <!-- Hidden field containing cash account IDs for client-side filtering -->
+                            <input type="hidden" id="cashAccountIds" value="@string.Join(",", (ViewBag.CashAccountIds as IEnumerable<int> ?? new List<int>()))" />
                         </div>
 
                         <div class="field-group">
@@ -182,6 +184,23 @@
                         setTimeout(() => { btn.html(originalHtml).css({borderColor:'',color:''}).prop('disabled', false); lucide.createIcons(); }, 2000);
                         Toast.fire({ icon:'success', title:'AI Analysis complete!', text:'Form pre-filled based on receipt data.' });
                     }, 2000);
+                }
+            });
+        });
+    </script>
+    <script>
+        $(function(){
+            const cashIds = $('#cashAccountIds').val().split(',').map(id=>id.trim()).filter(id=>id);
+            $('#CategoryId').on('change', function(){
+                const selectedCat = $(this).find('option:selected').text().trim();
+                $('#AccountId option').prop('disabled', false);
+                if(selectedCat === 'To Cash'){
+                    cashIds.forEach(id => {
+                        $('#AccountId option[value="' + id + '"]').prop('disabled', true);
+                    });
+                    if(cashIds.includes($('#AccountId').val())){
+                        $('#AccountId').val('');
+                    }
                 }
             });
         });

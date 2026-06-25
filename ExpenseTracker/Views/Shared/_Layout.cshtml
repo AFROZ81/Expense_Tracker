@@ -1136,20 +1136,12 @@
                 </div>
 
                 <div class="topbar-actions">
-                    <button class="btn btn-link text-muted p-2 me-2 rounded-circle" id="themeToggle"
-                            style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--border);">
-                        <i data-lucide="moon" id="themeIcon" size="20"></i>
-                    </button>
-                    @if (User.Identity?.IsAuthenticated ?? false)
-                    {
+                @if (User.Identity?.IsAuthenticated ?? false)
+                {
                         <div class="dropdown profile-menu-wrap">
                             <button type="button" class="topbar-profile-trigger" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class="profile-avatar-small">
                                     <i data-lucide="user" size="18"></i>
-                                </div>
-                                <div class="profile-info-text">
-                                    <span class="profile-name-text">@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</span>
-                                    <span class="profile-role-text">Profile</span>
                                 </div>
                                 <i data-lucide="chevron-down" size="14" class="profile-chevron"></i>
                             </button>
@@ -1163,7 +1155,6 @@
                                         <p class="profile-menu-email">@(User.Identity?.Name ?? "")</p>
                                     </div>
                                 </li>
-                                <li class="profile-menu-subtitle">Quick Actions</li>
                                 <li>
                                     <a asp-controller="Profile" asp-action="Index" class="dropdown-item-custom">
                                         <i data-lucide="user-round" size="18"></i>
@@ -1362,29 +1353,31 @@
             const body = $('body');
 
             // Theme Toggle Logic
-            const themeToggleBtn = $('#themeToggle');
             const setTheme = (theme) => {
             const html = $('html');
             if (theme === 'dark') {
             html.attr('data-theme', 'dark');
             html.attr('data-bs-theme', 'dark');
-            $('#themeIcon').replaceWith('<i data-lucide="sun" id="themeIcon" size="20"></i>');
             } else {
             html.removeAttr('data-theme');
             html.attr('data-bs-theme', 'light');
-            $('#themeIcon').replaceWith('<i data-lucide="moon" id="themeIcon" size="20"></i>');
             }
             localStorage.setItem('theme', theme);
-            lucide.createIcons();
+            
+            // Update toggle switch if present on page
+            const profileToggle = $('#profileThemeToggle');
+            if (profileToggle.length) {
+            profileToggle.prop('checked', theme === 'dark');
+            }
             };
 
             const savedTheme = localStorage.getItem('theme') || 'light';
             setTheme(savedTheme);
 
-            themeToggleBtn.on('click', function () {
-            const html = $('html');
-            const isDark = html.attr('data-theme') === 'dark';
-            setTheme(isDark ? 'light' : 'dark');
+            // Handle profile page toggle
+            $(document).on('change', '#profileThemeToggle', function () {
+            const isDark = $(this).is(':checked');
+            setTheme(isDark ? 'dark' : 'light');
             });
 
             // --- Draggable Floating Action Button ---

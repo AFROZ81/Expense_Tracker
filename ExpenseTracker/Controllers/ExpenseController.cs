@@ -25,7 +25,7 @@ namespace ExpenseTracker.Controllers
         private ExpenseSetupViewModel GetExpensePrerequisites(string userId)
         {
             var hasAccounts = _context.Accounts.Any(a => a.IsActive && a.UserId == userId);
-            var hasCategories = _context.Categories.Any(c => c.IsActive && c.UserId == userId);
+            var hasCategories = _context.Categories.Any(c => c.IsActive && c.UserId == userId && c.Name != "To Cash");
             return new ExpenseSetupViewModel
             {
                 HasAccounts = hasAccounts,
@@ -51,6 +51,13 @@ namespace ExpenseTracker.Controllers
         public IActionResult Create()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // Ensure default "To Cash" category exists for the user
+            var toCashCategory = _context.Categories.FirstOrDefault(c => c.Name == "To Cash" && c.UserId == userId);
+            if (toCashCategory == null)
+            {
+                _context.Categories.Add(new Category { Name = "To Cash", UserId = userId, IsActive = true });
+                _context.SaveChanges();
+            }
             var prerequisites = GetExpensePrerequisites(userId);
             if (!prerequisites.HasAccounts || !prerequisites.HasCategories)
             {
@@ -59,6 +66,7 @@ namespace ExpenseTracker.Controllers
 
             ViewBag.CategoryList = new SelectList(_context.Categories.Where(c => c.IsActive && c.UserId == userId), "Id", "Name");
             ViewBag.AccountList = new SelectList(_context.Accounts.Where(a => a.IsActive && a.UserId == userId), "Id", "Name");
+            ViewBag.CashAccountIds = _context.Accounts.Where(a => a.Type == AccountType.Cash && a.UserId == userId).Select(a => a.Id).ToList();
             return View();
         }
 
@@ -83,12 +91,38 @@ namespace ExpenseTracker.Controllers
                     expense.UserId = userId;
                     _context.Expenses.Add(expense);
                     
-                    // Update Account Balance
+                    // Update Account Balance (deduct from selected account)
                     var account = _context.Accounts.Find(expense.AccountId);
                     if (account != null)
                     {
                         account.CurrentBalance -= expense.Amount;
                         _context.Accounts.Update(account);
+                    }
+
+                    // If expense is categorized as "To Cash", ensure a cash account exists and credit it
+                    var category = _context.Categories.Find(expense.CategoryId);
+                    if (category != null && category.Name == "To Cash")
+                    {
+                        var cashAccount = _context.Accounts.FirstOrDefault(a => a.Type == AccountType.Cash && a.UserId == userId);
+                        if (cashAccount == null)
+                        {
+                            // Create a new cash account for the user
+                            cashAccount = new Account
+                            {
+                                Name = "Cash",
+                                Type = AccountType.Cash,
+                                InitialBalance = expense.Amount,
+                                CurrentBalance = expense.Amount,
+                                UserId = userId,
+                                IsActive = true
+                            };
+                            _context.Accounts.Add(cashAccount);
+                        }
+                        else
+                        {
+                            cashAccount.CurrentBalance += expense.Amount;
+                            _context.Accounts.Update(cashAccount);
+                        }
                     }
 
                     _context.SaveChanges();

@@ -12,9 +12,9 @@ namespace ExpenseTracker.Controllers
                 return RedirectToAction("Dashboard", "Expense");
             return View();
         }
-
-        public IActionResult Privacy()
+        public IActionResult Privacy(string source = null)
         {
+            ViewData["Source"] = source;
             return View();
         }
 
