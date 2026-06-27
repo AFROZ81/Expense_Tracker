@@ -98,7 +98,7 @@
                                 <label asp-for="ExpenseDate" class="field-label">Transaction Date</label>
                                 <div class="input-wrap">
                                     <div class="input-wrap-icon"><i data-lucide="calendar" style="width:17px;height:17px"></i></div>
-                                    <input asp-for="ExpenseDate" type="date" />
+                                    <input asp-for="ExpenseDate" type="date" value='@DateTime.Today.ToString("yyyy-MM-dd")' max='@DateTime.Today.ToString("yyyy-MM-dd")' />
                                 </div>
                                 <span asp-validation-for="ExpenseDate" class="text-danger small mt-1 d-block"></span>
                             </div>

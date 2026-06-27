@@ -81,118 +81,128 @@
     .btn-add { display:inline-flex; align-items:center; gap:8px; background:var(--accent); color:white; border:none; padding:11px 24px; border-radius:12px; font-weight:700; font-size:0.88rem; text-decoration:none; transition:all 0.22s; box-shadow:0 4px 16px rgba(14,165,233,0.2); }
     .btn-add:hover { background:var(--accent-hover); transform:translateY(-1px); box-shadow:0 8px 24px rgba(14,165,233,0.3); color:white; }
 
-    /* Search */
-    .exp-search-shell {
-        margin-bottom:20px;
-        padding:12px;
-        border-radius:22px;
-        background:var(--card-surface);
-        border:1px solid var(--card-border-soft);
-        box-shadow:0 14px 34px rgba(15,23,42,0.08);
-        backdrop-filter:blur(16px);
-        -webkit-backdrop-filter:blur(16px);
-        position:relative;
-        overflow:hidden;
+    /* Filter Bar (Search + Sort) */
+    .filter-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        align-items: center;
+        flex-wrap: nowrap;
+        background: var(--card-surface);
+        border: 1px solid var(--card-border-soft);
+        border-radius: 18px;
+        padding: 8px;
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
     }
-    .exp-search-shell::before {
-        content:"";
-        position:absolute;
-        inset:0;
-        background:linear-gradient(135deg, rgba(14,165,233,0.12), transparent 40%, rgba(59,130,246,0.08));
-        pointer-events:none;
+    .search-wrapper {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        background: var(--row-surface);
+        border: 1px solid var(--row-border-soft);
+        border-radius: 12px;
+        padding: 0 16px;
+        height: 48px;
+        transition: all 0.2s ease;
     }
-    .exp-search-row {
-        position:relative;
-        display:flex;
-        align-items:center;
-        gap:12px;
-        min-height:54px;
-        padding:0 14px 0 16px;
-        border-radius:16px;
-        background:var(--row-surface);
-        border:1px solid var(--row-border-soft);
-        transition:all 0.2s ease;
+    .search-wrapper:focus-within {
+        border-color: rgba(14,165,233,0.3);
+        box-shadow: 0 0 0 4px rgba(14,165,233,0.1);
     }
-    .exp-search-row:focus-within {
-        border-color:rgba(14,165,233,0.28);
-        box-shadow:0 0 0 4px rgba(14,165,233,0.10);
-        transform:translateY(-1px);
-    }
-    .exp-search-row .search-icon {
-        width:18px;
-        height:18px;
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        flex-shrink:0;
-        color:var(--accent);
-        font-size:1rem;
-    }
-    .exp-search-row .search-icon i {
-        font-size:1rem;
-        line-height:1;
+    .search-wrapper .search-icon {
+        color: var(--accent);
+        margin-right: 12px;
     }
     .exp-search {
-        width:100%;
-        border:none;
-        outline:none;
-        background:transparent;
-        color:var(--row-text-strong);
-        font-size:0.92rem;
-        font-weight:600;
-        padding:0;
-        min-width:0;
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--row-text-strong);
+        font-size: 0.95rem;
+        font-weight: 600;
+        min-width: 0;
     }
-    .exp-search::placeholder { color:var(--row-text-muted); font-weight:600; }
-    .exp-search-actions {
-        display:flex;
-        align-items:center;
-        gap:8px;
-        flex-shrink:0;
-    }
-    .search-chip {
-        display:inline-flex;
-        align-items:center;
-        gap:6px;
-        padding:6px 10px;
-        border-radius:999px;
-        border:1px solid rgba(14,165,233,0.14);
-        background:rgba(14,165,233,0.08);
-        color:var(--accent);
-        font-size:0.72rem;
-        font-weight:800;
-        white-space:nowrap;
-    }
-    .search-chip i {
-        font-size:0.82rem;
-        line-height:1;
-    }
-    [data-theme="dark"] .search-chip {
-        background:rgba(14,165,233,0.12);
-        border-color:rgba(56,189,248,0.16);
-    }
+    .exp-search::placeholder { color: var(--row-text-muted); font-weight: 500; }
+    
     .search-clear-btn {
-        width:34px;
-        height:34px;
-        border-radius:12px;
-        border:1px solid var(--row-border-soft);
-        background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-        color:var(--row-text-muted);
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        flex-shrink:0;
-        transition:all 0.2s ease;
+        background: transparent;
+        border: none;
+        color: var(--row-text-muted);
+        cursor: pointer;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+        margin-left: 8px;
     }
-    .search-clear-btn i {
-        font-size:0.9rem;
-        line-height:1;
+    .search-clear-btn:hover { color: var(--danger); transform: scale(1.1); }
+
+    .sort-controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-shrink: 0;
     }
-    .search-clear-btn:hover {
-        color:var(--accent);
-        border-color:rgba(14,165,233,0.22);
-        transform:translateY(-1px);
+    .sort-select-wrapper {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        background: var(--row-surface);
+        border: 1px solid var(--row-border-soft);
+        border-radius: 12px;
+        height: 48px;
+        transition: all 0.2s ease;
     }
+    .sort-select-wrapper:hover,
+    .sort-select-wrapper:focus-within {
+        border-color: rgba(14,165,233,0.3);
+        box-shadow: 0 4px 12px rgba(14,165,233,0.08);
+        transform: translateY(-1px);
+    }
+    .sort-select-wrapper .sort-icon {
+        position: absolute;
+        left: 14px;
+        color: var(--accent);
+        pointer-events: none;
+    }
+    .sort-select-wrapper .select-arrow {
+        position: absolute;
+        right: 14px;
+        color: var(--row-text-muted);
+        pointer-events: none;
+        transition: transform 0.2s ease;
+    }
+    .styled-select {
+        appearance: none;
+        -webkit-appearance: none;
+        background: transparent;
+        border: none;
+        padding: 0 38px 0 42px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--row-text-strong);
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        outline: none;
+    }
+    .styled-select:focus + .select-arrow {
+        transform: rotate(180deg);
+        color: var(--accent);
+    }
+    .styled-select option {
+        background: var(--card-surface);
+        color: var(--row-text-strong);
+        font-weight: 600;
+    }
+    [data-theme="dark"] .styled-select option { background: #0f172a; }
 
     /* Stats */
     .exp-stats { display:flex; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
@@ -498,12 +508,13 @@
     @@media (max-width:767.98px) {
         .exp-header { flex-direction:column; align-items:stretch; margin-bottom:18px; }
         .exp-header h1 { font-size:1.2rem; }
-        .btn-add { justify-content:center; padding:13px 20px; }
+        .btn-add { width: 100%; justify-content:center; padding:13px 20px; }
         .cat-header { padding:14px 14px; gap:10px; }
         .cat-icon-wrap { width:38px; height:38px; border-radius:11px; font-size:0.95rem; }
-        .exp-search-shell { padding:10px; border-radius:18px; }
-        .exp-search-row { min-height:50px; padding:0 12px 0 14px; gap:10px; }
-        .search-chip { display:none; }
+        .filter-bar { flex-direction: column; padding: 12px; border-radius: 22px; gap: 12px; }
+        .search-wrapper { height: 48px; padding: 0 12px; width: 100%; }
+        .sort-controls { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 12px; }
+        .sort-select-wrapper { height: 48px; }
         .cat-amount { font-size:0.85rem; }
         .cat-pct { display:inline-flex; }
         .exp-row { padding:8px 8px; gap:10px; }
@@ -525,21 +536,42 @@
             <h1>Transaction History</h1>
             <p>Track every penny you spend — organized by category.</p>
         </div>
-        <a asp-action="Create" class="btn-add">
-            <i data-lucide="plus" style="width:18px;height:18px"></i> Add Expense
-        </a>
+        <div class="header-actions">
+            <a asp-action="Create" class="btn-add">
+                <i data-lucide="plus" style="width:18px;height:18px"></i> Add Expense
+            </a>
+        </div>
     </div>
 
     @if (totalCount > 0)
     {
-        <div class="exp-search-shell">
-            <div class="exp-search-row">
-                <span class="search-icon" aria-hidden="true"><i class="bi bi-search"></i></span>
+        <div class="filter-bar">
+            <div class="search-wrapper">
+                <i data-lucide="search" class="search-icon" style="width:18px;height:18px"></i>
                 <input type="text" class="exp-search" id="searchInput" placeholder="Search expenses, categories, amounts..." />
-                <div class="exp-search-actions">
-                    <button type="button" class="search-clear-btn" id="clearSearchBtn" title="Clear search" aria-label="Clear search">
-                        <i class="bi bi-x-lg" aria-hidden="true"></i>
-                    </button>
+                <button type="button" class="search-clear-btn" id="clearSearchBtn" title="Clear search" aria-label="Clear search">
+                    <i data-lucide="x" style="width:14px;height:14px"></i>
+                </button>
+            </div>
+            
+            <div class="sort-controls">
+                <div class="sort-select-wrapper">
+                    <i data-lucide="arrow-up-down" class="sort-icon" style="width:16px;height:16px"></i>
+                    <select id="sortField" class="styled-select" aria-label="Sort by field">
+                        <option value="Category">Category</option>
+                        <option value="Date">Date</option>
+                        <option value="Amount">Amount</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="select-arrow" style="width:16px;height:16px"></i>
+                </div>
+                
+                <div class="sort-select-wrapper">
+                    <i data-lucide="list-filter" class="sort-icon" style="width:16px;height:16px"></i>
+                    <select id="sortOrder" class="styled-select" aria-label="Sort order">
+                    <option value="Asc">Ascending</option>
+                        <option value="Desc">Descending</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="select-arrow" style="width:16px;height:16px"></i>
                 </div>
             </div>
         </div>
@@ -569,8 +601,9 @@
                 var colorIdx = idx % 8;
                 var pct = grandTotal > 0 ? Math.Round((group.Total / grandTotal) * 100, 1) : 0;
                 var sectionId = $"cat-{group.CategoryId}";
+                var latestDateTicks = group.Expenses.Any() ? group.Expenses.Max(e => e.ExpenseDate.Ticks) : 0;
 
-                <div class="cat-section" data-category="@group.CategoryName.ToLower()" data-section-id="@sectionId">
+                <div class="cat-section" data-category="@group.CategoryName.ToLower()" data-section-id="@sectionId" data-total="@group.Total" data-latest="@latestDateTicks">
                     <div class="cat-header" onclick="toggleCategory('@sectionId')">
                         <div class="cat-icon-wrap cat-c@colorIdx">
                             <i class="bi @GetCategoryIcon(group.CategoryName)" aria-hidden="true"></i>
@@ -593,7 +626,7 @@
                         <div class="cat-body-inner">
                             @foreach (var item in group.Expenses)
                             {
-                                <div class="exp-row" data-desc="@(item.Description?.ToLower() ?? "")" data-amount="@item.Amount" data-cat="@group.CategoryName.ToLower()">
+                                <div class="exp-row" data-desc="@(item.Description?.ToLower() ?? "")" data-amount="@item.Amount" data-cat="@group.CategoryName.ToLower()" data-date="@item.ExpenseDate.Ticks">
                                     <div class="exp-row-date">
                                         @item.ExpenseDate.ToString("MMM")
                                         <span class="day">@item.ExpenseDate.ToString("dd")</span>
@@ -660,20 +693,135 @@
                 $('#confirmDeleteBtn').attr('href', `/Expense/Delete/${id}`);
                 new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
             });
+
+            // Sorting controls
+            $('#sortField, #sortOrder').on('change', function() {
+                sortPage();
+            });
+
+            function sortPage() {
+                var field = $('#sortField').val();
+                var order = $('#sortOrder').val();
+                // Sort categories
+                var container = $('#categoryList');
+                var sections = container.children('.cat-section').get();
+                sections.sort(function(a, b) {
+                    var aVal, bVal;
+                    if (field === 'Category') {
+                        aVal = $(a).data('category');
+                        bVal = $(b).data('category');
+                    } else if (field === 'Date') {
+                        aVal = parseFloat($(a).data('latest'));
+                        bVal = parseFloat($(b).data('latest'));
+                    } else if (field === 'Amount') {
+                        aVal = parseFloat($(a).data('total'));
+                        bVal = parseFloat($(b).data('total'));
+                    }
+                    if (aVal === bVal) return 0;
+                    if (order === 'Desc') return (aVal < bVal) ? 1 : -1;
+                    else return (aVal > bVal) ? 1 : -1;
+                });
+                $.each(sections, function(idx, sec) { container.append(sec); });
+                // Sort expenses within each category
+                sections.forEach(function(sec) {
+                    var body = $(sec).find('.cat-body-inner');
+                    var rows = body.children('.exp-row').get();
+                    rows.sort(function(a, b) {
+                        var aVal, bVal;
+                        if (field === 'Date') {
+                            aVal = parseFloat($(a).data('date'));
+                            bVal = parseFloat($(b).data('date'));
+                        } else if (field === 'Amount') {
+                            aVal = parseFloat($(a).data('amount'));
+                            bVal = parseFloat($(b).data('amount'));
+                        } else {
+                            // Fallback to Date Descending if sorted by Category
+                            var ad = parseFloat($(a).data('date'));
+                            var bd = parseFloat($(b).data('date'));
+                            if (ad === bd) return 0;
+                            return (ad < bd) ? 1 : -1;
+                        }
+                        
+                        if (aVal === bVal) {
+                            var ad = parseFloat($(a).data('date'));
+                            var bd = parseFloat($(b).data('date'));
+                            if (ad === bd) return 0;
+                            return (ad < bd) ? 1 : -1; // Fallback to date desc
+                        }
+                        if (order === 'Desc') return (aVal < bVal) ? 1 : -1;
+                        else return (aVal > bVal) ? 1 : -1;
+                    });
+                    $.each(rows, function(i, row) { body.append(row); });
+                });
+            }
+
+            // Existing search functionality unchanged
+            document.getElementById('searchInput')?.addEventListener('input', function() {
+                var q = this.value.toLowerCase().trim();
+                var sections = document.querySelectorAll('.cat-section');
+                var anyVisible = false;
+
+                sections.forEach(function(sec) {
+                    var catName = sec.getAttribute('data-category') || '';
+                    var rows = sec.querySelectorAll('.exp-row');
+                    var sectionHasMatch = false;
+
+                    if (!q) {
+                        sec.style.display = '';
+                        rows.forEach(function(r) { r.style.display = ''; });
+                        anyVisible = true;
+                        return;
+                    }
+
+                    rows.forEach(function(row) {
+                        var desc = row.getAttribute('data-desc') || '';
+                        var amt = row.getAttribute('data-amount') || '';
+                        var rowCat = row.getAttribute('data-cat') || '';
+                        if (desc.includes(q) || amt.includes(q) || rowCat.includes(q)) {
+                            row.style.display = '';
+                            sectionHasMatch = true;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    // Also check category name match
+                    if (catName.includes(q)) sectionHasMatch = true;
+
+                    if (sectionHasMatch) {
+                        sec.style.display = '';
+                        anyVisible = true;
+                    } else {
+                        sec.style.display = 'none';
+                    }
+                });
+
+                var noMatch = document.getElementById('noMatch');
+                if (noMatch) {
+                    if (!anyVisible && q) { noMatch.classList.add('show'); }
+                    else { noMatch.classList.remove('show'); }
+                }
+            });
+
+            document.getElementById('clearSearchBtn')?.addEventListener('click', function() {
+                var input = document.getElementById('searchInput');
+                if (!input) return;
+                input.value = '';
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.focus();
+            });
         });
 
+        // Category toggle functionality (unchanged)
         function toggleCategory(id) {
             var body = document.getElementById(id);
             var section = body.closest('.cat-section');
             var header = section.querySelector('.cat-header');
             var isOpen = body.classList.contains('open');
-
             if (isOpen) {
                 header.classList.remove('active');
                 body.style.height = body.scrollHeight + 'px';
-                requestAnimationFrame(function() {
-                    body.style.height = '0px';
-                });
+                requestAnimationFrame(function () { body.style.height = '0px'; });
                 body.classList.remove('open');
             } else {
                 body.classList.add('open');
@@ -682,69 +830,11 @@
             }
         }
 
-        document.querySelectorAll('.cat-body').forEach(function(body) {
-            body.addEventListener('transitionend', function(e) {
+        document.querySelectorAll('.cat-body').forEach(function (body) {
+            body.addEventListener('transitionend', function (e) {
                 if (e.propertyName !== 'height') return;
-                if (body.classList.contains('open')) {
-                    body.style.height = 'auto';
-                }
+                if (body.classList.contains('open')) { body.style.height = 'auto'; }
             });
-        });
-
-        // Search / filter
-        document.getElementById('searchInput')?.addEventListener('input', function() {
-            var q = this.value.toLowerCase().trim();
-            var sections = document.querySelectorAll('.cat-section');
-            var anyVisible = false;
-
-            sections.forEach(function(sec) {
-                var catName = sec.getAttribute('data-category') || '';
-                var rows = sec.querySelectorAll('.exp-row');
-                var sectionHasMatch = false;
-
-                if (!q) {
-                    sec.style.display = '';
-                    rows.forEach(function(r) { r.style.display = ''; });
-                    anyVisible = true;
-                    return;
-                }
-
-                rows.forEach(function(row) {
-                    var desc = row.getAttribute('data-desc') || '';
-                    var amt = row.getAttribute('data-amount') || '';
-                    var rowCat = row.getAttribute('data-cat') || '';
-                    if (desc.includes(q) || amt.includes(q) || rowCat.includes(q)) {
-                        row.style.display = '';
-                        sectionHasMatch = true;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                // Also check category name match
-                if (catName.includes(q)) sectionHasMatch = true;
-
-                if (sectionHasMatch) {
-                    sec.style.display = '';
-                    anyVisible = true;
-                } else {
-                    sec.style.display = 'none';
-                }
-            });
-
-            var noMatch = document.getElementById('noMatch');
-            if (noMatch) {
-                if (!anyVisible && q) { noMatch.classList.add('show'); }
-                else { noMatch.classList.remove('show'); }
-            }
-        });
-
-        document.getElementById('clearSearchBtn')?.addEventListener('click', function() {
-            var input = document.getElementById('searchInput');
-            if (!input) return;
-            input.value = '';
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-            input.focus();
         });
     </script>
 }
