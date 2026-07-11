@@ -265,8 +265,13 @@ h1, h2, h3, h4, h5, h6 {
     }
     
     /* Global Select styling */
-    select.form-select, select.modern-select {
+    select.form-select, select.modern-select, select {
         cursor: pointer;
+    }
+
+    select option {
+        background-color: var(--card);
+        color: var(--text-main);
     }
 
 /* =====================================================
