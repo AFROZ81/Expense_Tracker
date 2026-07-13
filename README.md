@@ -225,16 +225,6 @@ Use it to explore the app right after the first database setup.
 - **Recurring transactions** are handled through a dedicated service layer (`RecurringTransactionService`).
 - Charts are rendered client-side with **Chart.js**, and friendly confirmations use **SweetAlert2**.
 
----
-
-## 📄 License
-
-No license has been specified yet. Add one if you plan to publish or share the project publicly.
-
-<div align="center">
-
-<br/>
-
 Made with ❤️ and ASP.NET Core MVC
 
 </div>
