@@ -227,14 +227,8 @@ Use it to explore the app right after the first database setup.
 
 ---
 
-## 📄 License
-
-No license has been specified yet. Add one if you plan to publish or share the project publicly.
-
-<div align="center">
-
-<br/>
-
+<div style="text-align: center;">
+    
 Made with ❤️ and ASP.NET Core MVC
 
 </div>
