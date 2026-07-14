@@ -1,67 +1,484 @@
 @model IEnumerable<ExpenseTracker.Models.Entities.Income>
 
 @{
-    ViewData["Title"] = "Income History";
+    ViewData["Title"] = "Income";
+    var grouped = Model
+        .GroupBy(i => new { i.IncomeCategoryId, CategoryName = i.IncomeCategory?.Name ?? "Uncategorized" })
+        .Select(g => new {
+            g.Key.IncomeCategoryId,
+            g.Key.CategoryName,
+            Count = g.Count(),
+            Total = g.Sum(x => x.Amount),
+            Incomes = g.OrderByDescending(x => x.IncomeDate).ToList()
+        })
+        .OrderByDescending(g => g.Total)
+        .ToList();
+    var grandTotal = Model.Sum(x => x.Amount);
+    var totalCount = Model.Count();
+
+    string GetCategoryIcon(string name)
+    {
+        var n = (name ?? string.Empty).Trim().ToLowerInvariant();
+        if (n.Contains("salary") || n.Contains("pay") || n.Contains("wage"))
+            return "bi-cash-coin";
+        if (n.Contains("freelance") || n.Contains("contract") || n.Contains("gig"))
+            return "bi-laptop";
+        if (n.Contains("investment") || n.Contains("dividend") || n.Contains("stock") || n.Contains("interest"))
+            return "bi-graph-up-arrow";
+        if (n.Contains("rental") || n.Contains("lease") || n.Contains("property"))
+            return "bi-house-door-fill";
+        if (n.Contains("bonus") || n.Contains("reward") || n.Contains("commission"))
+            return "bi-gift-fill";
+        if (n.Contains("business") || n.Contains("profit") || n.Contains("sale"))
+            return "bi-briefcase-fill";
+        if (n.Contains("pension") || n.Contains("retirement") || n.Contains("social"))
+            return "bi-person-heart";
+        if (n.Contains("refund") || n.Contains("return") || n.Contains("cashback"))
+            return "bi-arrow-counterclockwise";
+        return "bi-wallet2";
+    }
 }
 
 <style>
-    :root { --accent:#10b981; --accent-hover:#059669; --accent-soft:rgba(16,185,129,0.08); --danger:#ef4444; --danger-soft:rgba(239,68,68,0.08); }
-    .inc-page { animation:pageIn 0.45s ease-out; }
-    @@keyframes pageIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-    @@keyframes cardIn { from{opacity:0;transform:translateY(10px) scale(0.98)} to{opacity:1;transform:translateY(0) scale(1)} }
+    :root {
+        --accent:#10b981;
+        --accent-hover:#059669;
+        --accent-soft:rgba(16,185,129,0.10);
+        --danger:#ef4444;
+        --danger-soft:rgba(239,68,68,0.10);
+        --card-glow:rgba(16,185,129,0.18);
+        --card-surface:linear-gradient(180deg, rgba(255,255,255,0.92), rgba(248,250,252,0.96));
+        --card-border-soft:rgba(148,163,184,0.22);
+        --row-surface:rgba(255,255,255,0.72);
+        --row-border-soft:rgba(148,163,184,0.18);
+        --row-text-strong:#0f172a;
+        --row-text-muted:#64748b;
+    }
+    [data-theme="dark"] {
+        --accent-soft:rgba(16,185,129,0.14);
+        --danger-soft:rgba(239,68,68,0.14);
+        --card-glow:rgba(16,185,129,0.28);
+        --card-surface:linear-gradient(180deg, rgba(15,23,42,0.98), rgba(17,24,39,0.96));
+        --card-border-soft:rgba(56,189,248,0.18);
+        --row-surface:rgba(15,23,42,0.72);
+        --row-border-soft:rgba(56,189,248,0.12);
+        --row-text-strong:#f8fafc;
+        --row-text-muted:#94a3b8;
+    }
+    .inc-page { animation: pageIn 0.45s ease-out; }
+    @@keyframes pageIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+    @@keyframes cardIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    @@keyframes barFill { from { width:0; } }
 
+    /* Header */
     .inc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; gap:16px; flex-wrap:wrap; }
-    .inc-header h1 { font-size:1.35rem; font-weight:800; color:var(--text-main); margin:0; }
+    .inc-header h1 { font-size:1.35rem; font-weight:800; color:var(--text-main); margin:0; letter-spacing:-0.02em; }
     .inc-header p { font-size:0.84rem; color:var(--muted); margin:4px 0 0; }
     .btn-add { display:inline-flex; align-items:center; gap:8px; background:var(--accent); color:white; border:none; padding:11px 24px; border-radius:12px; font-weight:700; font-size:0.88rem; text-decoration:none; transition:all 0.22s; box-shadow:0 4px 16px rgba(16,185,129,0.2); }
     .btn-add:hover { background:var(--accent-hover); transform:translateY(-1px); box-shadow:0 8px 24px rgba(16,185,129,0.3); color:white; }
 
-    .inc-stats { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+    /* Filter Bar (Search + Sort) */
+    .filter-bar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        align-items: center;
+        flex-wrap: nowrap;
+        background: var(--card-surface);
+        border: 1px solid var(--card-border-soft);
+        border-radius: 18px;
+        padding: 8px;
+        box-shadow: 0 12px 28px rgba(15,23,42,0.06);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+    .search-wrapper {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        background: var(--row-surface);
+        border: 1px solid var(--row-border-soft);
+        border-radius: 12px;
+        padding: 0 16px;
+        height: 48px;
+        transition: all 0.2s ease;
+    }
+    .search-wrapper:focus-within {
+        border-color: rgba(16,185,129,0.3);
+        box-shadow: 0 0 0 4px rgba(16,185,129,0.1);
+    }
+    .search-wrapper .search-icon {
+        color: var(--accent);
+        margin-right: 12px;
+    }
+    .inc-search {
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--row-text-strong);
+        font-size: 0.95rem;
+        font-weight: 600;
+        min-width: 0;
+    }
+    .inc-search::placeholder { color: var(--row-text-muted); font-weight: 500; }
+    
+    .search-clear-btn {
+        background: transparent;
+        border: none;
+        color: var(--row-text-muted);
+        cursor: pointer;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+        margin-left: 8px;
+    }
+    .search-clear-btn:hover { color: var(--danger); transform: scale(1.1); }
+
+    .sort-controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    .sort-select-wrapper {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        background: var(--row-surface);
+        border: 1px solid var(--row-border-soft);
+        border-radius: 12px;
+        height: 48px;
+        transition: all 0.2s ease;
+    }
+    .sort-select-wrapper:hover,
+    .sort-select-wrapper:focus-within {
+        border-color: rgba(16,185,129,0.3);
+        box-shadow: 0 4px 12px rgba(16,185,129,0.08);
+        transform: translateY(-1px);
+    }
+    .sort-select-wrapper .sort-icon {
+        position: absolute;
+        left: 14px;
+        color: var(--accent);
+        pointer-events: none;
+    }
+    .sort-select-wrapper .select-arrow {
+        position: absolute;
+        right: 14px;
+        color: var(--row-text-muted);
+        pointer-events: none;
+        transition: transform 0.2s ease;
+    }
+    .styled-select {
+        appearance: none;
+        -webkit-appearance: none;
+        background: transparent;
+        border: none;
+        padding: 0 38px 0 42px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--row-text-strong);
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        outline: none;
+    }
+    .styled-select:focus + .select-arrow {
+        transform: rotate(180deg);
+        color: var(--accent);
+    }
+    .styled-select option {
+        background: var(--card-surface);
+        color: var(--row-text-strong);
+        font-weight: 600;
+    }
+    [data-theme="dark"] .styled-select option { background: #0f172a; }
+
+    /* Stats */
+    .inc-stats { display:flex; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
     .inc-stat-chip { display:inline-flex; align-items:center; gap:8px; padding:7px 14px; border-radius:10px; font-size:0.76rem; font-weight:700; background:var(--card); border:1px solid var(--border); }
     .inc-stat-chip .dot { width:8px; height:8px; border-radius:50%; }
-    .dot.green { background:var(--accent); box-shadow:0 0 8px rgba(16,185,129,0.4); }
+    .dot.purple { background:var(--accent); box-shadow:0 0 8px rgba(16,185,129,0.4); }
+    .dot.green { background:#22c55e; box-shadow:0 0 8px rgba(34,197,94,0.4); }
+    .dot.amber { background:#f59e0b; box-shadow:0 0 8px rgba(245,158,11,0.4); }
 
-    .inc-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:16px; }
+    /* Category Accordion */
+    .cat-section { margin-bottom:10px; animation:cardIn 0.35s ease-out both; }
+    .cat-section:nth-child(1){animation-delay:.02s} .cat-section:nth-child(2){animation-delay:.06s}
+    .cat-section:nth-child(3){animation-delay:.10s} .cat-section:nth-child(4){animation-delay:.14s}
+    .cat-section:nth-child(5){animation-delay:.18s} .cat-section:nth-child(6){animation-delay:.22s}
 
-    .inc-card {
-        background:var(--card); border:1px solid var(--border); border-radius:20px; padding:20px;
-        display:flex; align-items:center; gap:16px; transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        animation:cardIn 0.35s ease-out both; position:relative; overflow:hidden;
+    .cat-header {
+        display:flex; align-items:center; gap:14px; padding:16px 18px;
+        background:var(--card-surface); border:1px solid var(--card-border-soft); border-radius:18px;
+        cursor:pointer; transition:all 0.25s; user-select:none; position:relative; overflow:hidden;
+        box-shadow:0 12px 28px rgba(15,23,42,0.06);
+        backdrop-filter:blur(14px);
+        -webkit-backdrop-filter:blur(14px);
     }
-    .inc-card:hover { border-color:var(--accent); box-shadow:0 12px 32px rgba(16,185,129,0.1); transform:translateY(-4px); }
-    
-    .inc-card:nth-child(1){animation-delay:.02s} .inc-card:nth-child(2){animation-delay:.04s} .inc-card:nth-child(3){animation-delay:.06s}
-    .inc-card:nth-child(4){animation-delay:.08s} .inc-card:nth-child(5){animation-delay:.10s} .inc-card:nth-child(6){animation-delay:.12s}
-    .inc-card:nth-child(7){animation-delay:.14s} .inc-card:nth-child(8){animation-delay:.16s} .inc-card:nth-child(9){animation-delay:.18s} .inc-card:nth-child(10){animation-delay:.20s}
-
-    .inc-icon-box {
-        width: 52px; height: 52px; border-radius: 16px; background: var(--accent-soft); color: var(--accent);
-        display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1;
+    .cat-header::before {
+        content:"";
+        position:absolute;
+        inset:0 auto 0 0;
+        width:5px;
+        background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0));
+        opacity:.25;
     }
-    .inc-icon-box .day { font-size: 0.80rem; font-weight: 600; }
-    .inc-icon-box .month { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
-    .inc-icon-box .year { font-size: 0.80rem; font-weight: 600; }
-    
-    .inc-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-    .inc-title { font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    
-    .inc-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .inc-cat { font-size: 0.75rem; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 4px; padding: 2px 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; }
-    
-    .inc-end { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; flex-shrink: 0; }
-    .inc-amount { font-size: 1.15rem; font-weight: 800; color: var(--accent); white-space: nowrap; }
-    
-    .inc-actions { display: flex; gap: 6px; }
-    .act-btn { width: 32px; height: 32px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; text-decoration: none; }
-    .act-btn:hover { transform: translateY(-2px); }
-    .act-btn.edit:hover { background: var(--accent-soft); color: var(--accent); border-color: rgba(16,185,129,0.3); }
-    .act-btn.delete:hover { background: var(--danger-soft); color: var(--danger); border-color: rgba(239,68,68,0.3); }
+    .cat-header:hover { border-color:rgba(16,185,129,0.28); box-shadow:0 16px 36px rgba(15,23,42,0.10); transform:translateY(-1px); }
+    .cat-header.active {
+        border-bottom-left-radius:0;
+        border-bottom-right-radius:0;
+        border-color:rgba(16,185,129,0.30);
+        box-shadow:0 18px 40px rgba(15,23,42,0.12);
+        background:linear-gradient(180deg, rgba(16,185,129,0.05), rgba(255,255,255,0.02)), var(--card-surface);
+    }
 
-    .empty-card { grid-column:1/-1; text-align:center; padding:56px 24px; background:var(--card); border:1px dashed var(--border); border-radius:20px; }
+    .cat-icon-wrap {
+        width:44px; height:44px; border-radius:13px; flex-shrink:0;
+        display:flex; align-items:center; justify-content:center;
+        color:#fff;
+        box-shadow:0 10px 22px rgba(15,23,42,0.16), 0 0 0 1px rgba(255,255,255,0.12) inset;
+        padding:0;
+        background:linear-gradient(135deg, rgba(16,185,129,0.95), rgba(34,197,94,0.95));
+        transition:transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+    .cat-header:hover .cat-icon-wrap {
+        transform:translateY(-1px);
+        box-shadow:0 14px 30px rgba(15,23,42,0.20), 0 0 0 1px rgba(255,255,255,0.14) inset;
+    }
+    .cat-icon-wrap i {
+        font-size:1.05rem;
+        line-height:1;
+        color:inherit;
+    }
+
+    .cat-info { flex:1; min-width:0; }
+    .cat-name { font-size:0.96rem; font-weight:800; color:var(--row-text-strong); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cat-sub { font-size:0.76rem; color:var(--row-text-muted); margin-top:3px; display:flex; align-items:center; gap:8px; font-weight:600; }
+
+    .cat-right { display:flex; align-items:center; gap:14px; flex-shrink:0; }
+    .cat-amount {
+        font-size:0.96rem;
+        font-weight:900;
+        color:var(--row-text-strong);
+        white-space:nowrap;
+        letter-spacing:-0.02em;
+    }
+    .cat-pct {
+        font-size:0.72rem;
+        font-weight:800;
+        color:var(--accent);
+        background:var(--accent-soft);
+        padding:5px 10px;
+        border-radius:999px;
+        white-space:nowrap;
+        border:1px solid rgba(16,185,129,0.14);
+    }
+
+    .cat-chevron {
+        width:32px;
+        height:32px;
+        border-radius:999px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        flex-shrink:0;
+        position:relative;
+        border:1px solid rgba(16,185,129,0.20);
+        background:
+            radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.12) 45%, rgba(16,185,129,0.10) 100%);
+        box-shadow:
+            0 10px 22px rgba(16,185,129,0.12),
+            inset 0 1px 0 rgba(255,255,255,0.55);
+        color:var(--accent);
+        transition:transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease, background 0.24s ease;
+        overflow:hidden;
+    }
+    [data-theme="dark"] .cat-chevron {
+        background:linear-gradient(180deg, rgba(15,23,42,0.96), rgba(30,41,59,0.92));
+        box-shadow:
+            0 10px 22px rgba(0,0,0,0.24),
+            inset 0 1px 0 rgba(255,255,255,0.06);
+        border-color:rgba(56,189,248,0.18);
+    }
+    .cat-chevron::before,
+    .cat-chevron::after {
+        content:"";
+        position:absolute;
+        width:8px;
+        height:2.5px;
+        border-radius:999px;
+        background:currentColor;
+        transition:transform 0.24s ease, opacity 0.24s ease, width 0.24s ease;
+    }
+    .cat-chevron::before { transform:translateX(-3px) rotate(45deg); }
+    .cat-chevron::after { transform:translateX(3px) rotate(-45deg); }
+    .cat-header:hover .cat-chevron {
+        transform:translateY(-1px);
+        border-color:rgba(16,185,129,0.32);
+        box-shadow:
+            0 14px 28px rgba(16,185,129,0.16),
+            inset 0 1px 0 rgba(255,255,255,0.65);
+        background:
+            radial-gradient(circle at 30% 30%, rgba(255,255,255,1), rgba(255,255,255,0.20) 45%, rgba(16,185,129,0.14) 100%);
+    }
+    [data-theme="dark"] .cat-header:hover .cat-chevron {
+        box-shadow:
+            0 14px 28px rgba(0,0,0,0.28),
+            inset 0 1px 0 rgba(255,255,255,0.06);
+        background:linear-gradient(180deg, rgba(15,23,42,1), rgba(30,41,59,0.96));
+        border-color:rgba(56,189,248,0.24);
+    }
+    .cat-header.active .cat-chevron {
+        background:
+            radial-gradient(circle at 30% 30%, rgba(255,255,255,1), rgba(255,255,255,0.14) 40%, rgba(16,185,129,0.16) 100%);
+        box-shadow:
+            0 16px 32px rgba(16,185,129,0.18),
+            inset 0 1px 0 rgba(255,255,255,0.72);
+    }
+    [data-theme="dark"] .cat-header.active .cat-chevron {
+        background:linear-gradient(180deg, rgba(15,23,42,0.98), rgba(30,41,59,0.94));
+        box-shadow:
+            0 16px 32px rgba(0,0,0,0.28),
+            inset 0 1px 0 rgba(255,255,255,0.06);
+        border-color:rgba(56,189,248,0.28);
+    }
+    .cat-header.active .cat-chevron::before {
+        transform:translateX(0) rotate(45deg);
+        width:10px;
+    }
+    .cat-header.active .cat-chevron::after {
+        transform:translateX(0) rotate(-45deg);
+        width:10px;
+    }
+
+    /* Progress bar under header */
+    .cat-bar-track {
+        height:4px;
+        background:rgba(148,163,184,0.16);
+        border-radius:0 0 12px 12px;
+        overflow:hidden;
+        margin:0 18px;
+    }
+    .cat-bar-fill {
+        height:100%;
+        border-radius:inherit;
+        animation:barFill 0.8s ease-out;
+        box-shadow:0 0 16px rgba(16,185,129,0.35);
+    }
+    .cat-meta-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 0.62rem;
+        font-weight: 700;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .cat-meta-pill:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    /* Expandable body */
+    .cat-body {
+        height:0; overflow:hidden; transition:height 0.28s cubic-bezier(0.2,0.8,0.2,1);
+        background:var(--card-surface);
+        border:1px solid var(--card-border-soft);
+        border-top:none;
+        border-radius:0 0 18px 18px;
+        box-shadow:0 12px 28px rgba(15,23,42,0.06);
+        backdrop-filter:blur(14px);
+        -webkit-backdrop-filter:blur(14px);
+    }
+    .cat-body-inner { padding:12px 12px 14px; }
+    .cat-body-inner .inc-row + .inc-row { margin-top:8px; }
+
+    /* Income row */
+    .inc-row {
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding:12px 14px;
+        border-radius:14px;
+        transition:all 0.18s;
+        border:1px solid var(--row-border-soft);
+        background:var(--row-surface);
+        box-shadow:0 6px 16px rgba(15,23,42,0.04);
+    }
+    .inc-row:hover {
+        background:linear-gradient(180deg, rgba(16,185,129,0.10), rgba(16,185,129,0.05)), var(--row-surface);
+        border-color:rgba(16,185,129,0.20);
+        transform:translateY(-1px);
+        box-shadow:0 10px 20px rgba(15,23,42,0.06);
+    }
+
+    .inc-row-date {
+        width:46px; height:46px; border-radius:12px; flex-shrink:0;
+        background:linear-gradient(180deg, rgba(16,185,129,0.08), rgba(255,255,255,0.02));
+        border:1px solid var(--row-border-soft);
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        font-size:0.54rem; font-weight:800; color:var(--row-text-muted); line-height:1; gap:1px;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .inc-row-date .day { font-size:0.90rem; font-weight:900; color:var(--row-text-strong); margin-top:-1px; }
+
+    .inc-row-body { flex:1; min-width:0; }
+    .inc-row-desc { font-size:0.88rem; font-weight:700; color:var(--row-text-strong); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .inc-row-meta { font-size:0.72rem; color:var(--row-text-muted); margin-top:3px; font-weight:600; }
+
+    .inc-row-amount {
+        font-size:0.92rem;
+        font-weight:900;
+        color:var(--row-text-strong);
+        flex-shrink:0;
+        white-space:nowrap;
+        letter-spacing:-0.02em;
+    }
+
+    .inc-row-actions { display:flex; gap:4px; flex-shrink:0; }
+    .act-btn {
+        width:32px;
+        height:32px;
+        border-radius:10px;
+        border:1px solid var(--row-border-soft);
+        background:linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
+        color:var(--row-text-muted);
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        transition:all 0.2s;
+        text-decoration:none;
+        font-size:0.72rem;
+        backdrop-filter:blur(10px);
+        -webkit-backdrop-filter:blur(10px);
+    }
+    .act-btn:hover { transform:translateY(-1px); box-shadow:0 8px 16px rgba(15,23,42,0.08); }
+    .act-btn.edit:hover { background:rgba(16,185,129,0.12); color:var(--accent); border-color:rgba(16,185,129,0.28); }
+    .act-btn.delete:hover { background:rgba(239,68,68,0.12); color:var(--danger); border-color:rgba(239,68,68,0.25); }
+
+    /* Empty */
+    .empty-card { text-align:center; padding:56px 24px; background:var(--card-surface); border:1px dashed var(--card-border-soft); border-radius:20px; box-shadow:0 12px 26px rgba(15,23,42,0.05); }
     .empty-icon { width:72px; height:72px; border-radius:20px; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
     .empty-card h5 { font-size:1.05rem; font-weight:800; color:var(--text-main); margin:0 0 6px; }
     .empty-card p { font-size:0.84rem; color:var(--muted); margin:0 0 20px; }
 
+    /* No-match */
+    .no-match { display:none; text-align:center; padding:32px; color:var(--muted); font-size:0.88rem; font-weight:600; }
+    .no-match.show { display:block; }
+
+    /* Modal */
     .del-modal .modal-content { border-radius:24px; border:none; box-shadow:0 30px 80px rgba(0,0,0,0.18); background:var(--card); }
     .del-modal-icon { width:68px; height:68px; border-radius:50%; background:var(--danger-soft); color:var(--danger); display:flex; align-items:center; justify-content:center; margin:0 auto 18px; }
     .modal-btn-del { background:var(--danger); color:white; border:none; padding:12px 28px; border-radius:12px; font-weight:700; transition:all 0.2s; text-decoration:none; }
@@ -69,21 +486,46 @@
     .modal-btn-cancel { background:var(--bg); color:var(--muted); border:1px solid var(--border); padding:12px 28px; border-radius:12px; font-weight:700; transition:all 0.2s; }
     .modal-btn-cancel:hover { background:var(--border); color:var(--text-main); }
 
+    /* Colors for category icons */
+    .cat-c0{background:linear-gradient(135deg,#10b981,#22c55e)} .cat-c1{background:linear-gradient(135deg,#8b5cf6,#a855f7)}
+    .cat-c2{background:linear-gradient(135deg,#f59e0b,#f97316)} .cat-c3{background:linear-gradient(135deg,#06b6d4,#14b8a6)}
+    .cat-c4{background:linear-gradient(135deg,#ef4444,#f43f5e)} .cat-c5{background:linear-gradient(135deg,#ec4899,#d946ef)}
+    .cat-c6{background:linear-gradient(135deg,#64748b,#475569)} .cat-c7{background:linear-gradient(135deg,#84cc16,#65a30d)}
+
+    [data-theme="dark"] .cat-icon-wrap {
+        box-shadow:0 10px 22px rgba(0,0,0,0.22);
+    }
+
+    .bar-c0{background:linear-gradient(90deg,#10b981,#22c55e)} .bar-c1{background:linear-gradient(90deg,#8b5cf6,#a855f7)}
+    .bar-c2{background:linear-gradient(90deg,#f59e0b,#f97316)} .bar-c3{background:linear-gradient(90deg,#06b6d4,#14b8a6)}
+    .bar-c4{background:linear-gradient(90deg,#ef4444,#f43f5e)} .bar-c5{background:linear-gradient(90deg,#ec4899,#d946ef)}
+    .bar-c6{background:linear-gradient(90deg,#64748b,#475569)} .bar-c7{background:linear-gradient(90deg,#84cc16,#65a30d)}
+
     @@media (max-width:767.98px) {
         .inc-header { flex-direction:column; align-items:stretch; margin-bottom:18px; }
         .inc-header h1 { font-size:1.2rem; }
-        .btn-add { justify-content:center; padding:13px 20px; }
-        .inc-grid { grid-template-columns:1fr; gap:12px; }
+        .btn-add { width: 100%; justify-content:center; padding:13px 20px; }
+        .inc-stats { gap: 6px; }
+        .inc-stat-chip { padding: 5px 10px; font-size: 0.70rem; }
+        .inc-stat-chip .dot { width: 6px; height: 6px; }
+        .cat-header { padding:14px 14px; gap:10px; }
+        .cat-icon-wrap { width:38px; height:38px; border-radius:11px; font-size:0.95rem; }
+        .filter-bar { flex-direction: column; padding: 12px; border-radius: 22px; gap: 12px; }
+        .search-wrapper { height: 48px; padding: 0 12px; width: 100%; }
+        .sort-controls { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 12px; }
+        .sort-select-wrapper { height: 48px; }
+        .cat-amount { font-size:0.85rem; }
+        .cat-pct { display:inline-flex; }
+        .inc-row { padding:8px 8px; gap:10px; }
+        .inc-row-date { width:36px; height:36px; border-radius:9px; }
+        .inc-row-date .day { font-size:0.78rem; }
+        .inc-row-amount { font-size:0.82rem; }
+        .act-btn { width:28px; height:28px; }
         .empty-card { padding:40px 16px; }
     }
-    @@media (max-width:500px) {
-        .inc-card { flex-direction: column; align-items: flex-start; padding: 16px; gap: 14px; }
-        .inc-icon-box { width: 44px; height: 44px; border-radius: 12px; }
-        .inc-icon-box .day { font-size: 1rem; }
-        .inc-end { width: 100%; flex-direction: row; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 14px; border-top: 1px dashed var(--border); }
-        .inc-amount { font-size: 1.25rem; }
-        .inc-actions { gap: 8px; }
-        .act-btn { width: 36px; height: 36px; }
+    @@media (max-width:400px) {
+        .inc-row { flex-wrap:wrap; }
+        .inc-row-actions { width:100%; justify-content:flex-end; margin-top:4px; }
     }
 </style>
 
@@ -91,71 +533,144 @@
     <div class="inc-header">
         <div>
             <h1>Income History</h1>
-            <p>Track all your earnings and monitor your financial growth.</p>
+            <p>Track every penny you earn — organized by category.</p>
         </div>
-        <a asp-action="Create" class="btn-add"><i data-lucide="plus" style="width:18px;height:18px"></i> Add Income</a>
+        <div class="header-actions">
+            <a asp-action="Create" class="btn-add">
+                <i data-lucide="plus" style="width:18px;height:18px"></i> Add Income
+            </a>
+        </div>
     </div>
 
-    @if (Model.Any())
+    @if (totalCount > 0)
     {
+        <div class="filter-bar">
+            <div class="search-wrapper">
+                <i data-lucide="search" class="search-icon" style="width:18px;height:18px"></i>
+                <input type="text" class="inc-search" id="searchInput" placeholder="Search income, categories, amounts..." />
+                <button type="button" class="search-clear-btn" id="clearSearchBtn" title="Clear search" aria-label="Clear search">
+                    <i data-lucide="x" style="width:14px;height:14px"></i>
+                </button>
+            </div>
+            
+            <div class="sort-controls">
+                <div class="sort-select-wrapper">
+                    <i data-lucide="arrow-up-down" class="sort-icon" style="width:16px;height:16px"></i>
+                    <select id="sortField" class="styled-select" aria-label="Sort by field">
+                        <option value="Category">Category</option>
+                        <option value="Date">Date</option>
+                        <option value="Amount">Amount</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="select-arrow" style="width:16px;height:16px"></i>
+                </div>
+                
+                <div class="sort-select-wrapper">
+                    <i data-lucide="list-filter" class="sort-icon" style="width:16px;height:16px"></i>
+                    <select id="sortOrder" class="styled-select" aria-label="Sort order">
+                    <option value="Asc">Ascending</option>
+                        <option value="Desc">Descending</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="select-arrow" style="width:16px;height:16px"></i>
+                </div>
+            </div>
+        </div>
+
         <div class="inc-stats">
-            <span class="inc-stat-chip"><span class="dot green"></span> @Model.Count() Records</span>
-            <span class="inc-stat-chip"><span class="dot green"></span> +₹@Model.Sum(x => x.Amount).ToString("N2") Total</span>
+            <span class="inc-stat-chip"><span class="dot purple"></span> @totalCount Records</span>
+            <span class="inc-stat-chip"><span class="dot green"></span> ₹ @grandTotal.ToString("N2") Total</span>
+            <span class="inc-stat-chip"><span class="dot amber"></span> @grouped.Count Categories</span>
         </div>
     }
 
-    <div class="inc-grid">
-        @if (!Model.Any())
+    <div id="categoryList">
+        @if (!grouped.Any())
         {
             <div class="empty-card">
-                <div class="empty-icon"><i data-lucide="trending-up" style="width:28px;height:28px"></i></div>
+                <div class="empty-icon"><i data-lucide="inbox" style="width:28px;height:28px"></i></div>
                 <h5>No Income Recorded</h5>
-                <p>You haven't added any income records yet.</p>
+                <p>Your income list is currently empty.</p>
                 <a asp-action="Create" class="btn-add"><i data-lucide="plus" style="width:18px;height:18px"></i> Add First Income</a>
             </div>
         }
         else
         {
-            foreach (var item in Model.OrderByDescending(x => x.IncomeDate))
+            var idx = 0;
+            foreach (var group in grouped)
             {
-                <div class="inc-card">
-                    <div class="inc-icon-box">
-                        <span class="day">@item.IncomeDate.ToString("dd")</span>
-                        <span class="month">@item.IncomeDate.ToString("MMM")</span>
-                        <span class="year">@item.IncomeDate.ToString("yyyy")</span>
-                    </div>
-                    <div class="inc-info">
-                        <h4 class="inc-title" title="@item.Description">@(string.IsNullOrWhiteSpace(item.Description) ? "Income" : item.Description)</h4>
-                        <div class="inc-meta">
-                            <span class="inc-cat"><i data-lucide="briefcase" style="width:10px;height:10px"></i> @(item.IncomeCategory?.Name ?? "General")</span>
+                var colorIdx = idx % 8;
+                var pct = grandTotal > 0 ? Math.Round((group.Total / grandTotal) * 100, 1) : 0;
+                var sectionId = $"cat-{group.IncomeCategoryId}";
+                var latestDateTicks = group.Incomes.Any() ? group.Incomes.Max(i => i.IncomeDate.Ticks) : 0;
+
+                <div class="cat-section" data-category="@group.CategoryName.ToLower()" data-section-id="@sectionId" data-total="@group.Total" data-latest="@latestDateTicks">
+                    <div class="cat-header" onclick="toggleCategory('@sectionId')">
+                        <div class="cat-icon-wrap cat-c@colorIdx">
+                            <i class="bi @GetCategoryIcon(group.CategoryName)" aria-hidden="true"></i>
+                        </div>
+                        <div class="cat-info">
+                            <p class="cat-name">@group.CategoryName</p>
+                            <div class="cat-sub">
+                                <span>@group.Count income@(group.Count > 1 ? "s" : "")</span>
+                                <span style="opacity:0.6">·</span>
+                                <span class="cat-meta-pill">@pct% of total</span>
+                            </div>
+                        </div>
+                        <div class="cat-right">
+                            <span class="cat-pct">₹ @group.Total.ToString("N2")</span>
+                            <span class="cat-chevron" aria-hidden="true"></span>
                         </div>
                     </div>
-                    <div class="inc-end">
-                        <span class="inc-amount">+₹@item.Amount.ToString("N2")</span>
-                        <div class="inc-actions">
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="act-btn edit" title="Edit">
-                                <i data-lucide="pencil" style="width:14px;height:14px"></i>
-                            </a>
-                            <button type="button" class="act-btn delete delete-trigger"
-                                    data-id="@item.Id" data-amount="@item.Amount.ToString("N2")"
-                                    data-date="@item.IncomeDate.ToString("dd MMM yyyy")" title="Delete">
-                                <i data-lucide="trash-2" style="width:14px;height:14px"></i>
-                            </button>
+                    
+                    <div class="cat-body" id="@sectionId">
+                        <div class="cat-body-inner">
+                            @foreach (var item in group.Incomes)
+                            {
+                                <div class="inc-row" data-desc="@(item.Description?.ToLower() ?? "")" data-amount="@item.Amount" data-cat="@group.CategoryName.ToLower()" data-date="@item.IncomeDate.Ticks">
+                                    <div class="inc-row-date">
+                                        @item.IncomeDate.ToString("MMM")
+                                        <span class="day">@item.IncomeDate.ToString("dd")</span>
+                                        <span class="year">@item.IncomeDate.ToString("yyyy")</span>
+                                    </div>
+                                    <div class="inc-row-body">
+                                        <p class="inc-row-desc">@(string.IsNullOrWhiteSpace(item.Description) ? "No description" : item.Description)</p>
+                                        <div class="inc-row-meta">@(item.Account != null ? $"{item.Account.Name}" : "")</div>
+                                    </div>
+                                    <span class="inc-row-amount">₹@item.Amount.ToString("N2")</span>
+                                    <div class="inc-row-actions">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="act-btn edit" title="Edit">
+                                            <i data-lucide="pencil" style="width:13px;height:13px"></i>
+                                        </a>
+                                        <button type="button" class="act-btn delete delete-trigger"
+                                                data-id="@item.Id" data-amount="@item.Amount.ToString("N2")"
+                                                data-date="@item.IncomeDate.ToString("dd MMM yyyy")" title="Delete">
+                                            <i data-lucide="trash-2" style="width:13px;height:13px"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
+
+                idx++;
             }
         }
     </div>
+
+    <div class="no-match" id="noMatch">
+        <span style="font-size:1.4rem;display:inline-block;line-height:1;margin-bottom:8px;">⌕</span><br/>
+        No income match your search.
+    </div>
 </div>
 
+<!-- Delete Modal -->
 <div class="modal fade del-modal" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width:400px">
         <div class="modal-content">
             <div class="modal-body p-5 text-center">
-                <div class="del-modal-icon"><i data-lucide="alert-triangle" style="width:28px;height:28px"></i></div>
+                <div class="del-modal-icon"><span style="font-size:1.4rem;line-height:1;">⚠</span></div>
                 <h4 class="fw-800 text-main-adaptive mb-2" style="font-size:1.15rem">Delete Income?</h4>
-                <p class="text-muted mb-4" style="font-size:0.88rem">Delete this income of <strong id="deleteTargetAmount" style="color:var(--accent)"></strong> from <span id="deleteTargetDate" class="fw-bold text-main-adaptive"></span>?</p>
+                <p class="text-muted mb-4" style="font-size:0.88rem">Delete <strong id="deleteTargetAmount" class="text-danger"></strong> from <span id="deleteTargetDate" class="fw-bold text-main-adaptive"></span>?</p>
                 <div class="d-flex gap-3 justify-content-center">
                     <button type="button" class="modal-btn-cancel flex-grow-1" data-bs-dismiss="modal">Cancel</button>
                     <a id="confirmDeleteBtn" href="#" class="modal-btn-del flex-grow-1 text-decoration-none text-center">Delete</a>
@@ -168,13 +683,156 @@
 @section Scripts {
     <script>
         $(function() {
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
+
             $('.delete-trigger').on('click', function() {
-                const id = $(this).data('id');
+                var id = $(this).data('id');
                 $('#deleteTargetAmount').text('₹' + $(this).data('amount'));
                 $('#deleteTargetDate').text($(this).data('date'));
                 $('#confirmDeleteBtn').attr('href', `/Income/Delete/${id}`);
                 new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+            });
+
+            // Sorting controls
+            $('#sortField, #sortOrder').on('change', function() {
+                sortPage();
+            });
+
+            function sortPage() {
+                var field = $('#sortField').val();
+                var order = $('#sortOrder').val();
+                // Sort categories
+                var container = $('#categoryList');
+                var sections = container.children('.cat-section').get();
+                sections.sort(function(a, b) {
+                    var aVal, bVal;
+                    if (field === 'Category') {
+                        aVal = $(a).data('category');
+                        bVal = $(b).data('category');
+                    } else if (field === 'Date') {
+                        aVal = parseFloat($(a).data('latest'));
+                        bVal = parseFloat($(b).data('latest'));
+                    } else if (field === 'Amount') {
+                        aVal = parseFloat($(a).data('total'));
+                        bVal = parseFloat($(b).data('total'));
+                    }
+                    if (aVal === bVal) return 0;
+                    if (order === 'Desc') return (aVal < bVal) ? 1 : -1;
+                    else return (aVal > bVal) ? 1 : -1;
+                });
+                $.each(sections, function(idx, sec) { container.append(sec); });
+                // Sort incomes within each category
+                sections.forEach(function(sec) {
+                    var body = $(sec).find('.cat-body-inner');
+                    var rows = body.children('.inc-row').get();
+                    rows.sort(function(a, b) {
+                        var aVal, bVal;
+                        if (field === 'Date') {
+                            aVal = parseFloat($(a).data('date'));
+                            bVal = parseFloat($(b).data('date'));
+                        } else if (field === 'Amount') {
+                            aVal = parseFloat($(a).data('amount'));
+                            bVal = parseFloat($(b).data('amount'));
+                        } else {
+                            // Fallback to Date Descending if sorted by Category
+                            var ad = parseFloat($(a).data('date'));
+                            var bd = parseFloat($(b).data('date'));
+                            if (ad === bd) return 0;
+                            return (ad < bd) ? 1 : -1;
+                        }
+                        
+                        if (aVal === bVal) {
+                            var ad = parseFloat($(a).data('date'));
+                            var bd = parseFloat($(b).data('date'));
+                            if (ad === bd) return 0;
+                            return (ad < bd) ? 1 : -1; // Fallback to date desc
+                        }
+                        if (order === 'Desc') return (aVal < bVal) ? 1 : -1;
+                        else return (aVal > bVal) ? 1 : -1;
+                    });
+                    $.each(rows, function(i, row) { body.append(row); });
+                });
+            }
+
+            // Search functionality
+            document.getElementById('searchInput')?.addEventListener('input', function() {
+                var q = this.value.toLowerCase().trim();
+                var sections = document.querySelectorAll('.cat-section');
+                var anyVisible = false;
+
+                sections.forEach(function(sec) {
+                    var catName = sec.getAttribute('data-category') || '';
+                    var rows = sec.querySelectorAll('.inc-row');
+                    var sectionHasMatch = false;
+
+                    if (!q) {
+                        sec.style.display = '';
+                        rows.forEach(function(r) { r.style.display = ''; });
+                        anyVisible = true;
+                        return;
+                    }
+
+                    rows.forEach(function(row) {
+                        var desc = row.getAttribute('data-desc') || '';
+                        var amt = row.getAttribute('data-amount') || '';
+                        var rowCat = row.getAttribute('data-cat') || '';
+                        if (desc.includes(q) || amt.includes(q) || rowCat.includes(q)) {
+                            row.style.display = '';
+                            sectionHasMatch = true;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    // Also check category name match
+                    if (catName.includes(q)) sectionHasMatch = true;
+
+                    if (sectionHasMatch) {
+                        sec.style.display = '';
+                        anyVisible = true;
+                    } else {
+                        sec.style.display = 'none';
+                    }
+                });
+
+                var noMatch = document.getElementById('noMatch');
+                if (noMatch) {
+                    if (!anyVisible && q) { noMatch.classList.add('show'); }
+                    else { noMatch.classList.remove('show'); }
+                }
+            });
+
+            document.getElementById('clearSearchBtn')?.addEventListener('click', function() {
+                var input = document.getElementById('searchInput');
+                if (!input) return;
+                input.value = '';
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.focus();
+            });
+        });
+
+        // Category toggle functionality
+        function toggleCategory(id) {
+            var body = document.getElementById(id);
+            var section = body.closest('.cat-section');
+            var header = section.querySelector('.cat-header');
+            var isOpen = body.classList.contains('open');
+            if (isOpen) {
+                header.classList.remove('active');
+                body.style.height = body.scrollHeight + 'px';
+                requestAnimationFrame(function () { body.style.height = '0px'; });
+                body.classList.remove('open');
+            } else {
+                body.classList.add('open');
+                header.classList.add('active');
+                body.style.height = body.scrollHeight + 'px';
+            }
+        }
+
+        document.querySelectorAll('.cat-body').forEach(function (body) {
+            body.addEventListener('transitionend', function (e) {
+                if (e.propertyName !== 'height') return;
+                if (body.classList.contains('open')) { body.style.height = 'auto'; }
             });
         });
     </script>

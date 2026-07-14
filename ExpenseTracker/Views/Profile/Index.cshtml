@@ -105,15 +105,15 @@
                 <div class="hero-stats">
                     <div class="hero-stat">
                         <div class="hero-stat-label">Total Balance</div>
-                        <div class="hero-stat-value">@Model.TotalBalance.ToString("C")</div>
+                        <div class="hero-stat-value">@Model.TotalBalance.ToString("C", new System.Globalization.CultureInfo("en-IN"))</div>
                     </div>
                     <div class="hero-stat">
                         <div class="hero-stat-label">Total Income</div>
-                        <div class="hero-stat-value">@Model.TotalIncome.ToString("C")</div>
+                        <div class="hero-stat-value">@Model.TotalIncome.ToString("C", new System.Globalization.CultureInfo("en-IN"))</div>
                     </div>
                     <div class="hero-stat">
                         <div class="hero-stat-label">Total Expenses</div>
-                        <div class="hero-stat-value">@Model.TotalExpense.ToString("C")</div>
+                        <div class="hero-stat-value">@Model.TotalExpense.ToString("C", new System.Globalization.CultureInfo("en-IN"))</div>
                     </div>
                     <div class="hero-stat">
                         <div class="hero-stat-label">Member Since</div>
