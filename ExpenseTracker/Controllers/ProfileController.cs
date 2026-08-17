@@ -49,7 +49,10 @@ namespace ExpenseTracker.Controllers
                 AutomationCount = _context.RecurringTransactions.Count(r => r.UserId == userId),
                 TotalBalance = _context.Accounts.Where(a => a.UserId == userId).Sum(a => (decimal?)a.CurrentBalance) ?? 0,
                 TotalIncome = _context.Incomes.Where(i => i.UserId == userId).Sum(i => (decimal?)i.Amount) ?? 0,
-                TotalExpense = _context.Expenses.Where(e => e.UserId == userId).Sum(e => (decimal?)e.Amount) ?? 0,
+                TotalExpense = _context.Expenses
+                    .Include(e => e.Category)
+                    .Where(e => e.UserId == userId && e.Category.Name != "To Cash")
+                    .Sum(e => (decimal?)e.Amount) ?? 0,
                 RecentAccounts = _context.Accounts
                     .Where(a => a.UserId == userId)
                     .OrderByDescending(a => a.CreatedOn)

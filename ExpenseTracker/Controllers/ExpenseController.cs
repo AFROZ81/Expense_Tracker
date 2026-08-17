@@ -90,7 +90,7 @@ namespace ExpenseTracker.Controllers
                 {
                     expense.UserId = userId;
                     _context.Expenses.Add(expense);
-                    
+
                     // Update Account Balance (deduct from selected account)
                     var account = _context.Accounts.Find(expense.AccountId);
                     if (account != null)
@@ -165,7 +165,9 @@ namespace ExpenseTracker.Controllers
                 using var transaction = _context.Database.BeginTransaction();
                 try
                 {
-                    var oldExpense = _context.Expenses.AsNoTracking().FirstOrDefault(e => e.Id == expense.Id && e.UserId == UserId);
+                    var oldExpense = _context.Expenses.AsNoTracking()
+                        .Include(e => e.Category)
+                        .FirstOrDefault(e => e.Id == expense.Id && e.UserId == UserId);
                     if (oldExpense == null) return NotFound();
 
                     // Revert old balance
@@ -176,12 +178,48 @@ namespace ExpenseTracker.Controllers
                         _context.Accounts.Update(oldAccount);
                     }
 
+                    // Revert old cash account if old category was "To Cash"
+                    if (oldExpense.Category?.Name == "To Cash")
+                    {
+                        var oldCashAccount = _context.Accounts.FirstOrDefault(a => a.Type == AccountType.Cash && a.UserId == UserId);
+                        if (oldCashAccount != null)
+                        {
+                            oldCashAccount.CurrentBalance -= oldExpense.Amount;
+                            _context.Accounts.Update(oldCashAccount);
+                        }
+                    }
+
                     // Apply new balance
                     var newAccount = _context.Accounts.FirstOrDefault(a => a.Id == expense.AccountId && a.UserId == UserId);
                     if (newAccount != null)
                     {
                         newAccount.CurrentBalance -= expense.Amount;
                         _context.Accounts.Update(newAccount);
+                    }
+
+                    // Apply new cash account if new category is "To Cash"
+                    var newCategory = _context.Categories.Find(expense.CategoryId);
+                    if (newCategory != null && newCategory.Name == "To Cash")
+                    {
+                        var cashAccount = _context.Accounts.FirstOrDefault(a => a.Type == AccountType.Cash && a.UserId == UserId);
+                        if (cashAccount == null)
+                        {
+                            cashAccount = new Account
+                            {
+                                Name = "Cash",
+                                Type = AccountType.Cash,
+                                InitialBalance = expense.Amount,
+                                CurrentBalance = expense.Amount,
+                                UserId = UserId,
+                                IsActive = true
+                            };
+                            _context.Accounts.Add(cashAccount);
+                        }
+                        else
+                        {
+                            cashAccount.CurrentBalance += expense.Amount;
+                            _context.Accounts.Update(cashAccount);
+                        }
                     }
 
                     expense.UserId = UserId;
@@ -209,7 +247,9 @@ namespace ExpenseTracker.Controllers
         public IActionResult Delete(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var expense = _context.Expenses.FirstOrDefault(e => e.Id == id && e.UserId == userId);
+            var expense = _context.Expenses
+                .Include(e => e.Category)
+                .FirstOrDefault(e => e.Id == id && e.UserId == userId);
             if (expense == null) return NotFound();
 
             using var transaction = _context.Database.BeginTransaction();
@@ -221,6 +261,17 @@ namespace ExpenseTracker.Controllers
                 {
                     account.CurrentBalance += expense.Amount;
                     _context.Accounts.Update(account);
+                }
+
+                // Revert cash account if category was "To Cash"
+                if (expense.Category?.Name == "To Cash")
+                {
+                    var cashAccount = _context.Accounts.FirstOrDefault(a => a.Type == AccountType.Cash && a.UserId == userId);
+                    if (cashAccount != null)
+                    {
+                        cashAccount.CurrentBalance -= expense.Amount;
+                        _context.Accounts.Update(cashAccount);
+                    }
                 }
 
                 _context.Expenses.Remove(expense);
@@ -248,7 +299,8 @@ namespace ExpenseTracker.Controllers
                 .Where(e =>
                     e.ExpenseDate.Month == selectedMonth &&
                     e.ExpenseDate.Year == selectedYear &&
-                    e.UserId == userId)
+                    e.UserId == userId &&
+                    e.Category.Name != "To Cash")
                 .GroupBy(e => e.Category.Name)
                 .Select(g => new MonthlySummaryViewModel
                 {
@@ -270,23 +322,29 @@ namespace ExpenseTracker.Controllers
 
             var now = DateTime.Now;
 
-            // Expenses logic
+            // Expenses logic (exclude "To Cash" category as it's just an account-to-cash transfer)
             var thisMonthExpense = _context.Expenses
+                .Include(e => e.Category)
                 .Where(e => e.ExpenseDate.Month == now.Month &&
                             e.ExpenseDate.Year == now.Year &&
-                            e.UserId == userId)
+                            e.UserId == userId &&
+                            e.Category.Name != "To Cash")
                 .Sum(e => (decimal?)e.Amount) ?? 0;
 
             var lastMonthDate = now.AddMonths(-1);
 
             var lastMonthExpense = _context.Expenses
+                .Include(e => e.Category)
                 .Where(e => e.ExpenseDate.Month == lastMonthDate.Month &&
                             e.ExpenseDate.Year == lastMonthDate.Year &&
-                            e.UserId == userId)
+                            e.UserId == userId &&
+                            e.Category.Name != "To Cash")
                 .Sum(e => (decimal?)e.Amount) ?? 0;
 
             var totalExpense = _context.Expenses
-                .Where(e => e.UserId == userId)
+                .Include(e => e.Category)
+                .Where(e => e.UserId == userId &&
+                            e.Category.Name != "To Cash")
                 .Sum(e => (decimal?)e.Amount) ?? 0;
 
             // Income logic
@@ -302,7 +360,8 @@ namespace ExpenseTracker.Controllers
 
             var categorySummary = _context.Expenses
                 .Include(e => e.Category)
-                .Where(e => e.UserId == userId)
+                .Where(e => e.UserId == userId &&
+                            e.Category.Name != "To Cash")
                 .GroupBy(e => e.Category.Name)
                 .Select(g => new MonthlySummaryViewModel
                 {
@@ -314,17 +373,19 @@ namespace ExpenseTracker.Controllers
             // Budget logic for current month
             var budgetSummary = _context.Budgets
                 .Include(b => b.Category)
-                .Where(b => b.Month == now.Month && b.Year == now.Year && b.UserId == userId)
+                .Where(b => b.Month == now.Month && b.Year == now.Year && b.UserId == userId && b.Category.Name != "To Cash")
                 .ToList()
                 .Select(b => new BudgetStatusViewModel
                 {
                     CategoryName = b.Category?.Name ?? "Unknown",
                     BudgetAmount = b.Amount,
                     ActualSpent = _context.Expenses
-                        .Where(e => e.CategoryId == b.CategoryId && 
-                                    e.ExpenseDate.Month == now.Month && 
+                        .Include(e => e.Category)
+                        .Where(e => e.CategoryId == b.CategoryId &&
+                                    e.ExpenseDate.Month == now.Month &&
                                     e.ExpenseDate.Year == now.Year &&
-                                    e.UserId == userId)
+                                    e.UserId == userId &&
+                                    e.Category.Name != "To Cash")
                         .Sum(e => (decimal?)e.Amount) ?? 0
                 })
                 .ToList();
@@ -351,7 +412,8 @@ namespace ExpenseTracker.Controllers
             // PIE CHART (Category-wise)
             var categoryData = _context.Expenses
                 .Include(e => e.Category)
-                .Where(e => e.UserId == userId)
+                .Where(e => e.UserId == userId &&
+                            e.Category.Name != "To Cash")
                 .GroupBy(e => e.Category.Name)
                 .Select(g => new
                 {
@@ -368,7 +430,9 @@ namespace ExpenseTracker.Controllers
 
             // BAR CHART (Monthly)
             var monthlyData = _context.Expenses
-                .Where(e => e.UserId == userId)
+                .Include(e => e.Category)
+                .Where(e => e.UserId == userId &&
+                            e.Category.Name != "To Cash")
                 .GroupBy(e => new { e.ExpenseDate.Year, e.ExpenseDate.Month })
                 .Select(g => new
                 {
