@@ -9,34 +9,25 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
     <title>@ViewData["Title"] — Smart Personal Finance Tracker</title>
     <link rel="icon" type="image/x-icon" href="~/favicon1.ico" asp-append-version="true"/>
+    <meta name="theme-color" content="#eef2f8"/>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/themes.css" asp-append-version="true"/>
     <script>
-        (function(){var t=localStorage.getItem('theme')||'light';if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.documentElement.setAttribute('data-bs-theme','dark');}else{document.documentElement.removeAttribute('data-theme');document.documentElement.setAttribute('data-bs-theme','light');}})();
+        (function(){  // mirrors wwwroot/js/themes.js registry — keep in sync
+            var P={daylight:{f:'light',c:'#eef2f8'},midnight:{f:'dark',c:'#0a101d'},parchment:{f:'light',c:'#f6f1e7'},onyx:{f:'dark',c:'#000000'}};
+            var L={dark:'midnight',light:'daylight'};var s=null;try{s=localStorage.getItem('theme');}catch(e){}
+            var id=(s&&(P[s]||L[s]))?(P[s]?s:L[s]):(matchMedia&&matchMedia('(prefers-contrast: more)').matches?'onyx':(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'midnight':'daylight'));
+            var m=P[id],r=document.documentElement;r.setAttribute('data-theme',id);r.setAttribute('data-bs-theme',m.f);r.classList.add(m.f);
+            var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.setAttribute('content',m.c);
+        })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --bg-main:#f4f8fa;--bg-soft:#eaf1f5;--text-primary:#0f172a;--text-muted:#475569;
-            --line:rgba(15,23,42,0.08);--card-bg:rgba(255,255,255,0.85);
-            --brand-a:#0ea5e9;--brand-b:#10b981;--brand-c:#059669;
-            --brand-gradient:linear-gradient(135deg,#0ea5e9 0%,#10b981 100%);
-            --brand-gradient-hover:linear-gradient(135deg,#0284c7 0%,#059669 100%);
-            --money-grid:rgba(15,23,42,0.04);--money-wave:rgba(14,165,233,0.08);--money-wave-2:rgba(16,185,129,0.06);
-            --glow-a:rgba(14,165,233,0.15);--glow-b:rgba(16,185,129,0.12);--glow-c:rgba(5,150,105,0.1);
-            --topbar-bg:rgba(244,248,250,0.75);
-            --success:#10b981;--danger:#ef4444;--warning:#f59e0b;--info:#0ea5e9;
-        }
-        [data-theme="dark"] {
-            --bg-main:#070d19;--bg-soft:#0e1726;--text-primary:#f1f5f9;--text-muted:#94a3b8;
-            --line:rgba(255,255,255,0.08);--card-bg:rgba(13,23,42,0.7);
-            --money-grid:rgba(255,255,255,0.03);--money-wave:rgba(14,165,233,0.12);--money-wave-2:rgba(16,185,129,0.1);
-            --glow-a:rgba(14,165,233,0.2);--glow-b:rgba(16,185,129,0.16);--glow-c:rgba(5,150,105,0.15);
-            --topbar-bg:rgba(7,13,25,0.7);
-            --success:#34d399;--danger:#f87171;--warning:#fbbf24;--info:#38bdf8;
-        }
+        
+        
         *{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
         body{font-family:'Manrope',system-ui,sans-serif;color:var(--text-primary);background:var(--bg-main);overflow-x:hidden;line-height:1.6;transition:background-color .3s,color .3s}
@@ -56,7 +47,7 @@
 
         /* ── Glass Card ── */
         .glass{background:var(--card-bg);border:1px solid var(--line);border-radius:20px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 10px 40px -10px rgba(0,0,0,0.06);transition:all .3s}
-        [data-theme="dark"] .glass{box-shadow:0 10px 40px -10px rgba(0,0,0,0.3)}
+        .dark .glass{box-shadow:0 10px 40px -10px rgba(0,0,0,0.3)}
 
         /* ── Topbar ── */
         .topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;transition:all .35s;padding:16px 0}
@@ -71,8 +62,6 @@
         .nav-link::after{content:'';position:absolute;width:0;height:2px;bottom:-5px;left:0;background:var(--brand-a);transition:width .3s}
         .nav-link:hover::after{width:100%}
         .top-actions{display:flex;align-items:center;gap:8px}
-        .theme-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card-bg);color:var(--text-primary);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s}
-        .theme-btn:hover{transform:rotate(15deg) scale(1.05);background:var(--bg-soft)}
         .btn-auth{border-radius:9px;padding:8px 16px;font-weight:700;font-size:.82rem;display:inline-flex;align-items:center;justify-content:center;transition:all .25s;cursor:pointer;border:none}
         .btn-signin{color:var(--text-primary);border:1px solid var(--line);background:var(--card-bg)}
         .btn-signin:hover{background:var(--bg-soft);transform:translateY(-1px)}
@@ -82,7 +71,7 @@
         /* ── Hero ── */
         .hero{position:relative;z-index:10;padding:150px 0 70px;text-align:center}
         .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px 6px 10px;border-radius:99px;background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);color:var(--brand-a);font-size:.78rem;font-weight:700;margin-bottom:24px;animation:pulse 2.5s infinite}
-        [data-theme="dark"] .hero-badge{background:rgba(14,165,233,0.15)}
+        .dark .hero-badge{background:rgba(14,165,233,0.15)}
         @@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(14,165,233,0.35)}70%{box-shadow:0 0 0 8px rgba(14,165,233,0)}100%{box-shadow:0 0 0 0 rgba(14,165,233,0)}}
         .hero-title{font-size:clamp(2.4rem,5.5vw,4.2rem);font-weight:900;line-height:1.08;letter-spacing:-0.04em;max-width:20ch;margin:0 auto 18px;color:var(--text-primary)}
         .text-grad{background:var(--brand-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -97,7 +86,7 @@
         /* ── Dashboard Preview ── */
         .dash-preview{max-width:960px;margin:48px auto 0;border-radius:20px;overflow:hidden;position:relative;box-shadow:0 25px 60px -12px rgba(0,0,0,0.12);background:var(--bg-soft);border:1px solid var(--line);transition:transform .4s ease,box-shadow .4s ease}
         .dash-preview:hover{transform:translateY(-4px);box-shadow:0 35px 70px -8px rgba(0,0,0,0.18)}
-        [data-theme="dark"] .dash-preview{box-shadow:0 25px 70px -12px rgba(0,0,0,0.5);background:#0d1525}
+        .dark .dash-preview{box-shadow:0 25px 70px -12px rgba(0,0,0,0.5);background:#0d1525}
         .dash-head{background:var(--card-bg);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
         .dots{display:flex;gap:4px}
         .dot{width:9px;height:9px;border-radius:50%}
@@ -154,7 +143,7 @@
         .bento{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
         .bento-card{padding:28px;transition:all .3s;position:relative;overflow:hidden}
         .bento-card:hover{transform:translateY(-4px);border-color:rgba(14,165,233,0.3);box-shadow:0 18px 40px -8px rgba(0,0,0,0.08)}
-        [data-theme="dark"] .bento-card:hover{box-shadow:0 18px 40px -8px rgba(0,0,0,0.3)}
+        .dark .bento-card:hover{box-shadow:0 18px 40px -8px rgba(0,0,0,0.3)}
         .bento-card.span{grid-column:1 / -1}
         .bento-card .icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
         .bento-card .icon.sky{background:rgba(14,165,233,0.1);color:var(--brand-a)}
@@ -181,7 +170,7 @@
 
         /* ── CTA ── */
         .cta-box{text-align:center;padding:64px 36px;border-radius:28px;background:linear-gradient(135deg,rgba(14,165,233,0.06),rgba(16,185,129,0.04));border:1px solid var(--line);position:relative;overflow:hidden}
-        [data-theme="dark"] .cta-box{background:linear-gradient(135deg,rgba(14,165,233,0.12),rgba(16,185,129,0.08))}
+        .dark .cta-box{background:linear-gradient(135deg,rgba(14,165,233,0.12),rgba(16,185,129,0.08))}
         .cta-box h2{font-size:clamp(1.7rem,3.8vw,2.6rem);font-weight:900;letter-spacing:-0.035em;margin-bottom:10px;color:var(--text-primary)}
         .cta-box p{font-size:1rem;color:var(--text-muted);max-width:52ch;margin:0 auto 28px}
 
@@ -211,7 +200,6 @@
             .brand{font-size:1rem;gap:7px}
             .brand-mark{width:30px;height:30px;border-radius:8px}
             .btn-signup{padding:7px 14px;font-size:.78rem}
-            .theme-btn{width:34px;height:34px}
 
             .hero{padding:120px 0 50px}
             .hero-title{font-size:clamp(2rem,8vw,2.8rem)}
@@ -283,9 +271,7 @@
                 ExpenseTracker
             </a>
             <div class="top-actions">
-                <button id="themeToggle" class="theme-btn" type="button" aria-label="Toggle theme">
-                    <span id="themeGlyph"><i data-lucide="moon" style="width:16px;height:16px"></i></span>
-                </button>
+                <div class="theme-swatches" data-theme-swatches></div>
             </div>
         </div>
     </header>
@@ -461,15 +447,10 @@
         </div>
     </footer>
 
+    <script src="~/js/themes.js" asp-append-version="true"></script>
     <script>
         lucide.createIcons();
         window.addEventListener('scroll',function(){document.getElementById('mainHeader').classList.toggle('scrolled',window.scrollY>20);});
-        (function(){
-            const h=document.documentElement,b=document.getElementById('themeToggle'),g=document.getElementById('themeGlyph');
-            const apply=(t)=>{if(t==='dark'){h.setAttribute('data-theme','dark');h.setAttribute('data-bs-theme','dark');g.innerHTML='<i data-lucide="sun" style="width:16px;height:16px"></i>';}else{h.removeAttribute('data-theme');h.setAttribute('data-bs-theme','light');g.innerHTML='<i data-lucide="moon" style="width:16px;height:16px"></i>';}localStorage.setItem('theme',t);lucide.createIcons();};
-            apply(localStorage.getItem('theme')||'light');
-            b.addEventListener('click',function(){apply(h.getAttribute('data-theme')==='dark'?'light':'dark');});
-        })();
         function switchTab(id){
             document.querySelectorAll('.dash-tab').forEach(b=>b.classList.remove('active'));
             document.querySelectorAll('.dash-view').forEach(v=>v.classList.remove('active'));

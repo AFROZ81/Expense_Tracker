@@ -6,7 +6,7 @@
 }
 
 <style>
-    :root { --accent:#0ea5e9; --accent-hover:#0284c7; --accent-soft:rgba(14,165,233,0.08); --success:#10b981; --success-soft:rgba(16,185,129,0.08); --warning:#f59e0b; --warning-soft:rgba(245,158,11,0.08); --danger:#ef4444; --danger-soft:rgba(239,68,68,0.08); }
+    
     .bud-page { animation:pageIn 0.45s ease-out; }
     @@keyframes pageIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
     @@keyframes cardIn { from{opacity:0;transform:translateY(10px) scale(0.98)} to{opacity:1;transform:translateY(0) scale(1)} }
@@ -33,9 +33,9 @@
     .bud-status-chip.good { background:var(--success-soft); color:var(--success); }
     .bud-status-chip.warn { background:var(--warning-soft); color:var(--warning); }
     .bud-status-chip.over { background:var(--danger-soft); color:var(--danger); }
-    [data-theme="dark"] .bud-status-chip.good { background:rgba(34,197,94,0.15); color:#4ade80; }
-    [data-theme="dark"] .bud-status-chip.warn { background:rgba(245,158,11,0.15); color:#fbbf24; }
-    [data-theme="dark"] .bud-status-chip.over { background:rgba(239,68,68,0.15); color:#f87171; }
+    .dark .bud-status-chip.good { background:rgba(34,197,94,0.15); color:#4ade80; }
+    .dark .bud-status-chip.warn { background:rgba(245,158,11,0.15); color:#fbbf24; }
+    .dark .bud-status-chip.over { background:rgba(239,68,68,0.15); color:#f87171; }
 
     /* Progress */
     .bud-progress { margin-bottom:14px; }

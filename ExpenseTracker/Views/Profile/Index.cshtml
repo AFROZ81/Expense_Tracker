@@ -7,7 +7,7 @@
 }
 
 <style>
-    :root { --accent: #0ea5e9; --accent2: #10b981; --accent-soft: rgba(14,165,233,.10); --accent2-soft: rgba(16,185,129,.10); }
+    
     .profile-page { animation: pageIn .42s ease-out; }
     @@keyframes pageIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     .profile-shell { max-width: 900px; margin: 0 auto; }
@@ -49,18 +49,23 @@
     .settings-item i { width: 22px; height: 22px; color: var(--muted); }
     .settings-item:hover i { color: var(--accent); }
     
-    /* Theme Toggle Switch */
-    .toggle-wrapper { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 16px; color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: all 0.2s ease; border: 1px solid transparent; }
-    .toggle-wrapper:hover { background: var(--bg); border-color: var(--border); color: var(--accent); }
-    .toggle-wrapper:hover i { color: var(--accent); }
-    .toggle-left { display: flex; align-items: center; gap: 12px; }
-    .toggle-left i { width: 22px; height: 22px; color: var(--muted); }
-    .switch { position: relative; display: inline-block; width: 52px; height: 28px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .3s; border-radius: 28px; }
-    .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
-    input:checked + .slider { background: linear-gradient(135deg, #0ea5e9, #10b981); }
-    input:checked + .slider:before { transform: translateX(24px); }
+    /* Theme picker (built by themes.js into #themePicker) */
+    .theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .theme-option { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); cursor: pointer; text-align: left; font: inherit; transition: all 0.18s ease; }
+    .theme-option:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .theme-option[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+    .theme-swatch { position: relative; width: 44px; height: 30px; border-radius: 8px; flex-shrink: 0; border: 1px solid var(--border); background: var(--sw-a); overflow: hidden; }
+    .theme-swatch::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 9px; background: var(--sw-b); }
+    .theme-swatch::after { content: ''; position: absolute; left: 6px; right: 12px; top: 14px; height: 3px; border-radius: 2px; background: color-mix(in oklab, var(--sw-b) 55%, transparent); box-shadow: 0 6px 0 color-mix(in oklab, var(--sw-b) 28%, transparent); }
+    .theme-swatch--auto { background: var(--bg); color: var(--accent); display: flex; align-items: center; justify-content: center; }
+    .theme-swatch--auto::before, .theme-swatch--auto::after { content: none; }
+    .theme-swatch--auto i, .theme-swatch--auto svg { width: 16px; height: 16px; }
+    .theme-option-body { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+    .theme-option-label { font-size: 0.92rem; font-weight: 800; }
+    .theme-option-blurb { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
+    .theme-check { opacity: 0; color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; transition: opacity 0.15s ease; }
+    .theme-option[aria-checked="true"] .theme-check { opacity: 1; }
+    .theme-option--system { grid-column: 1 / -1; }
 
     @@media (max-width: 767.98px) {
         .profile-topbar { margin-bottom: 18px; }
@@ -74,6 +79,7 @@
         .hero-stat-value { font-size: 1.1rem; }
         .panel { padding: 20px; border-radius: 20px; }
         .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .theme-grid { grid-template-columns: 1fr; }
     }
 </style>
 
@@ -195,25 +201,29 @@
                     <i data-lucide="key"></i>
                     Change Password
                 </a>
-                <div class="toggle-wrapper">
-                    <div class="toggle-left">
-                        <i data-lucide="sun-moon"></i>
-                        Dark Mode
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="profileThemeToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
                 <a asp-controller="Home" asp-action="Privacy" asp-route-source="profile" class="settings-item">
                     <i data-lucide="shield"></i>
                     Privacy & Security
                 </a>
             </div>
         </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">Appearance</h3>
+                    <p class="panel-subtitle">Choose the theme for ExpenseTracker</p>
+                </div>
+            </div>
+            <div id="themePicker"></div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    <script>₹(function(){ lucide.createIcons(); });</script>
+    <script>
+        $(function () {
+            lucide.createIcons();
+        });
+    </script>
 }

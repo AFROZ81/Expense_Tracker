@@ -1,0 +1,441 @@
+/* =====================================================
+   THEME SYSTEM — Token Layer
+   Single source of truth for all colours.
+   Themes: daylight (default), midnight, parchment, onyx.
+   Components must only consume --t-* / derived tokens.
+   Never hard-code a colour outside this file's theme blocks.
+===================================================== */
+
+/* ---------- Defaults: DAYLIGHT (light, cool, elevated) ----------
+   This block IS the daylight theme; other themes override deltas. */
+:root {
+    color-scheme: light;
+
+    /* Surfaces */
+    --t-canvas: #eef2f8;
+    --t-surface: #ffffff;
+    --t-surface-muted: #f3f6fb;
+
+    /* Ink ramp (explicit per theme; how far it fades is a theme axis) */
+    --t-ink: #0f172a;
+    --t-ink-soft: #334156;
+    --t-ink-muted: #55657a;
+    --t-ink-faint: #64748b;
+    --t-ink-ghost: #94a0b0;
+
+    /* Accent (brand hue constant; value tuned per theme) */
+    --t-accent: #0284c7;         /* icons, active states, small UI */
+    --t-accent-ink: #075985;     /* accent-coloured TEXT */
+    --t-accent-strong: #075985;  /* hover / pressed fills */
+    --t-accent-wash: #e8f2fa;    /* tinted fill */
+    --t-accent-line: rgba(2, 132, 199, 0.38);
+
+    /* Buttons */
+    --t-btn-primary-bg: linear-gradient(135deg, #075985 0%, #0c4a6e 100%);
+    --t-btn-primary-ink: #ffffff;
+    --t-btn-primary-glow: rgba(7, 89, 133, 0.30);
+
+    /* Status — explicit per theme, never derived */
+    --t-danger: #dc2626;         /* solid fill / icons */
+    --t-danger-ink: #b42318;     /* text */
+    --t-success: #12a158;
+    --t-success-ink: #067647;
+    --t-warning: #ea8a00;
+    --t-warning-ink: #b54708;
+    --t-info: #0284c7;
+    --t-info-ink: #075985;
+
+    /* Status washes — derived: ink ∝ surface, cannot collide */
+    --t-danger-wash: color-mix(in oklab, var(--t-danger) 11%, var(--t-surface));
+    --t-success-wash: color-mix(in oklab, var(--t-success) 11%, var(--t-surface));
+    --t-warning-wash: color-mix(in oklab, var(--t-warning) 13%, var(--t-surface));
+
+    /* Lines — derived from ink over surface: structurally always visible */
+    --line-strength: 15%;
+    --line-strong-strength: 43%;
+    --t-line: color-mix(in oklab, var(--t-ink) var(--line-strength), var(--t-surface-muted));
+    --t-line-strong: color-mix(in oklab, var(--t-ink) var(--line-strong-strength), var(--t-surface-muted));
+
+    /* Sidebar (dark chrome is the brand anchor; tinted per theme) */
+    --t-sidebar-bg: #0b1220;
+    --t-sidebar-line: rgba(255, 255, 255, 0.07);
+    --t-sidebar-ink: #f1f5f9;
+    --t-sidebar-ink-muted: #94a3b8;
+    --t-sidebar-hover: rgba(255, 255, 255, 0.05);
+    --t-sidebar-active-bg: rgba(56, 189, 248, 0.10);
+    --t-sidebar-accent: #7dd3fc;
+
+    /* Elevation */
+    --t-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --t-shadow-md: 0 4px 10px -2px rgba(15, 23, 42, 0.10), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
+    --t-shadow-lg: 0 14px 34px -8px rgba(15, 23, 42, 0.16), 0 4px 8px -4px rgba(15, 23, 42, 0.08);
+
+    /* Chrome */
+    --t-topbar-bg: rgba(255, 255, 255, 0.85);
+    --t-scrim: rgba(15, 23, 42, 0.50);
+    --t-scrollbar-thumb: color-mix(in oklab, var(--t-ink) 24%, transparent);
+    --t-focus-ring: 3px;
+    --t-glass-blur: 12px;
+}
+
+/* ---------- MIDNIGHT (dark, cool, soft elevation + glass) ---------- */
+[data-theme="midnight"] {
+    color-scheme: dark;
+
+    --t-canvas: #0a101d;
+    --t-surface: #121a2b;
+    --t-surface-muted: #1a2438;
+
+    --t-ink: #e8edf5;
+    --t-ink-soft: #b9c4d4;
+    --t-ink-muted: #8b99ad;
+    --t-ink-faint: #77869c;
+    --t-ink-ghost: #4d5a6e;
+
+    --t-accent: #38bdf8;
+    --t-accent-ink: #7dd3fc;
+    --t-accent-strong: #7dd3fc;
+    --t-accent-wash: #12283e;
+    --t-accent-line: rgba(56, 189, 248, 0.42);
+
+    --t-btn-primary-bg: linear-gradient(135deg, #0369a1 0%, #083c5c 100%);
+    --t-btn-primary-ink: #f6fbff;
+    --t-btn-primary-glow: rgba(2, 132, 199, 0.35);
+
+    --t-danger: #ef4444;
+    --t-danger-ink: #ff9797;
+    --t-success: #22c55e;
+    --t-success-ink: #7be4a8;
+    --t-warning: #f59e0b;
+    --t-warning-ink: #fcc44d;
+    --t-info: #38bdf8;
+    --t-info-ink: #7dd3fc;
+
+    --line-strength: 17%;
+    --line-strong-strength: 46%;
+
+    --t-sidebar-bg: #060b14;
+    --t-sidebar-line: rgba(255, 255, 255, 0.08);
+    --t-sidebar-accent: #7dd3fc;
+
+    --t-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+    --t-shadow-md: 0 4px 10px -2px rgba(0, 0, 0, 0.55), 0 2px 4px -2px rgba(0, 0, 0, 0.40);
+    --t-shadow-lg: 0 14px 34px -8px rgba(0, 0, 0, 0.60), 0 4px 8px -4px rgba(0, 0, 0, 0.45);
+
+    --t-topbar-bg: rgba(18, 26, 43, 0.85);
+    --t-scrim: rgba(2, 6, 14, 0.65);
+}
+
+/* ---------- PARCHMENT (light, warm sepia, flat reading mode) ---------- */
+[data-theme="parchment"] {
+    color-scheme: light;
+
+    --t-canvas: #f6f1e7;
+    --t-surface: #fdfaf2;
+    --t-surface-muted: #efe8d9;
+
+    --t-ink: #2a2113;
+    --t-ink-soft: #4d4230;
+    --t-ink-muted: #6f6349;
+    --t-ink-faint: #80725a;
+    --t-ink-ghost: #a5977b;
+
+    --t-accent: #076b9e;
+    --t-accent-ink: #075985;
+    --t-accent-strong: #064e75;
+    --t-accent-wash: #e2ecf5;
+    --t-accent-line: rgba(7, 107, 158, 0.40);
+
+    --t-btn-primary-bg: linear-gradient(135deg, #075985 0%, #074166 100%);
+    --t-btn-primary-ink: #ffffff;
+    --t-btn-primary-glow: rgba(7, 89, 133, 0.18);
+
+    --t-danger: #d92d20;
+    --t-danger-ink: #b42318;
+    --t-success: #0f8a54;
+    --t-success-ink: #067647;
+    --t-warning: #e8930c;
+    --t-warning-ink: #b54708;
+    --t-info: #076b9e;
+    --t-info-ink: #075985;
+
+    /* Warm shadows: tinted, gentle */
+    --t-shadow-sm: 0 1px 2px rgba(90, 62, 11, 0.07);
+    --t-shadow-md: 0 4px 10px -2px rgba(90, 62, 11, 0.10), 0 2px 4px -2px rgba(90, 62, 11, 0.06);
+    --t-shadow-lg: 0 14px 34px -8px rgba(90, 62, 11, 0.14), 0 4px 8px -4px rgba(90, 62, 11, 0.08);
+
+    --t-sidebar-bg: #221a0d;
+    --t-sidebar-line: rgba(255, 246, 224, 0.09);
+    --t-sidebar-ink: #fbf3e2;
+    --t-sidebar-ink-muted: #b3a488;
+    --t-sidebar-hover: rgba(255, 246, 224, 0.05);
+    --t-sidebar-active-bg: rgba(251, 191, 36, 0.12);
+    --t-sidebar-accent: #fcd34d;
+
+    --t-topbar-bg: rgba(253, 250, 242, 0.90);
+    --t-scrim: rgba(42, 30, 10, 0.45);
+}
+
+/* ---------- ONYX (high contrast, AAA, flat, hard borders) ---------- */
+[data-theme="onyx"] {
+    color-scheme: dark;
+
+    --t-canvas: #000000;
+    --t-surface: #0a0a0a;
+    --t-surface-muted: #161616;
+
+    --t-ink: #ffffff;
+    --t-ink-soft: #e6e6e6;
+    --t-ink-muted: #d4d4d4;   /* ≥7:1 — every step passes AAA on --t-surface */
+    --t-ink-faint: #c8c8c8;
+    --t-ink-ghost: #b8b8b8;
+
+    --t-accent: #38bdf8;
+    --t-accent-ink: #7dd3fc;  /* 11.9:1 on surface */
+    --t-accent-strong: #7dd3fc;
+    --t-accent-wash: #072438;
+    --t-accent-line: #7dd3fc; /* hard edges, not translucent glows */
+
+    --t-btn-primary-bg: #38bdf8;
+    --t-btn-primary-ink: #001220;
+    --t-btn-primary-glow: transparent;
+
+    --t-danger: #ff5555;      /* 4.6:1 as fill-adjacent; text uses -ink */
+    --t-danger-ink: #ffa1a1;
+    --t-success: #3cf09a;
+    --t-success-ink: #3cf09a; /* 12.9:1 */
+    --t-warning: #ffd166;
+    --t-warning-ink: #ffd166;
+    --t-info: #7dd3fc;
+    --t-info-ink: #7dd3fc;
+
+    --line-strength: 62%;     /* hard, unmistakable borders */
+    --line-strong-strength: 100%;
+
+    --t-sidebar-bg: #000000;
+    --t-sidebar-line: #ffffff;
+    --t-sidebar-ink: #ffffff;
+    --t-sidebar-ink-muted: #d4d4d4;
+    --t-sidebar-hover: rgba(255, 255, 255, 0.12);
+    --t-sidebar-active-bg: rgba(125, 211, 252, 0.18);
+    --t-sidebar-accent: #7dd3fc;
+
+    --t-shadow-sm: none;
+    --t-shadow-md: none;
+    --t-shadow-lg: none;
+
+    --t-topbar-bg: #0a0a0a;   /* opaque, no glass */
+    --t-scrim: rgba(0, 0, 0, 0.85);
+    --t-focus-ring: 4px;      /* widened focus indicator */
+    --t-glass-blur: 0px;
+
+    /* Status washes: kept faint so text contrast is untouched */
+    --t-danger-wash: #2b0f0f;
+    --t-success-wash: #062415;
+    --t-warning-wash: #2b1c06;
+}
+
+/* Onyx: strip elevation and blur globally (unlayered beats utilities).
+   Essential edges already use real borders via --t-line-strong. */
+[data-theme="onyx"] *,
+[data-theme="onyx"] *::before,
+[data-theme="onyx"] *::after {
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    text-shadow: none !important;
+}
+
+/* ---------- Legacy-value migration ----------
+   Old system stored only 'dark' — it maps straight onto the midnight id,
+   so existing users keep their choice with no code path. 'light' unset
+   already falls through to the daylight default. */
+
+/* =====================================================
+   BRAND CONSTANTS
+   The brand hue is deliberately the SAME across every
+   theme (playbook: a theme is a surface scheme, not an
+   accent). Used only for decorative fills/gradients.
+===================================================== */
+:root {
+    --brand-a: #0ea5e9;
+    --brand-b: #10b981;
+    --brand-c: #6366f1;
+    --brand-gradient: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+    --brand-gradient-hover: linear-gradient(135deg, #0284c7 0%, #059669 100%);
+    --glow-a: rgba(14, 165, 233, 0.30);
+    --glow-b: rgba(16, 185, 129, 0.28);
+    --glow-c: rgba(99, 102, 241, 0.24);
+    --money-grid: rgba(148, 163, 184, 0.16);
+    --money-wave: rgba(14, 165, 233, 0.10);
+    --money-wave-2: rgba(16, 185, 129, 0.08);
+}
+
+/* =====================================================
+   COMPATIBILITY / SEMANTIC ALIAS LAYER
+   Every colour a view/component asks for by its legacy
+   name resolves through here to a --t-* token, so the
+   whole app re-themes from the token layer alone.
+   Components must NEVER re-declare these with raw hex.
+===================================================== */
+:root {
+    /* Text / ink */
+    --text-main: var(--t-ink);
+    --text-primary: var(--t-ink);
+    --row-text-strong: var(--t-ink);
+    --muted: var(--t-ink-muted);
+    --text-muted: var(--t-ink-muted);
+    --row-text-muted: var(--t-ink-muted);
+    --ink-soft: var(--t-ink-soft);
+    --ink-faint: var(--t-ink-faint);
+
+    /* Surfaces */
+    --card: var(--t-surface);
+    --card-bg: var(--t-surface);
+    --card-surface: var(--t-surface);
+    --bg: var(--t-canvas);
+    --bg-main: var(--t-canvas);
+    --bg-soft: var(--t-surface-muted);
+    --row-surface: var(--t-surface-muted);
+
+    /* Lines */
+    --border: var(--t-line);
+    --line: var(--t-line);
+    --card-border-soft: var(--t-line);
+    --row-border-soft: var(--t-line);
+    --border-strong: var(--t-line-strong);
+
+    /* Accent */
+    --accent: var(--t-accent);
+    --accent-hover: var(--t-accent-strong);
+    --accent-soft: var(--t-accent-wash);
+    --accent-line: var(--t-accent-line);
+    --accent2: var(--brand-b);
+    --indigo-color: var(--t-accent);
+    --indigo-light: var(--t-accent-wash);
+    --card-glow: var(--t-accent-line);
+    --primary: var(--t-accent);
+    --primary-hover: var(--t-accent-strong);
+
+    /* Status */
+    --danger: var(--t-danger);
+    --danger-ink: var(--t-danger-ink);
+    --danger-soft: var(--t-danger-wash);
+    --success: var(--t-success);
+    --success-ink: var(--t-success-ink);
+    --success-soft: var(--t-success-wash);
+    --warning: var(--t-warning);
+    --warning-ink: var(--t-warning-ink);
+    --warning-soft: var(--t-warning-wash);
+    --info: var(--t-info);
+    --info-ink: var(--t-info-ink);
+
+    /* Layout chrome */
+    --body-bg: var(--t-canvas);
+    --topbar-bg: var(--t-topbar-bg);
+    --topbar-border: var(--t-line);
+    --sidebar-bg: var(--t-sidebar-bg);
+    --sidebar-text: var(--t-sidebar-ink-muted);
+    --sidebar-text-bright: var(--t-sidebar-ink);
+    --sidebar-accent: var(--t-sidebar-accent);
+    --sidebar-hover: var(--t-sidebar-hover);
+
+    /* Elevation */
+    --shadow-sm: var(--t-shadow-sm);
+    --shadow-md: var(--t-shadow-md);
+    --shadow-lg: var(--t-shadow-lg);
+
+    /* Geometry (non-colour, theme-independent) */
+    --radius-card: 16px;
+    --radius-btn: 10px;
+    --radius-input: 12px;
+    --topbar-h: 64px;
+    --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+
+/* =====================================================
+   SHARED THEME SWITCHER (icon → horizontal expand/collapse)
+   Used on the standalone auth / hero pages, which load
+   themes.css but not layout.css. themes.js builds a palette
+   icon + a panel of swatches into [data-theme-swatches];
+   clicking the icon expands the row horizontally (leftward),
+   clicking a swatch or outside collapses it.
+===================================================== */
+.theme-switcher { display: inline-flex; align-items: center; }
+.theme-switcher__trigger {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+.theme-switcher__trigger:hover { transform: scale(1.06); background: var(--bg-soft); }
+.theme-switcher__trigger svg { width: 18px; height: 18px; }
+.theme-switcher__panel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0;
+    border-radius: 999px;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: max-width 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.22s ease,
+                padding 0.32s ease, margin 0.32s ease, background 0.32s ease, border-color 0.32s ease;
+}
+.theme-switcher.open .theme-switcher__panel {
+    max-width: 260px;
+    opacity: 1;
+    padding: 6px;
+    margin-right: 8px;
+    background: var(--card-bg);
+    border-color: var(--line);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+.theme-swatches__dot {
+    position: relative;
+    width: 30px;
+    height: 22px;
+    padding: 0;
+    flex-shrink: 0;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--sw-a);
+    overflow: hidden;
+    cursor: pointer;
+    display: block;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.theme-swatches__dot::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 7px;
+    background: var(--sw-b);
+}
+.theme-swatches__dot::after {
+    content: ''; position: absolute; left: 4px; right: 9px; top: 11px; height: 2px; border-radius: 2px;
+    background: color-mix(in oklab, var(--sw-b) 55%, transparent);
+    box-shadow: 0 4px 0 color-mix(in oklab, var(--sw-b) 28%, transparent);
+}
+.theme-swatches__dot:hover { transform: translateY(-1px); }
+.theme-swatches__dot[aria-pressed="true"] {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--card-bg), 0 0 0 3px var(--accent);
+}
+.theme-swatches__auto {
+    background: var(--bg-soft);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.theme-swatches__auto::before, .theme-swatches__auto::after { content: none; }
+.theme-swatches__auto svg { width: 13px; height: 13px; }
+.theme-swatches__auto[aria-pressed="true"] { color: var(--accent); }

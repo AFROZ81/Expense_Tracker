@@ -12,34 +12,25 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
     <title>@ViewData["Title"] — ExpenseTracker</title>
     <link rel="icon" type="image/x-icon" href="~/favicon1.ico" asp-append-version="true"/>
+    <meta name="theme-color" content="#eef2f8"/>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/themes.css" asp-append-version="true"/>
     <script>
-        (function(){var t=localStorage.getItem('theme')||'light';if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.documentElement.setAttribute('data-bs-theme','dark');}else{document.documentElement.removeAttribute('data-theme');document.documentElement.setAttribute('data-bs-theme','light');}})();
+        (function(){  // mirrors wwwroot/js/themes.js registry — keep in sync
+            var P={daylight:{f:'light',c:'#eef2f8'},midnight:{f:'dark',c:'#0a101d'},parchment:{f:'light',c:'#f6f1e7'},onyx:{f:'dark',c:'#000000'}};
+            var L={dark:'midnight',light:'daylight'};var s=null;try{s=localStorage.getItem('theme');}catch(e){}
+            var id=(s&&(P[s]||L[s]))?(P[s]?s:L[s]):(matchMedia&&matchMedia('(prefers-contrast: more)').matches?'onyx':(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'midnight':'daylight'));
+            var m=P[id],r=document.documentElement;r.setAttribute('data-theme',id);r.setAttribute('data-bs-theme',m.f);r.classList.add(m.f);
+            var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.setAttribute('content',m.c);
+        })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --bg-main:#f4f8fa;--bg-soft:#eaf1f5;--text-primary:#0f172a;--text-muted:#475569;
-            --line:rgba(15,23,42,0.08);--card-bg:rgba(255,255,255,0.85);
-            --brand-a:#0ea5e9;--brand-b:#10b981;--brand-c:#059669;
-            --brand-gradient:linear-gradient(135deg,#0ea5e9 0%,#10b981 100%);
-            --brand-gradient-hover:linear-gradient(135deg,#0284c7 0%,#059669 100%);
-            --money-grid:rgba(15,23,42,0.04);--money-wave:rgba(14,165,233,0.08);--money-wave-2:rgba(16,185,129,0.06);
-            --glow-a:rgba(14,165,233,0.15);--glow-b:rgba(16,185,129,0.12);--glow-c:rgba(5,150,105,0.1);
-            --topbar-bg:rgba(244,248,250,0.75);
-            --success:#10b981;--danger:#ef4444;--warning:#f59e0b;--info:#0ea5e9;
-        }
-        [data-theme="dark"] {
-            --bg-main:#070d19;--bg-soft:#0e1726;--text-primary:#f1f5f9;--text-muted:#94a3b8;
-            --line:rgba(255,255,255,0.08);--card-bg:rgba(13,23,42,0.7);
-            --money-grid:rgba(255,255,255,0.03);--money-wave:rgba(14,165,233,0.12);--money-wave-2:rgba(16,185,129,0.1);
-            --glow-a:rgba(14,165,233,0.2);--glow-b:rgba(16,185,129,0.16);--glow-c:rgba(5,150,105,0.15);
-            --topbar-bg:rgba(7,13,25,0.7);
-            --success:#34d399;--danger:#f87171;--warning:#fbbf24;--info:#38bdf8;
-        }
+        
+        
         *{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
         body{font-family:'Manrope',system-ui,sans-serif;color:var(--text-primary);background:var(--bg-main);overflow-x:hidden;line-height:1.6;transition:background-color .3s,color .3s}
@@ -65,8 +56,6 @@
         .brand-mark{width:34px;height:34px;border-radius:9px;background:var(--brand-gradient);box-shadow:0 5px 14px rgba(14,165,233,0.25);display:inline-flex;align-items:center;justify-content:center;color:white;transition:transform .3s}
         .brand:hover .brand-mark{transform:scale(1.06) rotate(4deg)}
         .top-actions{display:flex;align-items:center;gap:8px}
-        .theme-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card-bg);color:var(--text-primary);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s}
-        .theme-btn:hover{transform:rotate(15deg) scale(1.05);background:var(--bg-soft)}
         .back-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card-bg);color:var(--text-primary);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s}
         .back-btn:hover{transform:scale(1.05);background:var(--bg-soft);color:var(--brand-a)}
 
@@ -77,7 +66,7 @@
         .priv-header h1{font-size:1.6rem;font-weight:900;color:var(--text-primary);margin:0 0 8px;letter-spacing:-0.03em}
         .priv-header p{font-size:.9rem;color:var(--text-muted);margin:0;line-height:1.6}
         .priv-card{background:var(--card-bg);border:1px solid var(--line);border-radius:20px;padding:28px 32px;box-shadow:0 10px 40px -10px rgba(0,0,0,0.06);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-        [data-theme="dark"] .priv-card{box-shadow:0 10px 40px -10px rgba(0,0,0,0.3)}
+        .dark .priv-card{box-shadow:0 10px 40px -10px rgba(0,0,0,0.3)}
         .priv-card h3{font-size:1rem;font-weight:800;color:var(--text-primary);margin:0 0 10px;display:flex;align-items:center;gap:10px}
         .priv-card p{font-size:.88rem;color:var(--text-muted);line-height:1.7;margin:0 0 20px}
         .priv-card p:last-child{margin-bottom:0}
@@ -101,7 +90,7 @@
             .top-actions{gap:6px}
             .brand{font-size:1rem;gap:7px}
             .brand-mark{width:30px;height:30px;border-radius:8px}
-            .theme-btn,.back-btn{width:34px;height:34px}
+            .back-btn{width:34px;height:34px}
             .priv-page{padding:100px 16px 40px}
             .priv-header h1{font-size:1.3rem}
             .priv-card{padding:20px 18px;border-radius:16px}
@@ -135,9 +124,7 @@
                 <a href="@backUrl" class="back-btn" title="@backText" aria-label="@backText">
                     <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
                 </a>
-                <button id="themeToggle" class="theme-btn" type="button" aria-label="Toggle theme">
-                    <span id="themeGlyph"><i data-lucide="moon" style="width:16px;height:16px"></i></span>
-                </button>
+                <div class="theme-swatches" data-theme-swatches></div>
             </div>
         </div>
     </header>
@@ -185,15 +172,10 @@
         </div>
     </footer>
 
+    <script src="~/js/themes.js" asp-append-version="true"></script>
     <script>
         lucide.createIcons();
         window.addEventListener('scroll',function(){document.getElementById('mainHeader').classList.toggle('scrolled',window.scrollY>20);});
-        (function(){
-            const h=document.documentElement,b=document.getElementById('themeToggle'),g=document.getElementById('themeGlyph');
-            const apply=(t)=>{if(t==='dark'){h.setAttribute('data-theme','dark');h.setAttribute('data-bs-theme','dark');g.innerHTML='<i data-lucide="sun" style="width:16px;height:16px"></i>';}else{h.removeAttribute('data-theme');h.setAttribute('data-bs-theme','light');g.innerHTML='<i data-lucide="moon" style="width:16px;height:16px"></i>';}localStorage.setItem('theme',t);lucide.createIcons();};
-            apply(localStorage.getItem('theme')||'light');
-            b.addEventListener('click',function(){apply(h.getAttribute('data-theme')==='dark'?'light':'dark');});
-        })();
     </script>
 </body>
 </html>

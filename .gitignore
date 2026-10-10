@@ -364,3 +364,8 @@ FodyWeavers.xsd
 
 # App configuration containing secrets
 ExpenseTracker/appsettings.json
+
+Essentials
+
+# VS Code workspace settings
+.vscode/

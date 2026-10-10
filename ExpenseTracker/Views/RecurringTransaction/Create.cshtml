@@ -5,7 +5,7 @@
 }
 
 <style>
-    :root { --accent:#0ea5e9; --accent-hover:#0284c7; --accent-soft:rgba(14,165,233,0.08); --success:#10b981; --success-soft:rgba(16,185,129,0.08); --danger:#ef4444; --danger-soft:rgba(239,68,68,0.08); }
+    
     .form-page { animation:slideIn 0.45s ease-out; }
     @@keyframes slideIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
 
@@ -23,8 +23,8 @@
     .type-pill:hover { border-color:rgba(14,165,233,0.3); }
     .type-pill.active.expense { border-color:rgba(239,68,68,0.35); background:var(--danger-soft); color:var(--danger); }
     .type-pill.active.income { border-color:rgba(16,185,129,0.35); background:var(--success-soft); color:var(--success); }
-    [data-theme="dark"] .type-pill.active.expense { color:#f87171; }
-    [data-theme="dark"] .type-pill.active.income { color:#4ade80; }
+    .dark .type-pill.active.expense { color:#f87171; }
+    .dark .type-pill.active.income { color:#4ade80; }
 
     .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
     .field-group { margin-bottom:20px; }

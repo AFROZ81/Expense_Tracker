@@ -22,7 +22,7 @@ namespace ExpenseTracker.Controllers
             _recurringService = recurringService;
         }
 
-        private ExpenseSetupViewModel GetExpensePrerequisites(string userId)
+        private ExpenseSetupViewModel GetExpensePrerequisites(string? userId)
         {
             var hasAccounts = _context.Accounts.Any(a => a.IsActive && a.UserId == userId);
             var hasCategories = _context.Categories.Any(c => c.IsActive && c.UserId == userId && c.Name != "To Cash");

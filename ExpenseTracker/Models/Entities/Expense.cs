@@ -12,7 +12,7 @@ namespace ExpenseTracker.Models.Entities
         public int CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
-        public Category? Category { get; set; }
+        public Category Category { get; set; } = null!;
 
         [Required]
         [Column(TypeName = "decimal(10,2)")]

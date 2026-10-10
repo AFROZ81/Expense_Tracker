@@ -12,51 +12,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create Account - ExpenseTracker</title>
     <link rel="icon" type="image/x-icon" href="~/favicon1.ico" asp-append-version="true" />
+    <meta name="theme-color" content="#eef2f8" />
+    <script>
+        (function () {  // mirrors wwwroot/js/themes.js registry — keep in sync
+            var P = { daylight:{f:'light',c:'#eef2f8'}, midnight:{f:'dark',c:'#0a101d'}, parchment:{f:'light',c:'#f6f1e7'}, onyx:{f:'dark',c:'#000000'} };
+            var L = { dark:'midnight', light:'daylight' }; var s=null;
+            try { s = localStorage.getItem('theme'); } catch (e) {}
+            var id = (s && (P[s] || L[s])) ? (P[s] ? s : L[s])
+                : (matchMedia && matchMedia('(prefers-contrast: more)').matches ? 'onyx'
+                  : (matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'midnight' : 'daylight'));
+            var m = P[id], r = document.documentElement;
+            r.setAttribute('data-theme', id); r.setAttribute('data-bs-theme', m.f); r.classList.add(m.f);
+            var mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute('content', m.c);
+        })();
+    </script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/themes.css" asp-append-version="true" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        :root {
-            --bg-main: #f4f8fa;
-            --bg-soft: #eaf1f5;
-            --text-primary: #0f172a;
-            --text-muted: #475569;
-            --line: rgba(15, 23, 42, 0.08);
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --brand-a: #0ea5e9;
-            --brand-b: #10b981;
-            --brand-c: #059669;
-            --brand-gradient: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
-            --brand-gradient-hover: linear-gradient(135deg, #0284c7 0%, #059669 100%);
-            --money-grid: rgba(15, 23, 42, 0.04);
-            --money-wave: rgba(14, 165, 233, 0.08);
-            --money-wave-2: rgba(16, 185, 129, 0.06);
-            --glow-a: rgba(14, 165, 233, 0.15);
-            --glow-b: rgba(16, 185, 129, 0.12);
-            --glow-c: rgba(99, 102, 241, 0.1);
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-        }
+        
 
-        [data-theme="dark"] {
-            --bg-main: #070d19;
-            --bg-soft: #0e1726;
-            --text-primary: #f1f5f9;
-            --text-muted: #94a3b8;
-            --line: rgba(255, 255, 255, 0.08);
-            --card-bg: rgba(13, 23, 42, 0.7);
-            --money-grid: rgba(255, 255, 255, 0.03);
-            --money-wave: rgba(14, 165, 233, 0.12);
-            --money-wave-2: rgba(16, 185, 129, 0.1);
-            --glow-a: rgba(14, 165, 233, 0.2);
-            --glow-b: rgba(16, 185, 129, 0.16);
-            --glow-c: rgba(99, 102, 241, 0.15);
-            --success: #34d399;
-            --danger: #f87171;
-            --warning: #fbbf24;
-        }
+        
 
         * {
             box-sizing: border-box;
@@ -150,7 +128,7 @@
             transition: all 0.3s ease;
         }
 
-        [data-theme="dark"] .auth-wrapper {
+        .dark .auth-wrapper {
             box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.5);
         }
 
@@ -444,27 +422,11 @@
             cursor: pointer;
         }
 
-        .theme-float-btn {
+        .theme-float-swatches {
             position: absolute;
             top: 20px;
             right: 20px;
             z-index: 120;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 1px solid var(--line);
-            background: var(--card-bg);
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .theme-float-btn:hover {
-            transform: scale(1.05);
-            background: var(--bg-soft);
         }
 
         /* Password Strength Meter */
@@ -544,10 +506,8 @@
         <div class="bg-glow-b"></div>
     </div>
 
-    <!-- Floating Theme Swapper -->
-    <button class="theme-float-btn" id="themeToggle" type="button" aria-label="Toggle theme">
-        <span id="themeGlyph"><i data-lucide="moon" style="width: 16px; height: 16px;"></i></span>
-    </button>
+    <!-- Floating Theme Switcher -->
+    <div class="theme-float-swatches" data-theme-swatches></div>
 
     <!-- Master Switchable Card - Default right-panel-active for Register Page -->
     <div class="auth-wrapper right-panel-active" id="authWrapper">
@@ -686,6 +646,7 @@
     </div>
 
     <!-- Controls & Animation script -->
+    <script src="~/js/themes.js" asp-append-version="true"></script>
     <script>
         lucide.createIcons();
 
@@ -757,35 +718,6 @@
                 strengthText.classList.add('text-strong');
             }
         }
-
-        // Theme Toggle Synchronization
-        (function () {
-            const html = document.documentElement;
-            const toggleBtn = document.getElementById('themeToggle');
-            const glyph = document.getElementById('themeGlyph');
-
-            const applyTheme = (theme) => {
-                if (theme === 'dark') {
-                    html.setAttribute('data-theme', 'dark');
-                    html.setAttribute('data-bs-theme', 'dark');
-                    glyph.innerHTML = '<i data-lucide="sun" style="width: 16px; height: 16px;"></i>';
-                } else {
-                    html.removeAttribute('data-theme');
-                    html.setAttribute('data-bs-theme', 'light');
-                    glyph.innerHTML = '<i data-lucide="moon" style="width: 16px; height: 16px;"></i>';
-                }
-                localStorage.setItem('theme', theme);
-                lucide.createIcons();
-            };
-
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
-
-            toggleBtn.addEventListener('click', function () {
-                const currentTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-                applyTheme(currentTheme);
-            });
-        })();
     </script>
 </body>
 </html>
