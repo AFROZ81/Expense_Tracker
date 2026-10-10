@@ -37,7 +37,7 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     z-index: 1000;
     border-right: 1px solid var(--t-sidebar-line);
@@ -68,9 +68,9 @@ html.sidebar-expanded #sidebar { width: 264px; min-width: 264px; }
     color: var(--t-sidebar-ink);
     letter-spacing: -0.03em;
     opacity: 0; white-space: nowrap;
-    transition: opacity 0.25s ease; pointer-events: none;
+    transition: opacity 0.15s ease; pointer-events: none;
 }
-html.sidebar-expanded #sidebar .brand-name-text { opacity: 1; }
+html.sidebar-expanded #sidebar .brand-name-text { opacity: 1; transition: opacity 0.25s ease 0.1s; }
 
 .sidebar-main-content { flex: 1; padding: 16px 10px; overflow-y: auto; overflow-x: hidden; }
 .sidebar-main-content::-webkit-scrollbar { width: 3px; }
@@ -81,9 +81,9 @@ html.sidebar-expanded #sidebar .brand-name-text { opacity: 1; }
     font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.12em; color: var(--t-sidebar-ink-muted);
     margin-bottom: 8px; padding: 0 12px; white-space: nowrap;
-    opacity: 0; transition: opacity 0.25s ease;
+    opacity: 0; transition: opacity 0.15s ease;
 }
-html.sidebar-expanded #sidebar .section-heading { opacity: 1; }
+html.sidebar-expanded #sidebar .section-heading { opacity: 1; transition: opacity 0.25s ease 0.1s; }
 
 .nav-item-new {
     display: flex; align-items: center; height: 44px;
@@ -111,9 +111,9 @@ html.sidebar-expanded #sidebar .section-heading { opacity: 1; }
 .nav-item-new.active .nav-icon-box { color: var(--t-sidebar-accent); }
 .nav-label-text {
     font-size: 0.85rem; font-weight: 600;
-    opacity: 0; white-space: nowrap; transition: opacity 0.25s ease;
+    opacity: 0; white-space: nowrap; transition: opacity 0.15s ease;
 }
-html.sidebar-expanded #sidebar .nav-label-text { opacity: 1; }
+html.sidebar-expanded #sidebar .nav-label-text { opacity: 1; transition: opacity 0.25s ease 0.1s; }
 
 .sidebar-user-profile {
     padding: 12px 10px;

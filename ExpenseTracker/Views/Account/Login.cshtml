@@ -290,70 +290,6 @@
             color: var(--brand-a);
         }
 
-        .remember-toggle-row {
-            margin: 14px 0 4px;
-        }
-
-        .remember-toggle-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            user-select: none;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 0.01em;
-        }
-
-        .remember-toggle-input {
-            position: absolute;
-            opacity: 0;
-            width: 1px;
-            height: 1px;
-            pointer-events: none;
-        }
-
-        .remember-toggle-track {
-            width: 46px;
-            height: 26px;
-            border-radius: 999px;
-            background: color-mix(in srgb, var(--bg-soft) 72%, var(--line));
-            border: 1px solid var(--line);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
-            position: relative;
-            transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .remember-toggle-track::after {
-            content: "";
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #ffffff;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .remember-toggle-input:checked + .remember-toggle-track {
-            background: var(--brand-gradient);
-            border-color: transparent;
-            box-shadow: 0 8px 18px -8px rgba(14, 165, 233, 0.55);
-        }
-
-        .remember-toggle-input:checked + .remember-toggle-track::after {
-            transform: translateX(20px);
-            box-shadow: 0 3px 10px rgba(2, 132, 199, 0.32);
-        }
-
-        .remember-toggle-input:focus-visible + .remember-toggle-track {
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
-        }
-
         .btn-auth-action {
             background: var(--brand-gradient);
             color: white;
@@ -663,14 +599,6 @@
                             </button>
                         </div>
                         <span asp-validation-for="Password" class="text-danger small" style="font-size: 0.74rem;"></span>
-                    </div>
-
-                    <div class="remember-toggle-row">
-                        <label class="remember-toggle-label" for="chkRememberMe">
-                            <input asp-for="RememberMe" class="remember-toggle-input" type="checkbox" id="chkRememberMe" />
-                            <span class="remember-toggle-track" aria-hidden="true"></span>
-                            <span>Remember me</span>
-                        </label>
                     </div>
 
                     <button type="submit" class="btn-auth-action">

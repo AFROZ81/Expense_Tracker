@@ -115,49 +115,94 @@
     if (mqDark) { mqDark.addEventListener ? mqDark.addEventListener('change', onSystemChange) : mqDark.addListener(onSystemChange); }
     if (mqContrast) { mqContrast.addEventListener ? mqContrast.addEventListener('change', onSystemChange) : mqContrast.addListener(onSystemChange); }
 
-    /* ---------- Picker UI (built from the registry, mounted in Profile settings) ---------- */
-    function optionHtml(t, withCheck) {
-        return '<span class="theme-swatch" style="--sw-a:' + t.swatch[0] + ';--sw-b:' + t.swatch[1] + '"></span>' +
-            '<span class="theme-option-body">' +
-            '  <span class="theme-option-label">' + t.label + '</span>' +
-            '  <span class="theme-option-blurb">' + t.blurb + '</span>' +
-            '</span>' +
-            (withCheck ? '<i class="theme-check" data-lucide="check" aria-hidden="true"></i>' : '');
+    /* ---------- Picker UI (modern dropdown, built from the registry, mounted in Profile settings) ---------- */
+    function previewSwatch(t) {
+        return '<span class="theme-select__swatch" style="--sw-a:' + t.swatch[0] + ';--sw-b:' + t.swatch[1] + '"></span>';
+    }
+
+    function setOpen(el, open) {
+        el.classList.toggle('open', open);
+        var t = el.querySelector('.theme-select__trigger');
+        if (t) t.setAttribute('aria-expanded', String(open));
+    }
+    function closeAllSelects(except) {
+        document.querySelectorAll('.theme-select.open').forEach(function (el) {
+            if (el !== except) setOpen(el, false);
+        });
     }
 
     function buildPicker(container) {
         if (!container) return;
-        container.classList.add('theme-grid');
-        container.setAttribute('role', 'radiogroup');
-        container.setAttribute('aria-label', 'Colour theme');
+        container.classList.add('theme-select');
         container.innerHTML = '';
+
+        /* Trigger: shows the live preview of the active theme */
+        var trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'theme-select__trigger';
+        trigger.setAttribute('aria-haspopup', 'listbox');
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.innerHTML =
+            '<span class="theme-select__current">' +
+            '  <span class="theme-select__swatch-slot"></span>' +
+            '  <span class="theme-select__meta">' +
+            '    <span class="theme-select__label"></span>' +
+            '    <span class="theme-select__hint"></span>' +
+            '  </span>' +
+            '</span>' +
+            '<i data-lucide="chevron-down" class="theme-select__chev" aria-hidden="true"></i>';
+        trigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var open = !container.classList.contains('open');
+            closeAllSelects(container);
+            setOpen(container, open);
+        });
+        container.appendChild(trigger);
+
+        /* Menu: one rich option per theme + a system option */
+        var menu = document.createElement('div');
+        menu.className = 'theme-select__menu';
+        menu.setAttribute('role', 'listbox');
+        menu.setAttribute('aria-label', 'Colour theme');
 
         THEME_IDS.forEach(function (id) {
             var t = THEMES[id];
-            var b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'theme-option';
-            b.setAttribute('role', 'radio');
-            b.dataset.themeId = id;
-            b.innerHTML = optionHtml(t, true);
-            b.addEventListener('click', function () { select(id); });
-            container.appendChild(b);
+            var opt = document.createElement('button');
+            opt.type = 'button';
+            opt.className = 'theme-select__option';
+            opt.setAttribute('role', 'option');
+            opt.dataset.themeId = id;
+            opt.innerHTML =
+                previewSwatch(t) +
+                '<span class="theme-select__opt-body">' +
+                '  <span class="theme-select__opt-label">' + t.label + '</span>' +
+                '  <span class="theme-select__opt-blurb">' + t.blurb + '</span>' +
+                '</span>' +
+                '<i data-lucide="check" class="theme-select__check" aria-hidden="true"></i>';
+            opt.addEventListener('click', function () { select(id); setOpen(container, false); });
+            menu.appendChild(opt);
         });
+
+        var divider = document.createElement('div');
+        divider.className = 'theme-select__divider';
+        menu.appendChild(divider);
 
         var sys = document.createElement('button');
         sys.type = 'button';
-        sys.className = 'theme-option theme-option--system';
-        sys.setAttribute('role', 'radio');
+        sys.className = 'theme-select__option theme-select__option--system';
+        sys.setAttribute('role', 'option');
         sys.dataset.action = 'system';
         sys.innerHTML =
-            '<span class="theme-swatch theme-swatch--auto"><i data-lucide="monitor" aria-hidden="true"></i></span>' +
-            '<span class="theme-option-body">' +
-            '  <span class="theme-option-label">Use system setting</span>' +
-            '  <span class="theme-option-blurb">Follow my device automatically</span>' +
+            '<span class="theme-select__swatch theme-select__swatch--auto"><i data-lucide="monitor" aria-hidden="true"></i></span>' +
+            '<span class="theme-select__opt-body">' +
+            '  <span class="theme-select__opt-label">Use system setting</span>' +
+            '  <span class="theme-select__opt-blurb">Follow my device automatically</span>' +
             '</span>' +
-            '<i class="theme-check" data-lucide="check" aria-hidden="true"></i>';
-        sys.addEventListener('click', function () { useSystem(); });
-        container.appendChild(sys);
+            '<i data-lucide="check" class="theme-select__check" aria-hidden="true"></i>';
+        sys.addEventListener('click', function () { useSystem(); setOpen(container, false); });
+        menu.appendChild(sys);
+
+        container.appendChild(menu);
 
         syncPicker();
         if (window.lucide) lucide.createIcons();
@@ -166,12 +211,25 @@
     function syncPicker() {
         var active = currentId();
         var explicit = isExplicit();
-        document.querySelectorAll('.theme-option[data-theme-id]').forEach(function (el) {
-            var on = explicit && el.dataset.themeId === active;
-            el.setAttribute('aria-checked', String(on));
+        var t = THEMES[active] || THEMES.daylight;
+        document.querySelectorAll('.theme-select').forEach(function (sel) {
+            var slot = sel.querySelector('.theme-select__swatch-slot');
+            if (slot) slot.innerHTML = previewSwatch(t);
+            var label = sel.querySelector('.theme-select__label');
+            if (label) label.textContent = t.label;
+            var hint = sel.querySelector('.theme-select__hint');
+            if (hint) hint.textContent = explicit ? 'Current theme' : 'Following system';
         });
-        var sys = document.querySelector('.theme-option[data-action="system"]');
-        if (sys) sys.setAttribute('aria-checked', String(!explicit));
+        document.querySelectorAll('.theme-select__option[data-theme-id]').forEach(function (el) {
+            var on = explicit && el.dataset.themeId === active;
+            el.setAttribute('aria-selected', String(on));
+            el.classList.toggle('is-active', on);
+        });
+        var sys = document.querySelector('.theme-select__option[data-action="system"]');
+        if (sys) {
+            sys.setAttribute('aria-selected', String(!explicit));
+            sys.classList.toggle('is-active', !explicit);
+        }
     }
 
     /* ---------- Collapsible theme switcher (auth / hero pages) ---------- */
@@ -269,13 +327,14 @@
         driftGuard();
         buildPicker(document.getElementById('themePicker'));
         document.querySelectorAll('[data-theme-swatches]').forEach(buildSwatchRow);
-        // Collapse any open switcher on outside click / Escape.
+        // Collapse any open switcher / dropdown on outside click or Escape.
         document.addEventListener('click', function (e) {
-            if (e.target.closest && e.target.closest('.theme-switcher')) return;
-            closeAllSwitchers(null);
+            var inside = e.target.closest ? e.target.closest.bind(e.target) : null;
+            if (!inside || !inside('.theme-switcher')) closeAllSwitchers(null);
+            if (!inside || !inside('.theme-select')) closeAllSelects(null);
         });
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closeAllSwitchers(null);
+            if (e.key === 'Escape') { closeAllSwitchers(null); closeAllSelects(null); }
         });
         apply(currentId(), true); // reconcile Bootstrap attrs + meta (no first-paint fade)
     }
