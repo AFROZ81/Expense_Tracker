@@ -84,6 +84,7 @@
                 <div class="form-card-body">
                     <form asp-action="Edit" method="post">
                         <input type="hidden" asp-for="Id" />
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger small mb-3" })
 
                         <div class="field-row">
                             <div>

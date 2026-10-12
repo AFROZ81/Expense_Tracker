@@ -93,6 +93,7 @@
 
                 <div class="form-card-body">
                     <form asp-action="Create" method="post">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger small mb-3" })
                         <div class="field-row">
                             <div>
                                 <label asp-for="ExpenseDate" class="field-label">Transaction Date</label>

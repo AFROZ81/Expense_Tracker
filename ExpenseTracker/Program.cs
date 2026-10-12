@@ -7,7 +7,13 @@ using ExpenseTracker.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    // Entities use non-nullable navigation properties (e.g. Expense.Category) that are
+    // never posted from forms. Without this, model binding treats them as implicitly
+    // [Required] and every create/edit POST fails validation with a hidden error.
+    options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(

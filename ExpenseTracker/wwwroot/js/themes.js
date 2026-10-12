@@ -147,7 +147,6 @@
             '  <span class="theme-select__swatch-slot"></span>' +
             '  <span class="theme-select__meta">' +
             '    <span class="theme-select__label"></span>' +
-            '    <span class="theme-select__hint"></span>' +
             '  </span>' +
             '</span>' +
             '<i data-lucide="chevron-down" class="theme-select__chev" aria-hidden="true"></i>';
@@ -176,7 +175,6 @@
                 previewSwatch(t) +
                 '<span class="theme-select__opt-body">' +
                 '  <span class="theme-select__opt-label">' + t.label + '</span>' +
-                '  <span class="theme-select__opt-blurb">' + t.blurb + '</span>' +
                 '</span>' +
                 '<i data-lucide="check" class="theme-select__check" aria-hidden="true"></i>';
             opt.addEventListener('click', function () { select(id); setOpen(container, false); });
@@ -196,7 +194,6 @@
             '<span class="theme-select__swatch theme-select__swatch--auto"><i data-lucide="monitor" aria-hidden="true"></i></span>' +
             '<span class="theme-select__opt-body">' +
             '  <span class="theme-select__opt-label">Use system setting</span>' +
-            '  <span class="theme-select__opt-blurb">Follow my device automatically</span>' +
             '</span>' +
             '<i data-lucide="check" class="theme-select__check" aria-hidden="true"></i>';
         sys.addEventListener('click', function () { useSystem(); setOpen(container, false); });
@@ -217,8 +214,6 @@
             if (slot) slot.innerHTML = previewSwatch(t);
             var label = sel.querySelector('.theme-select__label');
             if (label) label.textContent = t.label;
-            var hint = sel.querySelector('.theme-select__hint');
-            if (hint) hint.textContent = explicit ? 'Current theme' : 'Following system';
         });
         document.querySelectorAll('.theme-select__option[data-theme-id]').forEach(function (el) {
             var on = explicit && el.dataset.themeId === active;

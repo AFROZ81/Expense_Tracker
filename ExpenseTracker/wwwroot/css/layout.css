@@ -285,11 +285,23 @@ html.sidebar-expanded .sidebar-edge-toggle .chev-right { display: none; }
 .mobile-bottom-nav { display: none; }
 
 @media (max-width: 991.98px) {
-    body { justify-content: flex-start; min-height: 100dvh; }
-    .app-container { flex-direction: column; }
+    /* Single scroller = the viewport.
+       body had overflow-y:auto, and .app-container / .main-wrapper paired
+       overflow-x:hidden with overflow-y:visible — which computes to auto —
+       so each became its own scroll container (the second, footer-only scroll).
+       Contain horizontal overflow at the root instead, and use dvh consistently
+       so nothing is forced taller than the visible screen. */
+    html { height: auto; overflow: visible; overflow-x: hidden; }
+    body {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+        justify-content: flex-start;
+    }
+    .app-container { flex-direction: column; min-height: 100dvh; overflow: visible; }
     #sidebar { display: none !important; }
     .main-wrapper {
-        width: 100%; overflow-y: visible; min-height: unset;
+        width: 100%; min-height: 0; overflow: visible;
         padding-bottom: calc(36px + env(safe-area-inset-bottom));
     }
     .modern-topbar { height: auto; min-height: 60px; padding: 12px 16px; }
